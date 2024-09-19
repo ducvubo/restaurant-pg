@@ -33,8 +33,8 @@ export function LoginForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      restaurant_email: '',
-      restaurant_password: ''
+      restaurant_email: 'Tressie12@hotmail.com',
+      restaurant_password: 'Duc17052003*'
     }
   })
   const dispatch = useDispatch()

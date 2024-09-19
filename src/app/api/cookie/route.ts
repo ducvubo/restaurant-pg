@@ -4,8 +4,8 @@ export async function POST(request: Request) {
   // await deleteCookiesAndRedirect()
 
   // Xóa cookie bằng cách thiết lập ngày hết hạn trong quá khứ
-  const accessCookie = `access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Strict`
-  const refreshCookie = `refresh_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Strict`
+  const accessCookie = `access_token_rtr=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Strict`
+  const refreshCookie = `refresh_token_rtr=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Strict`
 
   const responseHeaders = new Headers()
   responseHeaders.append('Set-Cookie', accessCookie)

@@ -5,17 +5,17 @@ export const sendRequest = async <T>(props: IRequest) => {
   let { url, method, body, queryParams = {}, useCredentials = false, headers = {}, nextOption = {} } = props
   let options: any
   const cookie = cookies()
-  const access_token = cookie.get('access_token')?.value
-  const refresh_token = cookie.get('refresh_token')?.value
-  const id_user_guest = cookie.get('id_user_guest')?.value
+  const access_token = cookie.get('access_token_rtr')?.value
+  const refresh_token = cookie.get('refresh_token_rtr')?.value
+  const id_user_guest = cookie.get('refresh_token_rtr')?.value
   if (access_token && refresh_token) {
     options = {
       method: method,
       // by default setting the content-type to be json type
       headers: new Headers({
         'content-type': 'application/json',
-        'x-at-tk': `Bearer ${access_token}`,
-        'x-rf-tk': `Bearer ${refresh_token}`,
+        'x-at-rtr': `Bearer ${access_token}`,
+        'x-rf-rtr': `Bearer ${refresh_token}`,
         id_user_guest: id_user_guest,
         ...headers
       }),

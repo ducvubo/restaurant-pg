@@ -1,101 +1,93 @@
-import {
-  Tag,
-  Users,
-  Settings,
-  Bookmark,
-  SquarePen,
-  LayoutGrid,
-  LucideIcon
-} from "lucide-react";
+import { Tag, Users, Settings, Bookmark, SquarePen, LayoutGrid, LucideIcon } from 'lucide-react'
 
 type Submenu = {
-  href: string;
-  label: string;
-  active: boolean;
-};
+  href: string
+  label: string
+  active: boolean
+}
 
 type Menu = {
-  href: string;
-  label: string;
-  active: boolean;
+  href: string
+  label: string
+  active: boolean
   icon: LucideIcon
-  submenus: Submenu[];
-};
+  submenus: Submenu[]
+}
 
 type Group = {
-  groupLabel: string;
-  menus: Menu[];
-};
+  groupLabel: string
+  menus: Menu[]
+}
 
 export function getMenuList(pathname: string): Group[] {
   return [
     {
-      groupLabel: "",
+      groupLabel: '',
       menus: [
         {
-          href: "/dashboard",
-          label: "Dashboard",
-          active: pathname.includes("/dashboard"),
+          href: '/dashboard',
+          label: 'Dashboard',
+          active: pathname.includes('/dashboard'),
           icon: LayoutGrid,
           submenus: []
         }
       ]
     },
     {
-      groupLabel: "Contents",
+      groupLabel: 'Quản lý',
       menus: [
         {
-          href: "",
-          label: "Posts",
-          active: pathname.includes("/posts"),
+          href: '',
+          label: 'Nhân viên',
+          active: pathname.includes('/employees'),
           icon: SquarePen,
           submenus: [
             {
-              href: "/posts",
-              label: "All Posts",
-              active: pathname === "/posts"
+              href: '/dashboard/employees/add',
+              label: 'Thêm nhân viên',
+              active: pathname === '/dashboard/employees/add'
             },
             {
-              href: "/posts/new",
-              label: "New Post",
-              active: pathname === "/posts/new"
+              href: '/dashboard/employees',
+              label: 'Danh sách nhân viên',
+              active: pathname === '/dashboard/employees'
             }
           ]
         },
         {
-          href: "/categories",
-          label: "Categories",
-          active: pathname.includes("/categories"),
+          href: '/categories',
+          label: 'Categories',
+          active: pathname.includes('/categories'),
           icon: Bookmark,
           submenus: []
         },
         {
-          href: "/tags",
-          label: "Tags",
-          active: pathname.includes("/tags"),
+          href: '/tags',
+          label: 'Tags',
+          active: pathname.includes('/tags'),
           icon: Tag,
           submenus: []
         }
       ]
     },
     {
-      groupLabel: "Settings",
+      groupLabel: 'Settings',
       menus: [
         {
-          href: "/users",
-          label: "Users",
-          active: pathname.includes("/users"),
+          href: '/users',
+          label: 'Users',
+          active: pathname.includes('/users'),
           icon: Users,
           submenus: []
         },
         {
-          href: "/account",
-          label: "Account",
-          active: pathname.includes("/account"),
+          href: '/account',
+          label: 'Account',
+          active: pathname.includes('/account'),
           icon: Settings,
           submenus: []
         }
       ]
     }
-  ];
+  ]
 }

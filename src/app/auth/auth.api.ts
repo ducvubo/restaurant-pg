@@ -116,7 +116,6 @@ export const reFreshTokenNew = async () => {
     }
   })
 
-  console.log(res)
 
   if (res.statusCode === 201 && res.data) {
     const data = await Promise.all([

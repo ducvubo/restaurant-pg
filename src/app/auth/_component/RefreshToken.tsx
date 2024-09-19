@@ -56,13 +56,12 @@ export default function RefreshToken() {
 
     // Nếu thời gian lần cuối làm mới dưới 10 phút, không thực hiện refresh nữa
     if (lastRefreshTime && currentTime - parseInt(lastRefreshTime, 10) < 1000 * 60 * 9) {
-      console.log('Token đã được làm mới gần đây, bỏ qua việc làm mới')
+      // console.log('Token đã được làm mới gần đây, bỏ qua việc làm mới')
       return
     }
 
     // Gọi API refresh token
     const res = await reFreshTokenNew()
-    console.log(res)
     if (res?.code === 0 && res.data) {
       runAppRestaurant(res.data)
       router.push('/dashboard')
