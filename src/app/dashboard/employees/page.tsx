@@ -2,7 +2,7 @@ import React, { Suspense } from 'react'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import LoadingServer from '@/components/LoadingServer'
 import ToastServer from '@/components/ToastServer'
-import { IEmployee } from '../employees.interface'
+import { IEmployee } from './employees.interface'
 import { getAllEmployees } from './employees.api'
 import { PageEmployees } from './_component/PageEmployees'
 import { ContentLayout } from '@/components/admin-panel/content-layout'
@@ -25,8 +25,6 @@ async function Component({ searchParams }: PageProps) {
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10'
   })
-
-  console.log("searchParams.page::::: ", searchParams.page)
 
   if (res.code === -10) {
     deleteCookiesAndRedirect()

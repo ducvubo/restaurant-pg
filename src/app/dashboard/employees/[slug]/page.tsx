@@ -1,5 +1,39 @@
+// import { ContentLayout } from '@/components/admin-panel/content-layout'
+// import PlaceholderContent from '@/components/demo/placeholder-content'
+// import {
+//   Breadcrumb,
+//   BreadcrumbItem,
+//   BreadcrumbLink,
+//   BreadcrumbList,
+//   BreadcrumbPage,
+//   BreadcrumbSeparator
+// } from '@/components/ui/breadcrumb'
+// import Link from 'next/link'
+// import React from 'react'
+// import AddOrEdit from '../_component/AddOrEdit'
+
+// export default function Add() {
+//   return (
+//     <ContentLayout title='Thêm nhân viên'>
+//       <Breadcrumb className='-mt-4'>
+//         <BreadcrumbList>
+//           <BreadcrumbItem>
+//             <BreadcrumbLink asChild>
+//               <Link href='/dashboard'>Dashboard</Link>
+//             </BreadcrumbLink>
+//           </BreadcrumbItem>
+//           <BreadcrumbSeparator />
+//           <BreadcrumbItem>
+//             <BreadcrumbPage>Thêm nhân viên</BreadcrumbPage>
+//           </BreadcrumbItem>
+//         </BreadcrumbList>
+//       </Breadcrumb>
+//       <AddOrEdit />
+//     </ContentLayout>
+//   )
+// }
+
 import { ContentLayout } from '@/components/admin-panel/content-layout'
-import PlaceholderContent from '@/components/demo/placeholder-content'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,11 +42,97 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
-import Link from 'next/link'
-import React from 'react'
+import React, { Suspense } from 'react'
+import LoadingServer from '@/components/LoadingServer'
 import AddOrEdit from '../_component/AddOrEdit'
+import { redirect } from 'next/navigation'
+import { deleteCookiesAndRedirect } from '@/app/actions/action'
+import Link from 'next/link'
+import dynamic from 'next/dynamic'
+import { IEmployee } from '../employees.interface'
+import { findOneEmployee } from '../employees.api'
+const ToastServer = dynamic(() => import('@/components/ToastServer'), {
+  ssr: false
+})
 
-export default function Add() {
+interface PageProps {
+  searchParams: { [key: string]: string }
+  params: { slug: string }
+}
+
+async function Component({ searchParams, params }: PageProps) {
+  const id = params.slug
+  if (id === 'add') {
+    return (
+      <ContentLayout title='Thêm nhân viên'>
+        <Breadcrumb className='-mt-4'>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href='/dashboard'>Dashboard</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Thêm nhân viên</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <AddOrEdit id='add' />
+      </ContentLayout>
+    )
+  }
+
+  // if (id === 'recycle') {
+  //   const res: IBackendRes<IModelPaginate<IRestaurant[]>> = await getAllRestaurantRecycle({
+  //     current: searchParams.page ? searchParams.page : '1',
+  //     pageSize: searchParams.size ? searchParams.size : '10'
+  //   })
+  //   if (res.code === -10) {
+  //     deleteCookiesAndRedirect()
+  //   }
+  //   if (res.code === -11) {
+  //     return <ToastServer message='Bạn không có quyền truy cập' />
+  //   }
+  //   if (!res || !res.data) {
+  //     return (
+  //       <>
+  //         <div>Error fetching data</div>
+  //       </>
+  //     )
+  //   }
+
+  //   const data = res.data.result.flat()
+  //   return <GetPageRestaurantRecycle data={data} meta={res.data.meta} />
+  // }
+
+  const res: IBackendRes<IEmployee> = await findOneEmployee({ _id: id })
+
+  if (res.statusCode === 404) {
+    return (
+      <ToastServer
+        message='Không tìm thấy nhân viên'
+        title='Lỗi'
+        variant='destructive'
+        route='/dashboard/employees?page=1&size=10'
+      />
+    )
+  }
+
+  if (res.code === -10) {
+    deleteCookiesAndRedirect()
+    // redirect('/login')
+  }
+  if (res.code === -11) {
+    return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+  }
+  if (!res || !res.data) {
+    return (
+      <>
+        <div>Error fetching data</div>
+      </>
+    )
+  }
   return (
     <ContentLayout title='Thêm nhân viên'>
       <Breadcrumb className='-mt-4'>
@@ -24,12 +144,27 @@ export default function Add() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Thêm nhân viên</BreadcrumbPage>
+            <BreadcrumbLink asChild>
+              <Link href='/dashboard/employees'>Danh sách nhân viên</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Chỉnh sửa thông tin nhân viên</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-
-      <AddOrEdit />
+      <AddOrEdit id={id} inforEmployee={res.data} />
     </ContentLayout>
+  )
+}
+
+export default function Page(props: PageProps) {
+  return (
+    <div>
+      <Suspense fallback={<LoadingServer />}>
+        <Component {...props} />
+      </Suspense>
+    </div>
   )
 }

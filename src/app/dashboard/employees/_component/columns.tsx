@@ -13,7 +13,8 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { DataTableColumnHeader } from '../../../../components/ColumnHeader'
-import { IEmployee } from '../../employees.interface'
+import { IEmployee } from '../employees.interface'
+import Link from 'next/link'
 // export type Payment = {
 //   id: string
 //   amount: number
@@ -49,10 +50,15 @@ export const columns: ColumnDef<IEmployee>[] = [
     enableHiding: true
   },
   {
+    accessorKey: 'epl_status',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
+    enableHiding: true
+  },
+  {
     accessorKey: 'Actions',
     id: 'actions',
     cell: ({ row }) => {
-      const payment = row.original
+      const employees = row.original
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -63,11 +69,13 @@ export const columns: ColumnDef<IEmployee>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment._id)}>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(employees._id)}>
               Copy payment ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
+            <Link href={`/dashboard/employees/${employees._id}`}>
+              <DropdownMenuItem>Sửa</DropdownMenuItem>
+            </Link>
             <DropdownMenuItem>View payment details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
