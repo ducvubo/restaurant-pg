@@ -48,7 +48,7 @@ export function getMenuList(pathname: string): Group[] {
               active: pathname === '/dashboard/employees/add'
             },
             {
-              href: '/dashboard/employees',
+              href: '/dashboard/employees?page=1&size=10',
               label: 'Danh sách nhân viên',
               active: pathname === '/dashboard/employees'
             }

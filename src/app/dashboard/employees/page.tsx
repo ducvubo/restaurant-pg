@@ -1,6 +1,11 @@
-import React from 'react'
+import React, { Suspense } from 'react'
+import { deleteCookiesAndRedirect } from '@/app/actions/action'
+import LoadingServer from '@/components/LoadingServer'
+import ToastServer from '@/components/ToastServer'
+import { IEmployee } from '../employees.interface'
+import { getAllEmployees } from './employees.api'
+import { PageEmployees } from './_component/PageEmployees'
 import { ContentLayout } from '@/components/admin-panel/content-layout'
-import PlaceholderContent from '@/components/demo/placeholder-content'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,25 +15,62 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 import Link from 'next/link'
-import AddOrEdit from './_component/AddOrEdit'
-import PageEmployees from './_component/PageEmployees'
-export default function Page() {
+import { columns } from './_component/Columns'
+interface PageProps {
+  searchParams: { [key: string]: string }
+}
+
+async function Component({ searchParams }: PageProps) {
+  const res: IBackendRes<IModelPaginate<IEmployee[]>> = await getAllEmployees({
+    current: searchParams.page ? searchParams.page : '1',
+    pageSize: searchParams.size ? searchParams.size : '10'
+  })
+
+  console.log("searchParams.page::::: ", searchParams.page)
+
+  if (res.code === -10) {
+    deleteCookiesAndRedirect()
+  }
+  if (res.code === -11) {
+    return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+  }
+  if (!res || !res.data) {
+    return (
+      <>
+        <div>Error fetching data</div>
+      </>
+    )
+  }
+  const data = res.data.result.flat()
+
   return (
-    <ContentLayout title='Thêm nhân viên'>
-      <Breadcrumb className='-mt-4'>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href='/dashboard'>Dashboard</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Danh sách nhân viên</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <PageEmployees />
-    </ContentLayout>
+    <div>
+      <ContentLayout title='Thêm nhân viên'>
+        <Breadcrumb className='-mt-4'>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href='/dashboard'>Dashboard</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Danh sách nhân viên</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <PageEmployees data={data} columns={columns} meta={res.data.meta} />
+      </ContentLayout>
+    </div>
+  )
+}
+
+export default function Page(props: PageProps) {
+  return (
+    <div>
+      <Suspense fallback={<LoadingServer />}>
+        <Component {...props} />
+      </Suspense>
+    </div>
   )
 }

@@ -12,58 +12,40 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { DataTableColumnHeader } from './ColumnHeader'
-export type Payment = {
-  id: string
-  amount: number
-  status: string
-  email: string
-}
+import { DataTableColumnHeader } from '../../../../components/ColumnHeader'
+import { IEmployee } from '../../employees.interface'
+// export type Payment = {
+//   id: string
+//   amount: number
+//   status: string
+//   email: string
+// }
 
-export const columns: ColumnDef<Payment>[] = [
-  // {
-  //   id: 'select',
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label='Select all'
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label='Select row'
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: true
-  // },
+export const columns: ColumnDef<IEmployee>[] = [
   {
-    accessorKey: 'status',
+    accessorKey: '_id',
     id: 'Trạng thái',
     // header: 'Status',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true
   },
   {
-    accessorKey: 'email',
+    accessorKey: 'epl_email',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Email' />,
     enableHiding: true
   },
   {
-    accessorKey: 'amount',
-    header: () => <div className='text-right'>Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount'))
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(amount)
+    accessorKey: 'epl_phone',
+    header: () => <div>Amount</div>,
+    // cell: ({ row }) => {
+    //   const amount = parseFloat(row.getValue('epl_phone'))
+    //   const formatted = new Intl.NumberFormat('en-US', {
+    //     style: 'currency',
+    //     currency: 'USD'
+    //   }).format(amount)
 
-      return <div className='text-right font-medium'>{formatted}</div>
-    },
+    //   return <div className='text-right font-medium'>{formatted}</div>
+    // },
     enableHiding: true
   },
   {
@@ -81,7 +63,7 @@ export const columns: ColumnDef<Payment>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment._id)}>
               Copy payment ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
