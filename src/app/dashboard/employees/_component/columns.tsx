@@ -1,5 +1,4 @@
 'use client'
-
 import { ColumnDef } from '@tanstack/react-table'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -12,53 +11,113 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { DataTableColumnHeader } from '../../../../components/ColumnHeader'
 import { IEmployee } from '../employees.interface'
 import Link from 'next/link'
-// export type Payment = {
-//   id: string
-//   amount: number
-//   status: string
-//   email: string
-// }
-
+import DeleteOrRestore from './DeleteOrRestore'
+import { DataTableColumnHeader } from '@/components/ColumnHeader'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { updateStatus } from '../employees.api'
+import { useLoading } from '@/context/LoadingContext'
+import { toast } from '@/hooks/use-toast'
+import { deleteCookiesAndRedirect } from '@/app/actions/action'
 export const columns: ColumnDef<IEmployee>[] = [
   {
-    accessorKey: '_id',
-    id: 'Trạng thái',
-    // header: 'Status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
-    enableHiding: true
-  },
-  {
     accessorKey: 'epl_email',
+    id: 'Email',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Email' />,
     enableHiding: true
   },
   {
+    accessorKey: 'epl_name',
+    id: 'Tên',
+    header: () => <div>Tên</div>,
+    enableHiding: true
+  },
+  {
     accessorKey: 'epl_phone',
-    header: () => <div>Amount</div>,
-    // cell: ({ row }) => {
-    //   const amount = parseFloat(row.getValue('epl_phone'))
-    //   const formatted = new Intl.NumberFormat('en-US', {
-    //     style: 'currency',
-    //     currency: 'USD'
-    //   }).format(amount)
-
-    //   return <div className='text-right font-medium'>{formatted}</div>
-    // },
+    id: 'Số điện thoại',
+    header: () => <div>Số điện thoại</div>,
+    enableHiding: true
+  },
+  {
+    accessorKey: 'epl_address',
+    id: 'Địa chỉ',
+    header: () => <div>Địa chỉ</div>,
+    enableHiding: true
+  },
+  {
+    accessorKey: 'epl_gender',
+    id: 'Giới tính',
+    header: () => <div>Giới tính</div>,
     enableHiding: true
   },
   {
     accessorKey: 'epl_status',
+    id: 'Trạng thái',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
-    enableHiding: true
+    enableHiding: true,
+    cell: ({ row }) => {
+      const router = useRouter()
+      const employee = row.original
+      const handleUpdateStatus = async () => {
+        const res = await updateStatus({
+          _id: employee._id,
+          epl_status: employee.epl_status === 'enable' ? 'disable' : 'enable'
+        })
+        if (res.statusCode === 200) {
+          toast({
+            title: 'Thành công',
+            description: 'Cập nhật trạng thái thành công',
+            variant: 'default'
+          })
+          router.refresh()
+        } else if (res.statusCode === 404) {
+          toast({
+            title: 'Thông báo',
+            description: 'Nhân viên không tồn tại, vui lòng thử lại sau',
+            variant: 'destructive'
+          })
+        } else if (res.code === -10) {
+          toast({
+            title: 'Thông báo',
+            description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
+            variant: 'destructive'
+          })
+          await deleteCookiesAndRedirect()
+        } else if (res.code === -11) {
+          toast({
+            title: 'Thông báo',
+            description:
+              'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+            variant: 'destructive'
+          })
+        } else {
+          toast({
+            title: 'Thất bại',
+            description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+            variant: 'destructive'
+          })
+        }
+      }
+      return employee.epl_status === 'enable' ? (
+        <Button variant={'outline'} onClick={handleUpdateStatus}>
+          Đang làm
+        </Button>
+      ) : (
+        <Button onClick={handleUpdateStatus}>Nghỉ làm</Button>
+      )
+    }
   },
+
   {
     accessorKey: 'Actions',
-    id: 'actions',
+    id: 'Actions',
     cell: ({ row }) => {
       const employees = row.original
+      const pathname = usePathname().split('/').pop()
+      if (pathname === 'recycle') {
+        return <DeleteOrRestore inforEmployee={employees} path={pathname} />
+      }
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -73,14 +132,16 @@ export const columns: ColumnDef<IEmployee>[] = [
               Copy payment ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/employees/${employees._id}`}>
-              <DropdownMenuItem>Sửa</DropdownMenuItem>
+            <Link href={`/dashboard/employees/${employees._id}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <DeleteOrRestore inforEmployee={employees} path='delete' />
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
     },
-    enableHiding: true // Cho phép ẩn
+    enableHiding: true
   }
 ]

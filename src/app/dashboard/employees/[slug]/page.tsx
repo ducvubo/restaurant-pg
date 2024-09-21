@@ -50,7 +50,9 @@ import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { IEmployee } from '../employees.interface'
-import { findOneEmployee } from '../employees.api'
+import { findOneEmployee, getAllEmployees } from '../employees.api'
+import { PageEmployees } from '../_component/PageEmployees'
+import { columns } from '../_component/Columns'
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
 })
@@ -83,28 +85,51 @@ async function Component({ searchParams, params }: PageProps) {
     )
   }
 
-  // if (id === 'recycle') {
-  //   const res: IBackendRes<IModelPaginate<IRestaurant[]>> = await getAllRestaurantRecycle({
-  //     current: searchParams.page ? searchParams.page : '1',
-  //     pageSize: searchParams.size ? searchParams.size : '10'
-  //   })
-  //   if (res.code === -10) {
-  //     deleteCookiesAndRedirect()
-  //   }
-  //   if (res.code === -11) {
-  //     return <ToastServer message='Bạn không có quyền truy cập' />
-  //   }
-  //   if (!res || !res.data) {
-  //     return (
-  //       <>
-  //         <div>Error fetching data</div>
-  //       </>
-  //     )
-  //   }
+  if (id === 'recycle') {
+    const res: IBackendRes<IModelPaginate<IEmployee[]>> = await getAllEmployees({
+      current: searchParams.page ? searchParams.page : '1',
+      pageSize: searchParams.size ? searchParams.size : '10',
+      type: 'recycle'
+    })
 
-  //   const data = res.data.result.flat()
-  //   return <GetPageRestaurantRecycle data={data} meta={res.data.meta} />
-  // }
+    if (res.code === -10) {
+      deleteCookiesAndRedirect()
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <>
+          <div>Error fetching data</div>
+        </>
+      )
+    }
+    if (res.statusCode === 200) {
+      const data = res.data.result.flat()
+
+      return (
+        <div>
+          <ContentLayout title='Danh sách nhân viên đã xóa'>
+            <Breadcrumb className='-mt-4'>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href='/dashboard'>Dashboard</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Danh sách nhân viên đã xóa</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <PageEmployees data={data} columns={columns} meta={res.data.meta} />
+          </ContentLayout>
+        </div>
+      )
+    }
+  }
 
   const res: IBackendRes<IEmployee> = await findOneEmployee({ _id: id })
 
@@ -134,7 +159,7 @@ async function Component({ searchParams, params }: PageProps) {
     )
   }
   return (
-    <ContentLayout title='Thêm nhân viên'>
+    <ContentLayout title='Chỉnh sửa thông tin nhân viên'>
       <Breadcrumb className='-mt-4'>
         <BreadcrumbList>
           <BreadcrumbItem>

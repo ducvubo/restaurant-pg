@@ -51,6 +51,11 @@ export function getMenuList(pathname: string): Group[] {
               href: '/dashboard/employees?page=1&size=10',
               label: 'Danh sách nhân viên',
               active: pathname === '/dashboard/employees'
+            },
+            {
+              href: '/dashboard/employees/recycle?page=1&size=10',
+              label: 'Danh sách đã xóa',
+              active: pathname === '/dashboard/employees/recycle'
             }
           ]
         },

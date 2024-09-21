@@ -14,7 +14,7 @@ import {
 } from '@tanstack/react-table'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { DataTableViewOptions } from '@/components/ColumnToggle'
 import { DataTablePagination } from '@/components/Pagination'
 
@@ -31,6 +31,7 @@ interface DataTableProps<TData, TValue> {
 
 export function PageEmployees<TData, TValue>({ columns, meta, data }: DataTableProps<TData, TValue>) {
   const router = useRouter()
+  const pathname = usePathname().split('/').pop()
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -63,7 +64,7 @@ export function PageEmployees<TData, TValue>({ columns, meta, data }: DataTableP
   }
 
   React.useEffect(() => {
-    router.push(`/dashboard/employees?page=${pageIndex}&size=${pageSize}`)
+    router.push(`/dashboard/employees/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`)
   }, [pageIndex, pageSize, router])
 
   return (
@@ -81,7 +82,7 @@ export function PageEmployees<TData, TValue>({ columns, meta, data }: DataTableP
                 <TableRow key={headerGroup.id} className='h-[45px]'>
                   {/* Giảm chiều cao hàng */}
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className='py-[5px]'>
+                    <TableHead key={header.id} className='py-[5px] '>
                       {/* Giảm padding trong header */}
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>

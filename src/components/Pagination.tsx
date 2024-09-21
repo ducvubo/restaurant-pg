@@ -40,7 +40,7 @@ export function DataTablePagination<TData>({ table, meta, onPageChange }: DataTa
             onValueChange={(value) => {
               const newPageSize = Number(value)
               setPageSize(newPageSize)
-              table.setPageSize(newPageSize) // Cập nhật số hàng trên mỗi trang trong table
+              table.setPageSize(newPageSize)
             }}
           >
             <SelectTrigger className='h-8 w-[70px]'>

@@ -17,7 +17,9 @@ import { ReloadIcon } from '@radix-ui/react-icons'
 import { createEmployee, updateEmployee } from '../employees.api'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { IEmployee } from '../employees.interface'
-
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { ScrollArea } from '@/components/ui/scroll-area'
 const FormSchema = z.object({
   epl_email: z
     .string()
@@ -207,6 +209,13 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
           variant: 'destructive'
         })
       }
+    } else if (res.statusCode === 404) {
+      setLoading(false)
+      toast({
+        title: 'Thông báo',
+        description: 'Nhân viên không tồn tại, vui lòng thử lại sau',
+        variant: 'destructive'
+      })
     } else if (res.statusCode === 409) {
       setLoading(false)
       toast({
@@ -228,10 +237,18 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
         description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
         variant: 'destructive'
       })
+    } else {
+      setLoading(false)
+      toast({
+        title: 'Thất bại',
+        description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+        variant: 'destructive'
+      })
     }
   }
+
   return (
-    <div>
+    <div className='flex gap-5'>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
           <div>
@@ -406,9 +423,6 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
           </Button>
         </form>
       </Form>
-      <div >
-
-      </div>
     </div>
   )
 }

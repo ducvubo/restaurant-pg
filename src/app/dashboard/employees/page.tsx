@@ -23,7 +23,8 @@ interface PageProps {
 async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IEmployee[]>> = await getAllEmployees({
     current: searchParams.page ? searchParams.page : '1',
-    pageSize: searchParams.size ? searchParams.size : '10'
+    pageSize: searchParams.size ? searchParams.size : '10',
+    type: 'all'
   })
 
   if (res.code === -10) {
@@ -43,7 +44,7 @@ async function Component({ searchParams }: PageProps) {
 
   return (
     <div>
-      <ContentLayout title='Thêm nhân viên'>
+      <ContentLayout title='Danh sách nhân viên'>
         <Breadcrumb className='-mt-4'>
           <BreadcrumbList>
             <BreadcrumbItem>
