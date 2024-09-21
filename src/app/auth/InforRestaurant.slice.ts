@@ -79,10 +79,13 @@ const inforRestaurantSlice = createSlice({
         (state.restaurant_verify = action.payload.restaurant_verify),
         (state.restaurant_state = action.payload.restaurant_state),
         (state.restaurant_slug = action.payload.restaurant_slug)
+    },
+    endAppRestaurant: (state, action) => {
+      return initialState
     }
   }
 })
 
 const inforRestaurantReducer = inforRestaurantSlice.reducer
-export const { startAppRestaurant } = inforRestaurantSlice.actions
+export const { startAppRestaurant, endAppRestaurant } = inforRestaurantSlice.actions
 export default inforRestaurantReducer

@@ -1,11 +1,12 @@
 export interface IToken {
   access_token_rtr: string
   refresh_token_rtr: string
+  type: 'employee' | 'restaurant'
 }
 
 export interface IRestaurant {
   _id: string
-  email: string
+  restaurant_email: string
   restaurant_phone: string
   restaurant_category: string
   restaurant_name: string

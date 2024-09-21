@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
-import inforRestaurantReducer from '../auth/auth.slice'
+import inforRestaurantReducer from '../auth/InforRestaurant.slice'
+import inforEmployeeReducer from '../auth/InforEmployee.slice'
 
 // ...
 
 export const store = configureStore({
   reducer: {
-    inforRestaurant: inforRestaurantReducer
+    inforRestaurant: inforRestaurantReducer,
+    inforEmployee: inforEmployeeReducer
   }
   //Thêm api middleware để enable các tính năng như caching, invalidation, polling của rtk query
   // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(blogApi.middleware, rtkQueryErrorLogger)

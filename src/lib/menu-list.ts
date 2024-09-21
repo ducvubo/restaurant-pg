@@ -19,26 +19,14 @@ type Group = {
   menus: Menu[]
 }
 
-export function getMenuList(pathname: string): Group[] {
+export function getMenuListRestaurant(pathname: string): Group[] {
   return [
     {
-      groupLabel: '',
-      menus: [
-        {
-          href: '/dashboard',
-          label: 'Dashboard',
-          active: pathname.includes('/dashboard'),
-          icon: LayoutGrid,
-          submenus: []
-        }
-      ]
-    },
-    {
-      groupLabel: 'Quản lý',
+      groupLabel: 'Chủ cửa hàng',
       menus: [
         {
           href: '',
-          label: 'Nhân viên',
+          label: 'Quản lý nhân viên',
           active: pathname.includes('/employees'),
           icon: SquarePen,
           submenus: [
@@ -58,7 +46,12 @@ export function getMenuList(pathname: string): Group[] {
               active: pathname === '/dashboard/employees/recycle'
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      groupLabel: 'Nhân viên',
+      menus: [
         {
           href: '/categories',
           label: 'Categories',
@@ -74,22 +67,27 @@ export function getMenuList(pathname: string): Group[] {
           submenus: []
         }
       ]
-    },
+    }
+  ]
+}
+
+export function getMenuListEmployee(pathname: string): Group[] {
+  return [
     {
-      groupLabel: 'Settings',
+      groupLabel: 'Nhân viên',
       menus: [
         {
-          href: '/users',
-          label: 'Users',
-          active: pathname.includes('/users'),
-          icon: Users,
+          href: '/categories',
+          label: 'Categories',
+          active: pathname.includes('/categories'),
+          icon: Bookmark,
           submenus: []
         },
         {
-          href: '/account',
-          label: 'Account',
-          active: pathname.includes('/account'),
-          icon: Settings,
+          href: '/tags',
+          label: 'Tags',
+          active: pathname.includes('/tags'),
+          icon: Tag,
           submenus: []
         }
       ]
