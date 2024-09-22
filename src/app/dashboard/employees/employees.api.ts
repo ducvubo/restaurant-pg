@@ -3,13 +3,12 @@
 import { sendRequest } from '@/lib/api'
 import { IEmployee } from './employees.interface'
 
-export const createEmployee = async (payload: IEmployee) => {
+export const createEmployee = async (payload: Omit<IEmployee, 'epl_status' | '_id'>) => {
   const res: IBackendRes<IEmployee> = await sendRequest({
     url: `${process.env.URL_SERVER}/employees`,
     method: 'POST',
     body: payload
   })
-  console.log(res)
   return res
 }
 
@@ -48,7 +47,7 @@ export const findOneEmployee = async ({ _id }: { _id: string }) => {
   return res
 }
 
-export const updateEmployee = async (payload: IEmployee) => {
+export const updateEmployee = async (payload: Omit<IEmployee, 'epl_status'>) => {
   const res: IBackendRes<IEmployee> = await sendRequest({
     url: `${process.env.URL_SERVER}/employees`,
     method: 'PATCH',

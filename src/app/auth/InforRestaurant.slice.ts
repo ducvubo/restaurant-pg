@@ -9,9 +9,12 @@ export const initialState: IRestaurant = {
   restaurant_name: '',
   restaurant_banner: {
     image_cloud: '',
-    image_local: '',
     image_custom: ''
   },
+  // restaurant_image: {
+  //   image_cloud: '',
+  //   image_custom: ''
+  // }[],
   restaurant_address: {
     address_province: {
       value: '',
@@ -56,7 +59,6 @@ const inforRestaurantSlice = createSlice({
         (state.restaurant_category = action.payload.restaurant_category),
         (state.restaurant_name = action.payload.restaurant_name),
         (state.restaurant_banner.image_cloud = action.payload.restaurant_banner.image_cloud),
-        (state.restaurant_banner.image_local = action.payload.restaurant_banner.image_local),
         (state.restaurant_banner.image_custom = action.payload.restaurant_banner.image_custom),
         (state.restaurant_address.address_province.value = action.payload.restaurant_address.address_province.value),
         (state.restaurant_address.address_province.name = action.payload.restaurant_address.address_province.name),

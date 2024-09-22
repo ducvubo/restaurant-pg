@@ -11,58 +11,46 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { IEmployee } from '../employees.interface'
 import Link from 'next/link'
-import DeleteOrRestore from './DeleteOrRestore'
 import { DataTableColumnHeader } from '@/components/ColumnHeader'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { updateStatus } from '../employees.api'
 import { useLoading } from '@/context/LoadingContext'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-export const columns: ColumnDef<IEmployee>[] = [
+import { ITable } from '../table.interface'
+import DeleteOrRestore from './DeleteOrRestore'
+import { updateStatus } from '../table.api'
+export const columns: ColumnDef<ITable>[] = [
   {
-    accessorKey: 'epl_email',
-    id: 'Email',
+    accessorKey: 'tbl_name',
+    id: 'Tên bàn',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Email' />,
     enableHiding: true
   },
   {
-    accessorKey: 'epl_name',
-    id: 'Tên',
-    header: () => <div>Tên</div>,
+    accessorKey: 'tbl_capacity',
+    id: 'Số người',
+    header: () => <div>Số người</div>,
     enableHiding: true
   },
   {
-    accessorKey: 'epl_phone',
-    id: 'Số điện thoại',
-    header: () => <div>Số điện thoại</div>,
+    accessorKey: 'tbl_description',
+    id: 'Mô tả',
+    header: () => <div>Mô tả</div>,
     enableHiding: true
   },
   {
-    accessorKey: 'epl_address',
-    id: 'Địa chỉ',
-    header: () => <div>Địa chỉ</div>,
-    enableHiding: true
-  },
-  {
-    accessorKey: 'epl_gender',
-    id: 'Giới tính',
-    header: () => <div>Giới tính</div>,
-    enableHiding: true
-  },
-  {
-    accessorKey: 'epl_status',
+    accessorKey: 'tbl_status',
     id: 'Trạng thái',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
       const router = useRouter()
-      const employee = row.original
+      const table = row.original
       const handleUpdateStatus = async () => {
         const res = await updateStatus({
-          _id: employee._id,
-          epl_status: employee.epl_status === 'enable' ? 'disable' : 'enable'
+          _id: table._id,
+          tbl_status: table.tbl_status === 'enable' ? 'disable' : 'enable'
         })
         if (res.statusCode === 200) {
           toast({
@@ -87,12 +75,6 @@ export const columns: ColumnDef<IEmployee>[] = [
               variant: 'destructive'
             })
           }
-        } else if (res.statusCode === 404) {
-          toast({
-            title: 'Thông báo',
-            description: 'Nhân viên không tồn tại, vui lòng thử lại sau',
-            variant: 'destructive'
-          })
         } else if (res.code === -10) {
           toast({
             title: 'Thông báo',
@@ -115,13 +97,13 @@ export const columns: ColumnDef<IEmployee>[] = [
           })
         }
       }
-      return employee.epl_status === 'enable' ? (
+      return table.tbl_status === 'enable' ? (
         <Button variant={'outline'} onClick={handleUpdateStatus}>
-          Đang làm
+          Đang hoạt động
         </Button>
       ) : (
         <Button onClick={handleUpdateStatus} variant={'destructive'}>
-          Nghỉ làm
+          Ngưng hoạt động
         </Button>
       )
     }
@@ -131,10 +113,10 @@ export const columns: ColumnDef<IEmployee>[] = [
     accessorKey: 'Actions',
     id: 'Actions',
     cell: ({ row }) => {
-      const employees = row.original
+      const table = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
-        return <DeleteOrRestore inforEmployee={employees} path={pathname} />
+        return <DeleteOrRestore inforTable={table} path={pathname} />
       }
       return (
         <DropdownMenu>
@@ -146,15 +128,15 @@ export const columns: ColumnDef<IEmployee>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(employees._id)}>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(table._id)}>
               Copy payment ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/employees/${employees._id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/tables/${table._id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>
-              <DeleteOrRestore inforEmployee={employees} path='delete' />
+              <DeleteOrRestore inforTable={table} path='delete' />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

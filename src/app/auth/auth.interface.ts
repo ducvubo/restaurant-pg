@@ -12,7 +12,6 @@ export interface IRestaurant {
   restaurant_name: string
   restaurant_banner: {
     image_cloud: string
-    image_local: string
     image_custom: string
   }
   restaurant_address: {
@@ -46,7 +45,6 @@ export interface IRestaurant {
   restaurant_parking_area: string
   restaurant_amenity: string[]
   restaurant_image: {
-    image_local: string
     image_cloud: string
     image_custom: string
   }[]

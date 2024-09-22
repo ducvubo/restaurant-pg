@@ -22,13 +22,19 @@ export default function RefreshToken() {
 
   const refreshToken = async () => {
     const res = await reFreshTokenNew()
+    const currentPathname = window.location.pathname
+
     if (res?.code === 0 && res.data) {
       if (res.type === 'restaurant') {
         runAppRestaurant(res.data)
-        router.push('/dashboard')
+        if (!currentPathname.startsWith('/dashboard')) {
+          router.push('/dashboard')
+        }
       } else if (res.type === 'employee') {
         runAppEmployee(res.data)
-        router.push('/dashboard')
+        if (!currentPathname.startsWith('/dashboard')) {
+          router.push('/dashboard')
+        }
       }
     }
   }

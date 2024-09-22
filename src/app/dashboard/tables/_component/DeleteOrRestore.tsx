@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { IEmployee } from '../employees.interface'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -16,37 +15,31 @@ import {
 } from '@/components/ui/alert-dialog'
 
 import { useRouter } from 'next/navigation'
-import { deleteEmployee, restoreEmployee } from '../employees.api'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
+import { deleteTable, restoreTable } from '../table.api'
+import { ITable } from '../table.interface'
 interface Props {
-  inforEmployee: IEmployee
+  inforTable: ITable
   path: 'recycle' | 'delete'
 }
-export default function DeleteOrRestore({ inforEmployee, path }: Props) {
+export default function DeleteOrRestore({ inforTable, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
 
-  const handleDeleteEmployee = async (_id: string) => {
+  const handleDeleteTable = async (_id: string) => {
     setLoading(true)
-    const res = path === 'recycle' ? await restoreEmployee({ _id }) : await deleteEmployee({ _id })
+    const res = path === 'recycle' ? await restoreTable({ _id }) : await deleteTable({ _id })
+    console.log('res::::::::::::', res)
     if (res.statusCode === 200) {
       setLoading(false)
       toast({
         title: 'Thành công',
-        description:
-          path === 'recycle' ? 'Khôi phục nhân viên thành công' : 'Chuyển nhân viên vào thùng rác thành công',
+        description: path === 'recycle' ? 'Khôi phục bàn thành công' : 'Chuyển bàn vào thùng rác thành công',
         variant: 'default'
       })
       router.refresh()
-    } else if (res.statusCode === 404) {
-      setLoading(false)
-      toast({
-        title: 'Thông báo',
-        description: 'Nhân viên không tồn tại, vui lòng thử lại sau',
-        variant: 'destructive'
-      })
     } else if (res.code === -10) {
       setLoading(false)
       toast({
@@ -89,16 +82,16 @@ export default function DeleteOrRestore({ inforEmployee, path }: Props) {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{path === 'delete' ? 'Xóa nhân viên' : 'Khôi phục nhân viên'} </AlertDialogTitle>
+          <AlertDialogTitle>{path === 'delete' ? 'Xóa bàn' : 'Khôi phục bàn'} </AlertDialogTitle>
           <AlertDialogDescription>
             {path === 'delete'
-              ? `Bạn có chắc muốn chuyển nhân viên '${inforEmployee.epl_name}' vào thùng rác không?`
-              : `Bạn có chắc muốn khôi phục nhân viên '${inforEmployee.epl_name}' không?`}
+              ? `Bạn có chắc muốn chuyển bàn '${inforTable.tbl_name}' vào thùng rác không?`
+              : `Bạn có chắc muốn khôi phục bàn '${inforTable.tbl_name}' không?`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Không</AlertDialogCancel>
-          <AlertDialogAction onClick={() => handleDeleteEmployee(inforEmployee._id)}>Có</AlertDialogAction>
+          <AlertDialogAction onClick={() => handleDeleteTable(inforTable._id)}>Có</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

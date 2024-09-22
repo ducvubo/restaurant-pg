@@ -46,9 +46,28 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               active: pathname === '/dashboard/employees/recycle'
             }
           ]
+        },
+        {
+          href: '/dashboard/tables',
+          label: 'Bàn ăn',
+          active: pathname.includes('/tables'),
+          icon: Bookmark,
+          submenus: [
+            {
+              href: '/dashboard/tables',
+              label: 'Danh sách bàn ăn',
+              active: pathname === '/dashboard/tables'
+            },
+            {
+              href: '/dashboard/tables/add',
+              label: 'Thêm bàn ăn',
+              active: pathname === '/dashboard/tables/add'
+            }
+          ]
         }
       ]
     },
+
     {
       groupLabel: 'Nhân viên',
       menus: [
@@ -77,11 +96,27 @@ export function getMenuListEmployee(pathname: string): Group[] {
       groupLabel: 'Nhân viên',
       menus: [
         {
-          href: '/categories',
-          label: 'Categories',
-          active: pathname.includes('/categories'),
+          href: '/dashboard/tables',
+          label: 'Bàn ăn',
+          active: pathname.includes('/tables'),
           icon: Bookmark,
-          submenus: []
+          submenus: [
+            {
+              href: '/dashboard/tables',
+              label: 'Danh sách bàn ăn',
+              active: pathname === '/dashboard/tables'
+            },
+            {
+              href: '/dashboard/tables/add',
+              label: 'Thêm bàn ăn',
+              active: pathname === '/dashboard/tables/add'
+            },
+            {
+              href: '/dashboard/tables/recycle?page=1&size=10',
+              label: 'Danh sách đã xóa',
+              active: pathname === '/dashboard/tables/recycle'
+            }
+          ]
         },
         {
           href: '/tags',

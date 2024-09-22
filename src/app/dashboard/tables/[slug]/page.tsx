@@ -11,13 +11,14 @@ import React, { Suspense } from 'react'
 import LoadingServer from '@/components/LoadingServer'
 import AddOrEdit from '../_component/AddOrEdit'
 import { redirect } from 'next/navigation'
-import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { IEmployee } from '../employees.interface'
-import { findOneEmployee, getAllEmployees } from '../employees.api'
-import { PageEmployees } from '../_component/PageEmployees'
+import { ITable } from '../table.interface'
+import { findTableById, getAllTables } from '../table.api'
+import { deleteCookiesAndRedirect } from '@/app/actions/action'
+import { PageTables } from '../_component/PageTables'
 import { columns } from '../_component/Columns'
+
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
 })
@@ -31,7 +32,7 @@ async function Component({ searchParams, params }: PageProps) {
   const id = params.slug
   if (id === 'add') {
     return (
-      <ContentLayout title='Thêm nhân viên'>
+      <ContentLayout title='Thêm bàn ăn'>
         <Breadcrumb className='-mt-4'>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -41,7 +42,7 @@ async function Component({ searchParams, params }: PageProps) {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Thêm nhân viên</BreadcrumbPage>
+              <BreadcrumbPage>Thêm bàn ăn</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -51,7 +52,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
 
   if (id === 'recycle') {
-    const res: IBackendRes<IModelPaginate<IEmployee[]>> = await getAllEmployees({
+    const res: IBackendRes<IModelPaginate<ITable[]>> = await getAllTables({
       current: searchParams.page ? searchParams.page : '1',
       pageSize: searchParams.size ? searchParams.size : '10',
       type: 'recycle'
@@ -89,14 +90,14 @@ async function Component({ searchParams, params }: PageProps) {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-            <PageEmployees data={data} columns={columns} meta={res.data.meta} />
+            <PageTables data={data} columns={columns} meta={res.data.meta} />
           </ContentLayout>
         </div>
       )
     }
   }
 
-  const res: IBackendRes<IEmployee> = await findOneEmployee({ _id: id })
+  const res: IBackendRes<ITable> = await findTableById({ _id: id })
 
   if (res.statusCode === 404) {
     return (
@@ -144,7 +145,7 @@ async function Component({ searchParams, params }: PageProps) {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <AddOrEdit id={id} inforEmployee={res.data} />
+      <AddOrEdit id={id} inforTable={res.data} />
     </ContentLayout>
   )
 }

@@ -17,9 +17,8 @@ import { ReloadIcon } from '@radix-ui/react-icons'
 import { createEmployee, updateEmployee } from '../employees.api'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { IEmployee } from '../employees.interface'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { isNumericString } from '@/app/utils'
+
 const FormSchema = z.object({
   epl_email: z
     .string()
@@ -178,6 +177,16 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
       })
       return
     }
+
+    if (isNumericString(data.epl_phone)) {
+      toast({
+        title: 'Thông báo',
+        description: 'Số điện thoại không hợp lệ',
+        variant: 'default'
+      })
+      return
+    }
+
     setLoading(true)
     const payload: any = {
       ...data,
@@ -192,6 +201,7 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
         description: id == 'add' ? 'Thêm nhân viên mới thành công' : 'Chỉnh sửa thông tin nhân viên thành công',
         variant: 'default'
       })
+      router.push('/dashboard/employees')
     } else if (res.statusCode === 400) {
       setLoading(false)
       if (Array.isArray(res.message)) {
@@ -232,6 +242,8 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
       })
       await deleteCookiesAndRedirect()
     } else if (res.code === -11) {
+      setLoading(false)
+
       toast({
         title: 'Thông báo',
         description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
