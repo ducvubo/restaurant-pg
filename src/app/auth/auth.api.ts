@@ -278,9 +278,6 @@ export const getInfor = async () => {
   const refresh_token_rtr = cookies().get('refresh_token_rtr')?.value
   const access_token_rtr = cookies().get('access_token_rtr')?.value
 
-  const refresh_token_epl = cookies().get('refresh_token_epl')?.value
-  const access_token_epl = cookies().get('access_token_epl')?.value
-
   const type = refresh_token_rtr && access_token_rtr ? 'restaurant' : 'employee'
 
   const url =
