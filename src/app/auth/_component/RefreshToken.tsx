@@ -12,11 +12,11 @@ export default function RefreshToken() {
   const dispatch = useDispatch()
   const router = useRouter()
 
-  const runAppRestaurant = (inforRestaurant: IRestaurant) => {
+  const runAppRestaurant = (inforRestaurant: any) => {
     dispatch(startAppRestaurant(inforRestaurant))
   }
 
-  const runAppEmployee = (inforEmployee: IEmployee) => {
+  const runAppEmployee = (inforEmployee: any) => {
     dispatch(startAppEmployee(inforEmployee))
   }
 

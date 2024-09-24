@@ -5,17 +5,22 @@ export const sendRequest = async <T>(props: IRequest) => {
   let { url, method, body, queryParams = {}, useCredentials = false, headers = {}, nextOption = {} } = props
   let options: any
   const cookie = cookies()
-  const access_token = cookie.get('access_token_rtr')?.value
-  const refresh_token = cookie.get('refresh_token_rtr')?.value
-  const id_user_guest = cookie.get('refresh_token_rtr')?.value
-  if (access_token && refresh_token) {
+  const id_user_guest = cookie.get('id_user_guest')?.value
+
+  const access_token_rtr = cookie.get('access_token_rtr')?.value
+  const refresh_token_rtr = cookie.get('refresh_token_rtr')?.value
+
+  const access_token_epl = cookie.get('access_token_epl')?.value
+  const refresh_token_epl = cookie.get('refresh_token_epl')?.value
+
+  if (access_token_rtr && refresh_token_rtr) {
     options = {
       method: method,
       // by default setting the content-type to be json type
       headers: new Headers({
         'content-type': 'application/json',
-        'x-at-rtr': `Bearer ${access_token}`,
-        'x-rf-rtr': `Bearer ${refresh_token}`,
+        'x-at-rtr': `Bearer ${access_token_rtr}`,
+        'x-rf-rtr': `Bearer ${refresh_token_rtr}`,
         id_user_guest: id_user_guest,
         ...headers
       }),
@@ -23,7 +28,24 @@ export const sendRequest = async <T>(props: IRequest) => {
       ...nextOption
     }
   }
-  if (!access_token || !refresh_token) {
+
+  if (access_token_epl && refresh_token_epl) {
+    options = {
+      method: method,
+      // by default setting the content-type to be json type
+      headers: new Headers({
+        'content-type': 'application/json',
+        'x-at-epl': `Bearer ${access_token_epl}`,
+        'x-rf-epl': `Bearer ${refresh_token_epl}`,
+        id_user_guest: id_user_guest,
+        ...headers
+      }),
+      body: body ? JSON.stringify(body) : null,
+      ...nextOption
+    }
+  }
+
+  if (!access_token_rtr && !access_token_epl && !access_token_rtr && !access_token_epl) {
     options = {
       method: method,
       // by default setting the content-type to be json type

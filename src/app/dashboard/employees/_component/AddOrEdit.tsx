@@ -178,14 +178,14 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
       return
     }
 
-    if (isNumericString(data.epl_phone)) {
-      toast({
-        title: 'Thông báo',
-        description: 'Số điện thoại không hợp lệ',
-        variant: 'default'
-      })
-      return
-    }
+    // if (isNumericString(data.epl_phone)) {
+    //   toast({
+    //     title: 'Thông báo',
+    //     description: 'Số điện thoại không hợp lệ',
+    //     variant: 'default'
+    //   })
+    //   return
+    // }
 
     setLoading(true)
     const payload: any = {
