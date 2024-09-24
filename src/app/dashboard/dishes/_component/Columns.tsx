@@ -17,109 +17,126 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useLoading } from '@/context/LoadingContext'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { ITable } from '../table.interface'
-import DeleteOrRestore from './DeleteOrRestore'
-import { updateQrCode, updateStatus } from '../table.api'
 import { QRCodeSVG } from 'qrcode.react'
+import { IDish } from '../dishes.interface'
+import DOMPurify from 'dompurify'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import Image from 'next/image'
+import DeleteOrRestore from './DeleteOrRestore'
+import { updateStatus } from '../dishes.api'
 
-export const columns: ColumnDef<ITable>[] = [
+export const columns: ColumnDef<IDish>[] = [
   {
-    accessorKey: 'tbl_name',
-    id: 'Tên bàn',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Email' />,
+    accessorKey: 'dish_name',
+    id: 'Tên món',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Tên món' />,
     enableHiding: true
   },
   {
-    accessorKey: 'tbl_capacity',
-    id: 'Số người',
-    header: () => <div>Số người</div>,
-    enableHiding: true
-  },
-  {
-    accessorKey: 'tbl_description',
-    id: 'Mô tả',
-    header: () => <div>Mô tả</div>,
-    enableHiding: true
-  },
-  {
-    accessorKey: 'tbl_token',
-    id: 'Mã QR',
-    header: () => <div>Mã QR</div>,
+    accessorKey: 'dish_image',
+    id: 'Ảnh',
+    header: () => <div>Ảnh</div>,
     cell: ({ row }) => {
-      const router = useRouter()
-      const table = row.original
-      const url = `${process.env.NEXT_PUBLIC_URL_CLIENT}/table?id=${table._id}&token=${table.tbl_token}`
-      const handleUpdateToken = async () => {
-        const res = await updateQrCode({
-          _id: table._id
-        })
-        if (res.statusCode === 200) {
-          toast({
-            title: 'Thành công',
-            description: 'Đổi mã QR thành công',
-            variant: 'default'
-          })
-          router.refresh()
-        } else if (res.statusCode === 400) {
-          if (Array.isArray(res.message)) {
-            res.message.map((item: string) => {
-              toast({
-                title: 'Thất bại',
-                description: item,
-                variant: 'destructive'
-              })
-            })
-          } else {
-            toast({
-              title: 'Thất bại',
-              description: res.message,
-              variant: 'destructive'
-            })
-          }
-        } else if (res.code === -10) {
-          toast({
-            title: 'Thông báo',
-            description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
-            variant: 'destructive'
-          })
-          await deleteCookiesAndRedirect()
-        } else if (res.code === -11) {
-          toast({
-            title: 'Thông báo',
-            description:
-              'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
-            variant: 'destructive'
-          })
-        } else {
-          toast({
-            title: 'Thất bại',
-            description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
-            variant: 'destructive'
-          })
-        }
-      }
+      const dish = row.original
+      return (
+        <Image
+          src={dish.dish_image.image_cloud}
+          alt='vuducbo'
+          width={100}
+          height={100}
+          className='w-auto h-auto object-cover'
+        />
+      )
+    },
+    enableHiding: true
+  },
+  {
+    accessorKey: 'dish_short_description',
+    id: 'Giới thiệu ngắn',
+    header: () => <div>Giới thiệu ngắn</div>,
+    enableHiding: true
+  },
+  {
+    accessorKey: 'dish_price',
+    id: 'Giá',
+    cell: ({ row }) => {
+      const dish = row.original
+      return `${dish.dish_price.toLocaleString()} đ`
+    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Giá' />,
+    enableHiding: true
+  },
+  {
+    accessorKey: 'dish_sale',
+    id: 'Giảm giá',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Giảm giá' />,
+    cell: ({ row }) => {
+      const dish = row.original
       return (
         <div>
-          <QRCodeSVG value={url} />
-          <Link href={`/table?id=${table._id}&token=${table.tbl_token}`}>{url}</Link>
-          <Button onClick={handleUpdateToken}>Đổi mã QR</Button>
+          {!dish.dish_sale ? (
+            <span className='text-success'>Không</span>
+          ) : (
+            <div className='flex flex-col'>
+              <span className='text-danger'>
+                Giảm:{' '}
+                {dish.dish_sale.sale_type === 'percentage'
+                  ? `${dish.dish_sale.sale_value}%`
+                  : `${dish.dish_sale.sale_value.toLocaleString()}đ`}
+              </span>
+              <span className='text-danger'>
+                Giá sau khi giảm:
+                {dish.dish_sale.sale_type === 'percentage'
+                  ? (dish.dish_price - (dish.dish_price * dish.dish_sale.sale_value) / 100).toLocaleString()
+                  : (dish.dish_price - dish.dish_sale.sale_value).toLocaleString()}{' '}
+                đ
+              </span>
+            </div>
+          )}
         </div>
       )
     },
     enableHiding: true
   },
   {
-    accessorKey: 'tbl_status',
+    accessorKey: 'dish_priority',
+    id: 'Độ ưu tiên',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Độ ưu tiên' />,
+    enableHiding: true
+  },
+  {
+    accessorKey: 'dish_note',
+    id: 'Ghi chú',
+    header: () => <div>Ghi chú</div>,
+    enableHiding: true
+  },
+  {
+    accessorKey: 'dish_description',
+    id: 'Mô tả',
+    header: () => <div>Mô tả</div>,
+    cell: ({ row }) => {
+      const dish = row.original
+      const sanitizedHTML = DOMPurify.sanitize(dish.dish_description)
+      return (
+        <ScrollArea className='h-[200px] w-[200px] rounded-md border p-4'>
+          <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+        </ScrollArea>
+      )
+    },
+    enableHiding: true
+  },
+  {
+    accessorKey: 'dish_status',
     id: 'Trạng thái',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
       const router = useRouter()
-      const table = row.original
+      const dish = row.original
       const handleUpdateStatus = async () => {
         const res = await updateStatus({
-          _id: table._id,
-          tbl_status: table.tbl_status === 'enable' ? 'disable' : 'enable'
+          _id: dish._id,
+          dish_status: dish.dish_status === 'enable' ? 'disable' : 'enable'
         })
         if (res.statusCode === 200) {
           toast({
@@ -166,13 +183,13 @@ export const columns: ColumnDef<ITable>[] = [
           })
         }
       }
-      return table.tbl_status === 'enable' ? (
+      return dish.dish_status === 'enable' ? (
         <Button variant={'outline'} onClick={handleUpdateStatus}>
-          Đang hoạt động
+          Đang bán
         </Button>
       ) : (
         <Button onClick={handleUpdateStatus} variant={'destructive'}>
-          Ngưng hoạt động
+          Ngưng bán
         </Button>
       )
     }
@@ -182,10 +199,10 @@ export const columns: ColumnDef<ITable>[] = [
     accessorKey: 'Actions',
     id: 'Actions',
     cell: ({ row }) => {
-      const table = row.original
+      const dish = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
-        return <DeleteOrRestore inforTable={table} path={pathname} />
+        return <DeleteOrRestore inforDish={dish} path={pathname} />
       }
       return (
         <DropdownMenu>
@@ -199,11 +216,11 @@ export const columns: ColumnDef<ITable>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/tables/${table._id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/dishes/${dish._id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>
-              <DeleteOrRestore inforTable={table} path='delete' />
+              <DeleteOrRestore inforDish={dish} path='delete' />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

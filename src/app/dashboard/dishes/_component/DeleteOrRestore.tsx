@@ -18,24 +18,24 @@ import { useRouter } from 'next/navigation'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
-import { deleteTable, restoreTable } from '../table.api'
-import { ITable } from '../table.interface'
+import { IDish } from '../dishes.interface'
+import { deleteDish, restoreDish } from '../dishes.api'
 interface Props {
-  inforTable: ITable
+  inforDish: IDish
   path: 'recycle' | 'delete'
 }
-export default function DeleteOrRestore({ inforTable, path }: Props) {
+export default function DeleteOrRestore({ inforDish, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
 
   const handleDeleteTable = async (_id: string) => {
     setLoading(true)
-    const res = path === 'recycle' ? await restoreTable({ _id }) : await deleteTable({ _id })
+    const res = path === 'recycle' ? await restoreDish({ _id }) : await deleteDish({ _id })
     if (res.statusCode === 200) {
       setLoading(false)
       toast({
         title: 'Thành công',
-        description: path === 'recycle' ? 'Khôi phục bàn thành công' : 'Chuyển bàn vào thùng rác thành công',
+        description: path === 'recycle' ? 'Khôi phục món ăn thành công' : 'Chuyển món ăn vào thùng rác thành công',
         variant: 'default'
       })
       router.refresh()
@@ -81,16 +81,16 @@ export default function DeleteOrRestore({ inforTable, path }: Props) {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{path === 'delete' ? 'Xóa bàn' : 'Khôi phục bàn'} </AlertDialogTitle>
+          <AlertDialogTitle>{path === 'delete' ? 'Xóa món ăn' : 'Khôi phục món ăn'} </AlertDialogTitle>
           <AlertDialogDescription>
             {path === 'delete'
-              ? `Bạn có chắc muốn chuyển bàn '${inforTable.tbl_name}' vào thùng rác không?`
-              : `Bạn có chắc muốn khôi phục bàn '${inforTable.tbl_name}' không?`}
+              ? `Bạn có chắc muốn chuyển món ăn '${inforDish.dish_name}' vào thùng rác không?`
+              : `Bạn có chắc muốn khôi phục món ăn '${inforDish.dish_name}' không?`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Không</AlertDialogCancel>
-          <AlertDialogAction onClick={() => handleDeleteTable(inforTable._id)}>Có</AlertDialogAction>
+          <AlertDialogAction onClick={() => handleDeleteTable(inforDish._id)}>Có</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

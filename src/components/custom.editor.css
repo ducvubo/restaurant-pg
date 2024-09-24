@@ -1,0 +1,33 @@
+/* Container bao quanh toàn bộ editor */
+.custom-editor-wrapper .tox {
+  background-color: #1a202c; /* Màu nền tổng quát */
+  color: #ffffff; /* Màu chữ tổng quát */
+}
+
+/* Thanh công cụ (toolbar) */
+.custom-editor-wrapper .tox-toolbar,
+.custom-editor-wrapper .tox-toolbar__primary {
+  background-color: #2d3748; /* Màu nền thanh công cụ */
+}
+
+/* Nút trong thanh công cụ */
+.custom-editor-wrapper .tox-toolbar button {
+  background-color: #2d3748; /* Nền nút bình thường */
+  color: #ffffff; /* Màu chữ nút */
+}
+
+/* Nút khi hover */
+.custom-editor-wrapper .tox-toolbar button:hover {
+  background-color: #4a5568; /* Nền nút khi hover */
+}
+
+/* Vùng nội dung của editor */
+.custom-editor-wrapper .tox-edit-area__iframe {
+  background-color: #1a202c; /* Nền nội dung */
+}
+
+/* Nền bên trong vùng chỉnh sửa */
+.custom-editor-wrapper iframe body {
+  background-color: #1a202c; /* Màu nền bên trong iframe */
+  color: #ffffff; /* Màu chữ trong iframe */
+}

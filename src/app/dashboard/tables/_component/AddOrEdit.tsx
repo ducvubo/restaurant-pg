@@ -54,9 +54,8 @@ export default function AddOrEdit({ id, inforTable }: Props) {
   }, [inforTable, id])
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    // setLoading(true)
+    setLoading(true)
     const res = id === 'add' ? await createTable(data) : await updateTable({ ...data, _id: id })
-    console.log(res)
     if (res.statusCode === 201 || res.statusCode === 200) {
       setLoading(false)
       toast({

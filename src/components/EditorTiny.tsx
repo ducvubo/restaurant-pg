@@ -1,8 +1,9 @@
 'use client'
-import React, { Dispatch, SetStateAction, useRef, useState } from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { Editor } from '@tinymce/tinymce-react'
 import { toast } from '@/hooks/use-toast'
-
+import { useTheme } from 'next-themes'
+import './custom.editor.css'
 interface Props {
   data: string
   setData: Dispatch<SetStateAction<string>>
@@ -12,6 +13,21 @@ interface Props {
 }
 export default function EditorTiny({ data, setData, defaultData, width = '100%', height = '400px' }: Props) {
   const editorRef = useRef<any>(null)
+  const { theme } = useTheme()
+  const [editorKey, setEditorKey] = useState(0)
+
+  useEffect(() => {
+    // Tăng editorKey để tái khởi tạo editor khi theme thay đổi
+    setEditorKey((prev) => prev + 1)
+
+    return () => {
+      if (editorRef.current) {
+        editorRef.current.remove() // Hủy editor để tránh rò rỉ bộ nhớ
+        editorRef.current = null // Đặt lại ref
+      }
+    }
+  }, [theme])
+
   const handleImageUpload: any = (blobInfo: any, progress: any, failure: any) => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest()
@@ -65,9 +81,12 @@ export default function EditorTiny({ data, setData, defaultData, width = '100%',
   const handleEditorChange = (content: string) => {
     setData(content)
   }
+
+
   return (
     <div style={{ width, height }}>
       <Editor
+        key={editorKey}
         apiKey={`${process.env.NEXT_PUBLIC_API_KEY_TINY_CME}`}
         onInit={(evt, editor) => (editorRef.current = editor)}
         onEditorChange={handleEditorChange}
@@ -132,7 +151,9 @@ export default function EditorTiny({ data, setData, defaultData, width = '100%',
           table_default_attributes: {
             border: '1px solid #ccc',
             'border-collapse': 'collapse'
-          }
+          },
+          skin: theme === 'light' ? true : 'oxide-dark',
+          content_css: theme === 'light' ? true : 'dark'
         }}
         initialValue={defaultData ? defaultData : ''}
       />

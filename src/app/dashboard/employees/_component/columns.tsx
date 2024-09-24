@@ -146,9 +146,6 @@ export const columns: ColumnDef<IEmployee>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(employees._id)}>
-              Copy payment ID
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <Link href={`/dashboard/employees/${employees._id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>

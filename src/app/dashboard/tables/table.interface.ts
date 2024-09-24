@@ -4,4 +4,5 @@ export interface ITable {
   tbl_description: string
   tbl_capacity: number
   tbl_status: 'enable' | 'disable'
+  tbl_token: string
 }

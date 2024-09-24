@@ -1,4 +1,4 @@
-import { Tag, Users, Settings, Bookmark, SquarePen, LayoutGrid, LucideIcon } from 'lucide-react'
+import { Tag, Users, Settings, Bookmark, SquarePen, LayoutGrid, LucideIcon, Salad } from 'lucide-react'
 
 type Submenu = {
   href: string
@@ -115,6 +115,29 @@ export function getMenuListEmployee(pathname: string): Group[] {
               href: '/dashboard/tables/recycle?page=1&size=10',
               label: 'Danh sách đã xóa',
               active: pathname === '/dashboard/tables/recycle'
+            }
+          ]
+        },
+        {
+          href: '/dashboard/dishes',
+          label: 'Món ăn',
+          active: pathname.includes('/dishes'),
+          icon: Salad,
+          submenus: [
+            {
+              href: '/dashboard/dishes',
+              label: 'Danh sách món ăn',
+              active: pathname === '/dashboard/dishes'
+            },
+            {
+              href: '/dashboard/dishes/add',
+              label: 'Thêm món ăn',
+              active: pathname === '/dashboard/dishes/add'
+            },
+            {
+              href: '/dashboard/dishes/recycle?page=1&size=10',
+              label: 'Danh sách đã xóa',
+              active: pathname === '/dashboard/dishes/recycle'
             }
           ]
         },
