@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useLoading } from '@/context/LoadingContext'
 import { toast } from '@/hooks/use-toast'
+import { calculateFinalPrice } from '@/app/utils'
 
 export default function OrderPage() {
   const { setLoading } = useLoading()
@@ -39,17 +40,6 @@ export default function OrderPage() {
       getListDish()
     }
   }, [inforGuest])
-
-  const calculateFinalPrice = (price: number, sale: { sale_type: string; sale_value: number } | undefined) => {
-    if (!sale) return price // Nếu không có khuyến mãi, trả về giá gốc
-    if (sale.sale_type === 'fixed') {
-      return Math.max(0, price - sale.sale_value) // Khuyến mãi cố định
-    }
-    if (sale.sale_type === 'percentage') {
-      return Math.max(0, price - (price * sale.sale_value) / 100) // Khuyến mãi phần trăm
-    }
-    return price
-  }
 
   const handleQuantityChange = (id: string, change: number) => {
     setSelectedDishes((prev) => {
@@ -111,7 +101,7 @@ export default function OrderPage() {
   // console.log(dishOrderArray)
 
   return (
-    <div className='flex justify-center items-center'>
+    <div className='flex justify-center items-center mx-1'>
       <div className='border-none rounded-none'>
         <CardHeader className='flex justify-center items-center'>
           <CardTitle className='font-bold text-2xl'>
@@ -120,7 +110,7 @@ export default function OrderPage() {
         </CardHeader>
         <div className='flex flex-col justify-between gap-3'>
           {listDish?.map((dish, index) => (
-            <div key={index} className='flex gap-4'>
+            <div key={index} className='flex gap-2'>
               <Image
                 src={dish.dish_image.image_cloud}
                 width={100}
@@ -129,17 +119,19 @@ export default function OrderPage() {
                 className='w-20 h-20 object-cover rounded-lg'
               />
               <div className='flex flex-col justify-between gap-1 w-full'>
-                <Label className='font-semibold min-h-[10px]'>{dish.dish_name}</Label>
+                <Label className='font-bold text-lg min-h-[10px]'>{dish.dish_name}</Label>
                 <span className='min-h-[10px] line-clamp-2 overflow-hidden'>{dish.dish_short_description}</span>
                 <span>Giá: {calculateFinalPrice(dish.dish_price, dish.dish_sale).toLocaleString()} đ</span>
               </div>
-              <div className='flex flex-col'>
-                <span>akjfknjakjsnkj</span>
-                {/* <div className='flex gap-2 items-end'>
-                  <Button className='h-6 w-6'>-</Button>
-                  <Input disabled className='w-9 h-6 text-center' value={0} />
-                  <Button className='h-6 w-6'>+</Button>
-                </div> */}
+              <div className='flex flex-col justify-center gap-2'>
+                {dish.dish_sale && (
+                  <div className='flex'>
+                    Giảm:
+                    {dish.dish_sale?.sale_type === 'percentage'
+                      ? ` ${dish.dish_sale.sale_value}%`
+                      : ` ${dish.dish_sale?.sale_value}đ`}
+                  </div>
+                )}
                 <div className='flex gap-2 items-end'>
                   <Button className='h-6 w-6' onClick={() => handleQuantityChange(dish._id, -1)}>
                     -
@@ -159,7 +151,9 @@ export default function OrderPage() {
         </div> */}
         <div className='w-full sticky bottom-0 z-10 mt-2'>
           <Button className='w-full' disabled={totalQuantity === 0} onClick={handleOrderDish}>
-            {`Đặt hàng ${totalQuantity} món với giá ${totalPrice.toLocaleString()} đ`}
+            {totalQuantity === 0 && totalPrice === 0
+              ? 'Chọn món trước khi đặt hàng'
+              : `Đặt hàng ${totalQuantity} món với giá ${totalPrice.toLocaleString()} đ`}
           </Button>
         </div>
       </div>

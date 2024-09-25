@@ -2,7 +2,7 @@
 
 import { sendRequest } from '@/lib/api'
 import { cookies } from 'next/headers'
-import { IGuest } from './guest.interface'
+import { IGuest, IOrderDish } from './guest.interface'
 import { IDish } from '../dashboard/dishes/dishes.interface'
 
 export const loginGuest = async (payload: {
@@ -159,6 +159,19 @@ export const orderDish = async (payload: { od_dish_id: string; od_dish_quantity:
       'x-rf-guest': `Bearer ${cookies().get('refresh_token_guest')?.value}`
     },
     body: payload
+  })
+
+  return res
+}
+
+export const getListOrder = async () => {
+  const res: IBackendRes<IOrderDish[]> = await sendRequest({
+    url: `${process.env.URL_SERVER}/order-dish/list-order-guest`,
+    method: 'GET',
+    headers: {
+      'x-at-guest': `Bearer ${cookies().get('access_token_guest')?.value}`,
+      'x-rf-guest': `Bearer ${cookies().get('refresh_token_guest')?.value}`
+    }
   })
 
   return res

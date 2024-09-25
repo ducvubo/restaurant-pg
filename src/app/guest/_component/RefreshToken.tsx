@@ -18,7 +18,9 @@ export default function RefreshTokenPage() {
 
     if (res?.code === 0 && res.infor) {
       runAppGuest(res.infor)
-      router.push('/guest/order')
+      if (window.location.pathname.startsWith('/guest/table')) {
+        router.push('/guest/order')
+      }
       return
     } else if (typeof window !== 'undefined') {
       const currentPath = window.location.pathname
