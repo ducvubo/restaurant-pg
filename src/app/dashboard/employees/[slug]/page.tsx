@@ -18,6 +18,7 @@ import { IEmployee } from '../employees.interface'
 import { findOneEmployee, getAllEmployees } from '../employees.api'
 import { PageEmployees } from '../_component/PageEmployees'
 import { columns } from '../_component/Columns'
+import LogoutPage from '@/app/logout/page'
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
 })
@@ -58,7 +59,7 @@ async function Component({ searchParams, params }: PageProps) {
     })
 
     if (res.code === -10) {
-      deleteCookiesAndRedirect()
+      return <LogoutPage />
     }
     if (res.code === -11) {
       return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
@@ -110,7 +111,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
 
   if (res.code === -10) {
-    deleteCookiesAndRedirect()
+    return <LogoutPage />
     // redirect('/login')
   }
   if (res.code === -11) {

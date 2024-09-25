@@ -81,9 +81,6 @@ export const sendRequest = async <T>(props: IRequest) => {
     } else {
       return res.json().then(async function (json: any) {
         if (res.status === 401 && json?.code === -10) {
-          await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/cookie`, {
-            method: 'POST'
-          })
           return {
             statusCode: res.status,
             message: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục sử dụng.',

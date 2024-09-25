@@ -17,6 +17,7 @@ import { IDish } from '../dishes.interface'
 import { findDishById, getAllDish } from '../dishes.api'
 import { PageDishes } from '../_component/PageDishes'
 import { columns } from '../_component/Columns'
+import LogoutPage from '@/app/logout/page'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -58,7 +59,7 @@ async function Component({ searchParams, params }: PageProps) {
     })
 
     if (res.code === -10) {
-      deleteCookiesAndRedirect()
+      return <LogoutPage />
     }
     if (res.code === -11) {
       return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
@@ -110,7 +111,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
 
   if (res.code === -10) {
-    deleteCookiesAndRedirect()
+    return <LogoutPage />
     // redirect('/login')
   }
   if (res.code === -11) {

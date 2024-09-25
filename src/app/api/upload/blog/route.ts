@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { Buffer } from 'buffer'
 
 export const POST = async (req: any) => {
-  console.log('object POST request')
   try {
     const header = req.headers
     const folder_type = header.get('folder_type') || ''

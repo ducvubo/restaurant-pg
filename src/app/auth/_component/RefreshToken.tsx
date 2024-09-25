@@ -1,11 +1,9 @@
 'use client'
-import React, { useLayoutEffect } from 'react'
+import React, { use, useLayoutEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { startAppRestaurant } from '../InforRestaurant.slice'
 import { useRouter } from 'next/navigation'
-import { IRestaurant } from '../auth.interface'
 import { getInfor, reFreshTokenNew } from '../auth.api'
-import { IEmployee } from '@/app/dashboard/employees/employees.interface'
 import { startAppEmployee } from '../InforEmployee.slice'
 
 export default function RefreshToken() {
@@ -34,12 +32,12 @@ export default function RefreshToken() {
         if (res.type === 'restaurant') {
           runAppRestaurant(res.data)
           if (!currentPathname.startsWith('/dashboard')) {
-            router.push('/dashboard')
+            // router.push('/dashboard')
           }
         } else if (res.type === 'employee') {
           runAppEmployee(res.data)
           if (!currentPathname.startsWith('/dashboard')) {
-            router.push('/dashboard')
+            // router.push('/dashboard')
           }
         }
       }
@@ -54,12 +52,12 @@ export default function RefreshToken() {
       if (res.type === 'restaurant') {
         runAppRestaurant(res.data)
         if (!currentPathname.startsWith('/dashboard')) {
-          router.push('/dashboard')
+          // router.push('/dashboard')
         }
       } else if (res.type === 'employee') {
         runAppEmployee(res.data)
         if (!currentPathname.startsWith('/dashboard')) {
-          router.push('/dashboard')
+          // router.push('/dashboard')
         }
       }
     }

@@ -278,8 +278,17 @@ export const getInfor = async () => {
   const refresh_token_rtr = cookies().get('refresh_token_rtr')?.value
   const access_token_rtr = cookies().get('access_token_rtr')?.value
 
-  const type = refresh_token_rtr && access_token_rtr ? 'restaurant' : 'employee'
+  // const refresh_token_epl = cookies().get('refresh_token_epl')?.value
+  // const access_token_epl = cookies().get('access_token_epl')?.value
 
+  // if (!refresh_token_rtr && !access_token_rtr && !refresh_token_epl && !access_token_epl) {
+  //   return {
+  //     message: 'Vui lòng đăng nhập để lấy thông tin',
+  //     code: -1
+  //   }
+  // }
+
+  const type = refresh_token_rtr && access_token_rtr ? 'restaurant' : 'employee'
   const url =
     type === 'restaurant' ? `${process.env.URL_SERVER}/restaurants/infor` : `${process.env.URL_SERVER}/employees/infor`
 

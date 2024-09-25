@@ -48,7 +48,7 @@ export const columns: ColumnDef<ITable>[] = [
     cell: ({ row }) => {
       const router = useRouter()
       const table = row.original
-      const url = `${process.env.NEXT_PUBLIC_URL_CLIENT}/table?id=${table._id}&token=${table.tbl_token}`
+      const url = `${process.env.NEXT_PUBLIC_URL_CLIENT}/guest/table/${table.tbl_restaurant_id}?token=${table.tbl_token}`
       const handleUpdateToken = async () => {
         const res = await updateQrCode({
           _id: table._id
@@ -101,7 +101,9 @@ export const columns: ColumnDef<ITable>[] = [
       return (
         <div>
           <QRCodeSVG value={url} />
-          <Link href={`/table?id=${table._id}&token=${table.tbl_token}`}>{url}</Link>
+          <Link target='_blank' href={`/guest/table/${table.tbl_restaurant_id}?token=${table.tbl_token}`}>
+            {url}
+          </Link>
           <Button onClick={handleUpdateToken}>Đổi mã QR</Button>
         </div>
       )

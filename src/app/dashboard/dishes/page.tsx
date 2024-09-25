@@ -17,6 +17,7 @@ import { PageDishes } from './_component/PageDishes'
 import { getAllDish } from './dishes.api'
 import { IDish } from './dishes.interface'
 import { columns } from './_component/Columns'
+import LogoutPage from '@/app/logout/page'
 interface PageProps {
   searchParams: { [key: string]: string }
 }
@@ -29,7 +30,7 @@ async function Component({ searchParams }: PageProps) {
   })
 
   if (res.code === -10) {
-    deleteCookiesAndRedirect()
+    return <LogoutPage />
   }
   if (res.code === -11) {
     return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />

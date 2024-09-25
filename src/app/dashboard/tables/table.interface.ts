@@ -1,4 +1,5 @@
 export interface ITable {
+  tbl_restaurant_id: string
   _id: string
   tbl_name: string
   tbl_description: string
