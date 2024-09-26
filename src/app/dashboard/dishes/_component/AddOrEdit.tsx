@@ -503,7 +503,7 @@ export default function AddOrEdit({ id, inforDish }: Props) {
           )}
         />
         <EditorTiny data={description} setData={setDescription} defaultData={description} />
-        <div dangerouslySetInnerHTML={{ __html: description }} />
+        {/* <div dangerouslySetInnerHTML={{ __html: description }} /> */}
         <Button type='submit'>{id === 'add' ? 'Thêm bàn mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>

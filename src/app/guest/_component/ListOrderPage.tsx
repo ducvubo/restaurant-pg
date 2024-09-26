@@ -104,7 +104,7 @@ export default function ListOrderPage() {
             </div>
           ))}
           <span>
-            Đơn chưa thanh toán * {totalQuantity} món {totalPrice?.toLocaleString()} đ
+            Đơn chưa thanh toán {totalQuantity} món * {totalPrice?.toLocaleString()} đ
           </span>
         </div>
       </div>

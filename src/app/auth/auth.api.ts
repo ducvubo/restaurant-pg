@@ -278,29 +278,35 @@ export const getInfor = async () => {
   const refresh_token_rtr = cookies().get('refresh_token_rtr')?.value
   const access_token_rtr = cookies().get('access_token_rtr')?.value
 
-  // const refresh_token_epl = cookies().get('refresh_token_epl')?.value
-  // const access_token_epl = cookies().get('access_token_epl')?.value
+  const refresh_token_epl = cookies().get('refresh_token_epl')?.value
+  const access_token_epl = cookies().get('access_token_epl')?.value
 
-  // if (!refresh_token_rtr && !access_token_rtr && !refresh_token_epl && !access_token_epl) {
-  //   return {
-  //     message: 'Vui lòng đăng nhập để lấy thông tin',
-  //     code: -1
-  //   }
-  // }
+  if (!refresh_token_rtr && !access_token_rtr && !refresh_token_epl && !access_token_epl) {
+    return {
+      message: 'Vui lòng đăng nhập để lấy thông tin',
+      code: -1
+    }
+  }
 
-  const type = refresh_token_rtr && access_token_rtr ? 'restaurant' : 'employee'
-  const url =
-    type === 'restaurant' ? `${process.env.URL_SERVER}/restaurants/infor` : `${process.env.URL_SERVER}/employees/infor`
+  if (access_token_epl || access_token_rtr) {
+    const type = refresh_token_rtr && access_token_rtr ? 'restaurant' : 'employee'
+    const url =
+      type === 'restaurant'
+        ? `${process.env.URL_SERVER}/restaurants/infor`
+        : `${process.env.URL_SERVER}/employees/infor`
+    const res: IBackendRes<IRestaurant | IEmployee> = await sendRequest({
+      url,
+      method: 'GET'
+    })
+    return {
+      type,
+      data: res.data,
+      message: 'Lấy thông tin thành công',
+      code: 0
+    }
+  }
 
-  const res: IBackendRes<IRestaurant | IEmployee> = await sendRequest({
-    url,
-    method: 'GET'
-  })
-
-  return {
-    type,
-    data: res.data,
-    message: 'Lấy thông tin thành công',
-    code: 0
+  if (refresh_token_epl || refresh_token_rtr) {
+    return await reFreshTokenNew()
   }
 }

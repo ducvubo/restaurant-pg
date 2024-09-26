@@ -19,35 +19,35 @@ export default function RefreshToken() {
   }
 
   const refreshToken = async () => {
-    const lastRefreshTime = localStorage.getItem('last_refresh_token_time_restaurant_pg')
-    const currentTime = Date.now()
+    // const lastRefreshTime = localStorage.getItem('last_refresh_token_time_restaurant_pg')
+    // const currentTime = Date.now()
 
-    // Kiểm tra nếu lần cuối refresh token dưới 10 phút thì không thực hiện nữa
-    if (lastRefreshTime && currentTime - parseInt(lastRefreshTime, 10) < 1000 * 60 * 8) {
-      console.log('Token đã được làm mới gần đây, bỏ qua việc làm mới')
-      const currentPathname = window.location.pathname
+    // // Kiểm tra nếu lần cuối refresh token dưới 10 phút thì không thực hiện nữa
+    // if (lastRefreshTime && currentTime - parseInt(lastRefreshTime, 10) < 1000 * 60 * 8) {
+    //   console.log('Token đã được làm mới gần đây, bỏ qua việc làm mới')
+    //   const currentPathname = window.location.pathname
 
-      const res = await getInfor()
-      if (res?.code === 0 && res.data) {
-        if (res.type === 'restaurant') {
-          runAppRestaurant(res.data)
-          if (!currentPathname.startsWith('/dashboard')) {
-            // router.push('/dashboard')
-          }
-        } else if (res.type === 'employee') {
-          runAppEmployee(res.data)
-          if (!currentPathname.startsWith('/dashboard')) {
-            // router.push('/dashboard')
-          }
-        }
-      }
-    }
+    //   const res = await getInfor()
+    //   if (res?.code === 0 && res.data) {
+    //     if (res.type === 'restaurant') {
+    //       runAppRestaurant(res.data)
+    //       if (!currentPathname.startsWith('/dashboard')) {
+    //         // router.push('/dashboard')
+    //       }
+    //     } else if (res.type === 'employee') {
+    //       runAppEmployee(res.data)
+    //       if (!currentPathname.startsWith('/dashboard')) {
+    //         // router.push('/dashboard')
+    //       }
+    //     }
+    //   }
+    // }
 
-    const res = await reFreshTokenNew()
+    const res = await getInfor()
     const currentPathname = window.location.pathname
 
     if (res?.code === 0 && res.data) {
-      localStorage.setItem('last_refresh_token_time_restaurant_pg', currentTime.toString())
+      // localStorage.setItem('last_refresh_token_time_restaurant_pg', currentTime.toString())
 
       if (res.type === 'restaurant') {
         runAppRestaurant(res.data)

@@ -12,8 +12,10 @@ import { Input } from '@/components/ui/input'
 import { useLoading } from '@/context/LoadingContext'
 import { toast } from '@/hooks/use-toast'
 import { calculateFinalPrice } from '@/app/utils'
+import { useRouter } from 'next/navigation'
 
 export default function OrderPage() {
+  const router = useRouter()
   const { setLoading } = useLoading()
   const inforGuest = useSelector((state: RootState) => state.inforGuest)
   const [listDish, setListDish] = useState<Omit<IDish, 'dish_status' | 'isDeleted'>[]>([])
@@ -71,6 +73,7 @@ export default function OrderPage() {
         description: 'Đặt hàng thành công',
         variant: 'default'
       })
+      router.push('/guest/list-order')
     } else if (res?.code === 400) {
       setLoading(false)
       if (Array.isArray(res.message)) {
