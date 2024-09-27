@@ -57,8 +57,8 @@ export const columns: ColumnDef<IEmployee>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
-      const router = useRouter()
       const employee = row.original
+      const router = useRouter()
       const handleUpdateStatus = async () => {
         const res = await updateStatus({
           _id: employee._id,

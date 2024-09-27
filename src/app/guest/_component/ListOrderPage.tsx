@@ -10,7 +10,7 @@ import Image from 'next/image'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { IOrderDish } from '../guest.interface'
-import { calculateFinalPrice } from '@/app/utils'
+import { calculateFinalPrice, switchStatusOrderVi } from '@/app/utils'
 
 export default function ListOrderPage() {
   const inforGuest = useSelector((state: RootState) => state.inforGuest)
@@ -27,23 +27,6 @@ export default function ListOrderPage() {
     findListOrder()
   }, [])
 
-  const switchStatusVi = (status: string) => {
-    switch (status) {
-      case 'processing':
-        return 'Đang nấu'
-      case 'pending':
-        return 'Chờ xử lý'
-      case 'paid':
-        return 'Đã thanh toán'
-      case 'delivered':
-        return 'Đã phục vụ'
-      case 'refuse':
-        return 'Từ chối'
-      default:
-        return 'Trạng thái không hợp lệ'
-    }
-  }
-
   const filteredDishes = listOrder?.filter((dish) => dish.od_dish_status !== 'paid')
   const totalQuantity = filteredDishes?.reduce((total, dish) => total + dish.od_dish_quantity, 0)
   const totalPrice = filteredDishes?.reduce(
@@ -56,8 +39,6 @@ export default function ListOrderPage() {
         ),
     0
   )
-
-  console.log(listOrder)
 
   return (
     <div className='flex justify-center items-center'>
@@ -99,7 +80,9 @@ export default function ListOrderPage() {
                 </span>
               </div>
               <div className='flex gap-2 items-end justify-end'>
-                <Badge className='cursor-default w-auto whitespace-nowrap'>{switchStatusVi(item.od_dish_status)}</Badge>
+                <Badge className='cursor-default w-auto whitespace-nowrap' variant={'secondary'}>
+                  {switchStatusOrderVi(item.od_dish_status)}
+                </Badge>
               </div>
             </div>
           ))}

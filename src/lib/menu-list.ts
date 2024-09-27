@@ -1,4 +1,15 @@
-import { Tag, Users, Settings, Bookmark, SquarePen, LayoutGrid, LucideIcon, Salad } from 'lucide-react'
+import {
+  Tag,
+  Users,
+  Settings,
+  Bookmark,
+  SquarePen,
+  LayoutGrid,
+  LucideIcon,
+  Salad,
+  HandPlatter,
+  ListOrdered
+} from 'lucide-react'
 
 type Submenu = {
   href: string
@@ -21,6 +32,29 @@ type Group = {
 
 export function getMenuListRestaurant(pathname: string): Group[] {
   return [
+    {
+      groupLabel: 'Đơn hàng',
+      menus: [
+        {
+          href: '/dashboard/order',
+          label: 'Đơn đặt hàng',
+          active: pathname.includes('/order'),
+          icon: ListOrdered,
+          submenus: [
+            {
+              href: '/dashboard/order/dish',
+              label: 'Danh sách đơn đặt món ăn',
+              active: pathname === '/dashboard/order/dish'
+            },
+            {
+              href: '/dashboard/order/table',
+              label: 'Đơn đặt theo bàn',
+              active: pathname === '/dashboard/order'
+            }
+          ]
+        }
+      ]
+    },
     {
       groupLabel: 'Chủ cửa hàng',
       menus: [
@@ -121,13 +155,36 @@ export function getMenuListRestaurant(pathname: string): Group[] {
 export function getMenuListEmployee(pathname: string): Group[] {
   return [
     {
+      groupLabel: 'Đơn hàng',
+      menus: [
+        {
+          href: '/dashboard/order',
+          label: 'Đơn đặt hàng',
+          active: pathname.includes('/order'),
+          icon: ListOrdered,
+          submenus: [
+            {
+              href: '/dashboard/order/dish',
+              label: 'Danh sách đơn đặt món ăn',
+              active: pathname === '/dashboard/order/dish'
+            },
+            {
+              href: '/dashboard/order/table',
+              label: 'Đơn đặt theo bàn',
+              active: pathname === '/dashboard/order'
+            }
+          ]
+        }
+      ]
+    },
+    {
       groupLabel: 'Nhân viên',
       menus: [
         {
           href: '/dashboard/tables',
           label: 'Bàn ăn',
           active: pathname.includes('/tables'),
-          icon: Bookmark,
+          icon: HandPlatter,
           submenus: [
             {
               href: '/dashboard/tables',
@@ -168,13 +225,6 @@ export function getMenuListEmployee(pathname: string): Group[] {
               active: pathname === '/dashboard/dishes/recycle'
             }
           ]
-        },
-        {
-          href: '/tags',
-          label: 'Tags',
-          active: pathname.includes('/tags'),
-          icon: Tag,
-          submenus: []
         }
       ]
     }

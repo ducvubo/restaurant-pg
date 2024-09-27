@@ -243,7 +243,6 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
       await deleteCookiesAndRedirect()
     } else if (res.code === -11) {
       setLoading(false)
-
       toast({
         title: 'Thông báo',
         description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',

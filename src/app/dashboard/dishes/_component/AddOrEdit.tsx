@@ -262,7 +262,6 @@ export default function AddOrEdit({ id, inforDish }: Props) {
       setLoading(false)
       if (Array.isArray(res.message)) {
         res.message.map((item: string) => {
-          console.log('item', item)
           toast({
             title: 'Thất bại',
             description: item,

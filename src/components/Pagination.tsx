@@ -13,10 +13,11 @@ interface DataTablePaginationProps<TData> {
     totalPage: number
     totalItem: number
   }
+  defaultRow?: number
   onPageChange: (pageIndex: number, pageSize: number) => void // Hàm để gọi API khi thay đổi trang
 }
 
-export function DataTablePagination<TData>({ table, meta, onPageChange }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({ table, meta, onPageChange, defaultRow }: DataTablePaginationProps<TData>) {
   const [pageIndex, setPageIndex] = useState(meta.current - 1)
   const [pageSize, setPageSize] = useState(meta.pageSize)
 
@@ -47,7 +48,7 @@ export function DataTablePagination<TData>({ table, meta, onPageChange }: DataTa
               <SelectValue placeholder={pageSize} />
             </SelectTrigger>
             <SelectContent side='top'>
-              {[10, 20, 30, 40, 50].map((size) => (
+              {[meta.pageSize, 10, 20, 30, 40, 50].map((size) => (
                 <SelectItem key={size} value={`${size}`}>
                   {size}
                 </SelectItem>

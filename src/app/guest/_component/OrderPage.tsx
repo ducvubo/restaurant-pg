@@ -63,7 +63,6 @@ export default function OrderPage() {
     const dishOrderArray = Object.entries(selectedDishes)
       .filter(([_, quantity]) => quantity > 0) // Only include dishes with quantity > 0
       .map(([dishId, quantity]) => ({ od_dish_id: dishId, od_dish_quantity: quantity }))
-    console.log(dishOrderArray)
 
     const res: IBackendRes<any> = await orderDish(dishOrderArray)
     if (res.statusCode === 201) {
@@ -136,11 +135,11 @@ export default function OrderPage() {
                   </div>
                 )}
                 <div className='flex gap-2 items-end'>
-                  <Button className='h-6 w-6' onClick={() => handleQuantityChange(dish._id, -1)}>
+                  <Button className='h-6 w-6' onClick={() => handleQuantityChange(dish._id, -1)} variant={'secondary'}>
                     -
                   </Button>
                   <Input disabled className='w-11 h-6 text-center' value={selectedDishes[dish._id] || 0} />
-                  <Button className='h-6 w-6' onClick={() => handleQuantityChange(dish._id, 1)}>
+                  <Button className='h-6 w-6' onClick={() => handleQuantityChange(dish._id, 1)} variant={'secondary'}>
                     +
                   </Button>
                 </div>
