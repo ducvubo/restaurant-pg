@@ -116,6 +116,7 @@ export function TableOrder<TData, TValue>({
           table={table}
           meta={meta}
           onPageChange={(pageIndex, pageSize) => handlePageChange(pageIndex + 1, pageSize)}
+          defaultRow={6}
         />
       </div>
     </div>

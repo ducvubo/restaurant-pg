@@ -37,7 +37,7 @@ export default function RootLayout({
             <LoadingProvider>
               <GlobalLoading />
               <Toaster />
-              <RefreshToken />
+              {/* <RefreshToken /> */}
               {children}
             </LoadingProvider>
           </ThemeProvider>

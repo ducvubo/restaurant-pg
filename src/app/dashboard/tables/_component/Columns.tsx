@@ -21,7 +21,15 @@ import { ITable } from '../table.interface'
 import DeleteOrRestore from './DeleteOrRestore'
 import { updateQrCode, updateStatus } from '../table.api'
 import { QRCodeSVG } from 'qrcode.react'
-
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 export const columns: ColumnDef<ITable>[] = [
   {
     accessorKey: 'tbl_name',
@@ -99,10 +107,10 @@ export const columns: ColumnDef<ITable>[] = [
         }
       }
       return (
-        <div>
+        <div className='w-40'>
           <QRCodeSVG value={url} />
           <Link target='_blank' href={`/guest/table/${table.tbl_restaurant_id}?token=${table.tbl_token}`}>
-            {url}
+            <span className='inline-block break-all whitespace-normal break-words max-w-full'>{url}</span>
           </Link>
           <Button onClick={handleUpdateToken}>Đổi mã QR</Button>
         </div>
@@ -118,10 +126,10 @@ export const columns: ColumnDef<ITable>[] = [
     cell: ({ row }) => {
       const router = useRouter()
       const table = row.original
-      const handleUpdateStatus = async () => {
+      const handleUpdateStatus = async (table_status: 'enable' | 'disable' | 'serving') => {
         const res = await updateStatus({
           _id: table._id,
-          tbl_status: table.tbl_status === 'enable' ? 'disable' : 'enable'
+          tbl_status: table_status
         })
         if (res.statusCode === 200) {
           toast({
@@ -168,14 +176,29 @@ export const columns: ColumnDef<ITable>[] = [
           })
         }
       }
-      return table.tbl_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
-          Đang hoạt động
-        </Button>
-      ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
-          Ngưng hoạt động
-        </Button>
+
+      if (table.tbl_status === 'reserve') {
+        return <Button disabled>Đang phục vụ</Button>
+      }
+
+      return (
+        <Select
+          value={table.tbl_status}
+          onValueChange={(value: 'enable' | 'disable' | 'serving') => handleUpdateStatus(value)}
+        >
+          <SelectTrigger className='w-[153px]'>
+            <SelectValue placeholder='Trạng thái' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Chọn trạng thái</SelectLabel>
+              <SelectItem value='enable'>Có sẵn</SelectItem>
+              <SelectItem value='disable'>Không có sẵn</SelectItem>
+              <SelectItem value='serving'>Đã đặt trước</SelectItem>
+              {/* <SelectItem value='reserve'>Đang phục vụ</SelectItem> */}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       )
     }
   },

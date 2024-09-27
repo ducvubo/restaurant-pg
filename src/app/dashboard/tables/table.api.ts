@@ -77,7 +77,13 @@ export const restoreTable = async ({ _id }: { _id: string }) => {
   return res
 }
 
-export const updateStatus = async ({ _id, tbl_status }: { _id: string; tbl_status: 'enable' | 'disable' }) => {
+export const updateStatus = async ({
+  _id,
+  tbl_status
+}: {
+  _id: string
+  tbl_status: 'enable' | 'disable' | 'serving'
+}) => {
   const res: IBackendRes<ITable> = await sendRequest({
     url: `${process.env.URL_SERVER}/tables/update-status`,
     method: 'PATCH',

@@ -48,7 +48,7 @@ export function DataTablePagination<TData>({ table, meta, onPageChange, defaultR
               <SelectValue placeholder={pageSize} />
             </SelectTrigger>
             <SelectContent side='top'>
-              {[meta.pageSize, 10, 20, 30, 40, 50].map((size) => (
+              {[defaultRow ? defaultRow : null, 10, 20, 30, 40, 50].map((size) => (
                 <SelectItem key={size} value={`${size}`}>
                   {size}
                 </SelectItem>
