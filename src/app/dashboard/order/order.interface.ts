@@ -31,6 +31,11 @@ export interface OdDishGuestId {
   guest_table_id: string
   guest_name: string
   guest_refresh_token: string
+  guest_type: 'owner' | 'member'
+  guest_owner: {
+    owner_id: string
+    owner_name: string
+  }
   createdAt: string
   updatedAt: string
   __v: number
@@ -46,6 +51,7 @@ export interface OdDishTableId {
   tbl_capacity: number
   tbl_status: string
   tbl_token: string
+
   createdAt: string
   updatedAt: string
   __v: number

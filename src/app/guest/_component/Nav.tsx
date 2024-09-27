@@ -11,8 +11,14 @@ import {
 import { MoonIcon, SunIcon } from '@radix-ui/react-icons'
 import { useTheme } from 'next-themes'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { RootState } from '@/app/redux/store'
+import { useSelector } from 'react-redux'
 export default function Nav() {
   const { setTheme } = useTheme()
+  const inforGuest = useSelector((state: RootState) => state.inforGuest)
+
+  console.log(inforGuest)
+
   return (
     <header className='flex h-20 w-full shrink-0 items-center px-4 md:px-6 sticky top-0  z-10 dark:bg-[#121212] bg-white'>
       <Sheet>
@@ -34,9 +40,16 @@ export default function Nav() {
             <Link href='#' className='flex w-full items-center py-2 text-lg font-semibold' prefetch={false}>
               About
             </Link>
-            <Link href='#' className='flex w-full items-center py-2 text-lg font-semibold' prefetch={false}>
-              Services
-            </Link>
+            {inforGuest?.guest_type === 'owner' && (
+              <Link
+                href='/guest/add-member'
+                className='flex w-full items-center py-2 text-lg font-semibold'
+                prefetch={false}
+              >
+                Thêm thành viên
+              </Link>
+            )}
+
             <Link href='/guest/order' className='flex w-full items-center py-2 text-lg font-semibold' prefetch={false}>
               Gọi món
             </Link>
@@ -74,15 +87,18 @@ export default function Nav() {
               About
             </Link>
           </NavigationMenuLink>
-          <NavigationMenuLink asChild>
-            <Link
-              href='#'
-              className='group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-[#121212] dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50'
-              prefetch={false}
-            >
-              Services
-            </Link>
-          </NavigationMenuLink>
+          {inforGuest?.guest_type === 'owner' && (
+            <NavigationMenuLink asChild>
+              <Link
+                href='/guest/add-member'
+                className='group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-[#121212] dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50'
+                prefetch={false}
+              >
+                Thêm thành viên
+              </Link>
+            </NavigationMenuLink>
+          )}
+
           <NavigationMenuLink asChild>
             <Link
               href='/guest/order'

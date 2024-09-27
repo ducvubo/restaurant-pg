@@ -36,9 +36,26 @@ export const columns: ColumnDef<OrderRestaurant>[] = [
     id: 'Khách hàng',
     cell: ({ row }) => {
       const order: OrderRestaurant = row.original
-      return <span>{order.od_dish_guest_id.guest_name}</span>
+      return <span>{order.od_dish_guest_id?.guest_name}</span>
     },
     header: () => <div>Khách hàng</div>,
+    enableHiding: true
+  },
+  {
+    accessorKey: 'ahgdfhbashb',
+    id: 'Chức vụ',
+    cell: ({ row }) => {
+      const order: OrderRestaurant = row.original
+      return (
+        <span>
+          {order.od_dish_guest_id.guest_type === 'owner'
+            ? 'Chủ bàn'
+            : order.od_dish_guest_id.guest_type === 'member' &&
+              `Thành viên (${order.od_dish_guest_id.guest_owner.owner_name})`}
+        </span>
+      )
+    },
+    header: () => <div>Chức vụ</div>,
     enableHiding: true
   },
   {

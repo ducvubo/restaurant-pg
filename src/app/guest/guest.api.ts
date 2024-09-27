@@ -176,3 +176,66 @@ export const getListOrder = async () => {
 
   return res
 }
+
+export const generateTokenAddMember = async () => {
+  const res: IBackendRes<string> = await sendRequest({
+    url: `${process.env.URL_SERVER}/guest-restaurant/generate-token-add-member`,
+    method: 'POST',
+    headers: {
+      'x-at-guest': `Bearer ${cookies().get('access_token_guest')?.value}`,
+      'x-rf-guest': `Bearer ${cookies().get('refresh_token_guest')?.value}`
+    }
+  })
+
+  return res
+}
+
+export const addMember = async (payload: { token: string; guest_name: string }) => {
+  const res: IBackendRes<{
+    access_token_guest: string
+    refresh_token_guest: string
+    guest_name: string
+    guest_restaurant_id: string
+    guest_table_id: string
+  }> = await sendRequest({
+    url: `${process.env.URL_SERVER}/guest-restaurant/add-member`,
+    method: 'POST',
+    body: payload
+  })
+
+  if (res.statusCode === 201 && res.data) {
+    await cookies().set({
+      name: 'access_token_guest',
+      value: res.data.access_token_guest,
+      path: '/',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: Number(process.env.JWT_ACCESSTOKEN_GUEST_RESTAURANT_EXPIRE)
+    }),
+      await cookies().set({
+        name: 'refresh_token_guest',
+        value: res.data.refresh_token_guest,
+        path: '/',
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        maxAge: Number(process.env.JWT_REFRESHTOKEN_GUEST_RESTAURANT_EXPIRE)
+      })
+
+    return {
+      data: {
+        guest_name: res.data.guest_name,
+        guest_restaurant_id: res.data.guest_restaurant_id,
+        guest_table_id: res.data.guest_table_id
+      },
+      code: res.statusCode,
+      message: res.message
+    }
+  }
+
+  return {
+    code: res.statusCode,
+    message: res.message
+  }
+}

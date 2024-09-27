@@ -8,7 +8,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input'
 import { toast } from '@/hooks/use-toast'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { loginGuest } from '../guest.api'
+import { addMember, loginGuest } from '../guest.api'
 import { startAppGuest } from '../guest.slice'
 import { IGuest } from '../guest.interface'
 import { useDispatch } from 'react-redux'
@@ -20,11 +20,10 @@ const FormSchema = z.object({
       message: 'Vui lòng nhập ít nhất 2 ký tự'
     })
     .max(50, { message: 'Vui lòng nhập tối đa 50 ký tự' }),
-  guest_table_id: z.string(),
-  guest_restaurant_id: z.string()
+  token: z.string()
 })
 
-export function LoginTableForm() {
+export function MemberLogin() {
   const param = useParams()
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -38,8 +37,7 @@ export function LoginTableForm() {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       guest_name: '',
-      guest_restaurant_id: (param.slug as string) || '', // Ép kiểu hoặc sử dụng giá trị mặc định
-      guest_table_id: (searchParams.get('token') ?? '') as string
+      token: (searchParams.get('token') ?? '') as string
     }
   })
 
@@ -48,18 +46,18 @@ export function LoginTableForm() {
   }
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    const res = await loginGuest(data)
-    if (res.code === 201) {
+    const res: any = await addMember(data)
+    if (res.code === 201 && res.data) {
       toast({
         title: 'Thành công',
         description: 'Đăng nhập thành công',
         variant: 'default'
       })
       runAppGuest({
-        guest_name: data.guest_name,
-        guest_restaurant_id: data.guest_restaurant_id,
-        guest_table_id: data.guest_table_id,
-        guest_type: 'owner'
+        guest_name: res.data.guest_name,
+        guest_restaurant_id: res.data.guest_restaurant_id,
+        guest_table_id: res.data.guest_table_id,
+        guest_type: 'member'
       })
 
       router.push('/guest/order')
