@@ -94,13 +94,12 @@ export default function OrderPage() {
       setLoading(false)
       toast({
         title: 'Thất bại',
-        description: 'Đã xảy ra lỗi, vui lòng thử lại sau ít phút',
+        description: 'Đã xảy ra lỗi, vui lòng thử lại sau ít phút hoặc liên hệ nhân viên',
         variant: 'destructive'
       })
     }
   }
 
-  // console.log(dishOrderArray)
 
   return (
     <div className='flex justify-center items-center mx-1'>

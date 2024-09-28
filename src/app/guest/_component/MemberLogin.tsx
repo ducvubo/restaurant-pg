@@ -57,7 +57,8 @@ export function MemberLogin() {
         guest_name: res.data.guest_name,
         guest_restaurant_id: res.data.guest_restaurant_id,
         guest_table_id: res.data.guest_table_id,
-        guest_type: 'member'
+        guest_type: 'member',
+        order_id: res.data.order_id
       })
 
       router.push('/guest/order')

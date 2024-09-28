@@ -1,5 +1,3 @@
-import { IOrderDish } from '../guest/guest.interface'
-
 export const isNumericString = (str: string) => {
   return /^[0-9]{10,}$/.test(str)
 }
@@ -15,18 +13,29 @@ export const calculateFinalPrice = (price: number, sale: { sale_type: string; sa
   return price
 }
 
+export const switchStatusOrderSummaryVi = (status: string) => {
+  switch (status) {
+    case 'ordering':
+      return ' Đang order'
+    case 'paid':
+      return ' Đã thanh toán'
+    case 'refuse':
+      return ' Từ chối order'
+    default:
+      return 'Trạng thái không hợp lệ'
+  }
+}
+
 export const switchStatusOrderVi = (status: string) => {
   switch (status) {
     case 'processing':
-      return 'Đang nấu'
+      return ' Đang nấu'
     case 'pending':
       return 'Chờ xử lý'
-    case 'paid':
-      return 'Đã thanh toán'
+    case 'refuse':
+      return ' Từ chối'
     case 'delivered':
       return 'Đã phục vụ'
-    case 'refuse':
-      return 'Từ chối'
     default:
       return 'Trạng thái không hợp lệ'
   }
@@ -49,21 +58,31 @@ export const formatDateMongo = (dateStr: string) => {
   return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`
 }
 
-// export const countOrderStatus = (
-//   orders: IOrderDish[],
-//   statuses: 'processing' | 'pending' | 'paid' | 'delivered' | 'refuse'
-// ) => {
-//   const statusCount = statuses.reduce((acc, status) => {
-//     acc[status] = 0
-//     return acc
-//   }, {})
+export const calculateTotalPrice = (data: any) => {
+  let totalPrice = 0
 
-//   // Duyệt qua danh sách các order và đếm số lượng theo trạng thái
-//   orders.forEach((order) => {
-//     if (statusCount.hasOwnProperty(order.od_dish_status)) {
-//       statusCount[order.od_dish_status]++
-//     }
-//   })
+  data.or_dish.forEach((dish: any) => {
+    // Loại trừ các món có trạng thái 'refuse'
+    if (dish.od_dish_status !== 'refuse') {
+      const price = dish.od_dish_duplicate_id.dish_duplicate_price
+      const sale = dish.od_dish_duplicate_id.dish_duplicate_sale
+      const quantity = dish.od_dish_quantity
 
-//   return statusCount
-// }
+      let finalPrice = price
+
+      // Kiểm tra giảm giá
+      if (sale) {
+        if (sale.sale_type === 'fixed') {
+          finalPrice = price - sale.sale_value
+        } else if (sale.sale_type === 'percent') {
+          finalPrice = price * (1 - sale.sale_value / 100)
+        }
+      }
+
+      // Tính tổng cho món ăn này
+      totalPrice += finalPrice * quantity
+    }
+  })
+
+  return totalPrice
+}

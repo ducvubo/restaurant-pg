@@ -3,14 +3,23 @@ export interface IGuest {
   guest_table_id: string
   guest_name: string
   guest_type: string
+  order_id: string
 }
 
-export interface IOrderDish {
+export interface IOrderDishGuest {
+  _id: string
+  od_dish_smr_restaurant_id: string
+  od_dish_smr_guest_id: string
+  od_dish_smr_table_id: string
+  od_dish_smr_status: 'paid' | 'refuse' | 'ordering'
+  or_dish: OrDish[]
+}
+
+export interface OrDish {
   _id: string
   isDeleted: boolean
-  od_dish_restaurant_id: string
+  od_dish_summary_id: string
   od_dish_guest_id: string
-  od_dish_table_id: string
   od_dish_duplicate_id: OdDishDuplicateId
   od_dish_quantity: number
   od_dish_status: string

@@ -19,16 +19,21 @@ import {
 import { Label } from '@radix-ui/react-dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { getListOrderDish } from '../order.api'
+import { getListOrderDish, updateStatusOrder } from '../order.api'
 import { TableOrder } from './Table'
 import { columns } from './Columns'
 import { debounce } from 'lodash'
-import { IModelPaginateWithStatusCount, IStatusCount, OrderRestaurant } from '../order.interface'
-import { switchStatusOrderVi } from '@/app/utils'
+import { IModelPaginateWithStatusCount, IStatusCount, IOrderRestaurant } from '../order.interface'
+import { calculateFinalPrice, calculateTotalPrice, formatDateMongo, switchStatusOrderSummaryVi } from '@/app/utils'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useLoading } from '@/context/LoadingContext'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import Image from 'next/image'
+import { Pagination } from '@/components/Pagination'
+import { ModalUpdateStatusSummary } from './ModalUpdateSummary'
 
 const formatVietnameseDate = (date: Date) => {
   const day = date.getDate()
@@ -45,6 +50,7 @@ const disableFutureDates = (date: any) => {
 }
 export default function ListOrderPage() {
   const { setLoading } = useLoading()
+  const router = useRouter()
   const today = new Date()
   const defaultToDate = new Date(today.setHours(0, 0, 0, 0)) // Set to 00:00
   const defaultFromDate = new Date(today.setHours(23, 59, 0, 0)) // Set to 23:59
@@ -52,8 +58,8 @@ export default function ListOrderPage() {
   const [fromDate, setFromDate] = useState<Date>(defaultFromDate)
   const [nameGuest, setNameGuest] = useState('')
   const [tableName, setTableName] = useState('')
-  const [status, setStatus] = useState<'processing' | 'pending' | 'paid' | 'delivered' | 'refuse' | 'all'>('all')
-  const [listOrder, setlistOrder] = useState<OrderRestaurant[]>([])
+  const [status, setStatus] = useState<'ordering' | 'paid' | 'refuse' | 'all'>('all')
+  const [listOrder, setlistOrder] = useState<IOrderRestaurant[]>([])
   const [pageIndex, setPageIndex] = React.useState(1)
   const [pageSize, setPageSize] = React.useState(10)
   const [meta, setMeta] = useState<{
@@ -63,7 +69,7 @@ export default function ListOrderPage() {
     totalItem: number
   }>({
     current: 1,
-    pageSize: 6,
+    pageSize: 10,
     totalPage: 1,
     totalItem: 0
   })
@@ -78,10 +84,10 @@ export default function ListOrderPage() {
     setStatus('all')
     setlistOrder([])
     setPageIndex(1)
-    setPageSize(6)
+    setPageSize(10)
     setMeta({
       current: 1,
-      pageSize: 6,
+      pageSize: 10,
       totalPage: 1,
       totalItem: 0
     })
@@ -111,14 +117,14 @@ export default function ListOrderPage() {
 
   const findListOrder = async () => {
     setLoading(true)
-    const res: IBackendRes<IModelPaginateWithStatusCount<OrderRestaurant>> = await getListOrderDish({
+    const res: IBackendRes<IModelPaginateWithStatusCount<IOrderRestaurant>> = await getListOrderDish({
       current: pageIndex,
       pageSize: pageSize,
       toDate,
       fromDate,
       guest_name: nameGuest ? nameGuest : undefined,
       tbl_name: tableName ? tableName : undefined,
-      od_dish_status: status
+      od_dish_smr_status: status
     })
     if (res.statusCode === 200 && res.data && res.data.result) {
       setLoading(false)
@@ -176,7 +182,77 @@ export default function ListOrderPage() {
     }
   }, [searchParam])
 
-  // console.log(listOrder)
+  const handleUpdateStatus = async ({
+    _id,
+    od_dish_status,
+    od_dish_summary_id
+  }: {
+    _id: string
+    od_dish_summary_id: string
+    od_dish_status: 'processing' | 'pending' | 'delivered' | 'refuse'
+  }) => {
+    setLoading(true)
+    const res = await updateStatusOrder({
+      _id,
+      od_dish_status,
+      od_dish_summary_id
+    })
+    if (res.statusCode === 200) {
+      setLoading(false)
+      toast({
+        title: 'Thành công',
+        description: 'Cập nhật trạng thái thành công',
+        variant: 'default'
+      })
+      router.push(`/dashboard/order/dish?a=${Math.floor(Math.random() * 100000) + 1}`)
+      router.refresh()
+    } else if (res.statusCode === 400) {
+      setLoading(false)
+      if (Array.isArray(res.message)) {
+        res.message.map((item: string) => {
+          toast({
+            title: 'Thất bại',
+            description: item,
+            variant: 'destructive'
+          })
+        })
+      } else {
+        toast({
+          title: 'Thất bại',
+          description: res.message,
+          variant: 'destructive'
+        })
+      }
+    } else if (res.statusCode === 404) {
+      setLoading(false)
+      toast({
+        title: 'Thông báo',
+        description: 'Đơn hàng không tồn tại, vui lòng thử lại sau',
+        variant: 'destructive'
+      })
+    } else if (res.code === -10) {
+      setLoading(false)
+      toast({
+        title: 'Thông báo',
+        description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
+        variant: 'destructive'
+      })
+      await deleteCookiesAndRedirect()
+    } else if (res.code === -11) {
+      toast({
+        title: 'Thông báo',
+        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+        variant: 'destructive'
+      })
+    } else {
+      toast({
+        title: 'Thất bại',
+        description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+        variant: 'destructive'
+      })
+    }
+  }
+
 
   return (
     <section className='mt-2'>
@@ -280,20 +356,229 @@ export default function ListOrderPage() {
           </SelectContent>
         </Select>
       </div>
+
       <div className='flex gap-3 mt-5'>
         {countStatus.map((item) => (
           <Badge
             key={item.status}
             className='whitespace-nowrap'
-            variant={item.status === 'refuse' ? 'destructive' : 'secondary'}
+            variant={item.status === 'refuse' ? 'destructive' : 'outline'}
           >
-            {switchStatusOrderVi(item.status)}: {item.count}
+            {switchStatusOrderSummaryVi(item.status)}: {item.count}
           </Badge>
         ))}
       </div>
-      <TableOrder
-        columns={columns}
-        data={listOrder}
+
+      <div className='flex flex-col gap-3 mt-2'>
+        {listOrder?.map((order_summary: IOrderRestaurant, index1) => {
+          return (
+            <Card className='w-full' key={index1}>
+              <CardHeader>
+                <div className='flex justify-between'>
+                  <div>
+                    <div className='flex gap-1'>
+                      <CardTitle className='mt-[1px]'>{order_summary.od_dish_smr_table_id.tbl_name}: </CardTitle>
+                      <CardTitle className='mt-[1px]'>{order_summary.od_dish_smr_guest_id.guest_name}</CardTitle>
+                      <CardDescription>({formatDateMongo(order_summary.createdAt)})</CardDescription>
+                    </div>
+                    <span className='italic'>
+                      Tổng hóa đơn: {calculateTotalPrice(order_summary)?.toLocaleString()}đ
+                    </span>
+                  </div>
+                  {/* <Select
+                    value={order_summary.od_dish_smr_status}
+                    onValueChange={(value: 'ordering' | 'paid' | 'refuse') =>
+                      handlUpdateStatusSummary({
+                        _id: order_summary._id,
+                        od_dish_smr_status: value
+                      })
+                    }
+                  >
+                    <SelectTrigger className='w-[140px] mr-[80px]'>
+                      <SelectValue placeholder='Chọn trạng thái' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Chọn trạng thái</SelectLabel>
+                        <SelectItem value='paid'>Đã thanh toán</SelectItem>
+                        <SelectItem value='refuse'>Từ chối</SelectItem>
+                        <SelectItem value='ordering'>Đang order</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select> */}
+                  <ModalUpdateStatusSummary order_summary={order_summary} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Accordion type='single' collapsible className='w-full'>
+                  <AccordionItem value='item-1'>
+                    <div className='grid grid-cols-[450px_250px_200px_200px] -mt-4 mb-2'>
+                      <Label className='font-bold -mt-1'>Món ăn</Label>
+                      <Label className='font-bold -mt-1'>Tên khách</Label>
+                      <Label className='font-bold -mt-1'>Trạng thái</Label>
+                      <Label className='font-bold -mt-1'>Tạo/ cập nhật</Label>
+                    </div>
+
+                    {order_summary?.or_dish[0] && (
+                      <div className='grid grid-cols-[450px_250px_200px_200px] mb-4'>
+                        <div className='flex gap-2 '>
+                          <Image
+                            src={order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_image.image_cloud}
+                            width={100}
+                            height={100}
+                            alt='vuducbo'
+                            className='w-[69px] h-[69px] rounded-lg object-cover'
+                          />
+                          <div className='-mt-1 flex flex-col'>
+                            <Label className=''>
+                              {order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_name}
+                            </Label>
+                            <Label className='italic'>
+                              Giá:{' '}
+                              {calculateFinalPrice(
+                                order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_price,
+                                order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_sale
+                              )?.toLocaleString()}
+                              đ x {order_summary?.or_dish[0]?.od_dish_quantity}
+                            </Label>
+                            <Label className='italic'>
+                              Tổng:{' '}
+                              {(
+                                calculateFinalPrice(
+                                  order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_price,
+                                  order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_sale
+                                ) * order_summary?.or_dish[0]?.od_dish_quantity
+                              )?.toLocaleString()}
+                              đ
+                            </Label>
+                          </div>
+                        </div>
+                        <div className='flex items-center'>
+                          <Label className='-mt-1 text-sm'>
+                            {order_summary?.or_dish[0]?.od_dish_guest_id.guest_name}
+                            {order_summary?.or_dish[0]?.od_dish_guest_id.guest_type === 'member'
+                              ? ' (Thành viên)'
+                              : ' (Chủ bàn)'}
+                          </Label>
+                        </div>
+                        <div className='flex items-center'>
+                          <Select
+                            value={order_summary?.or_dish[0]?.od_dish_status}
+                            onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
+                              handleUpdateStatus({
+                                _id: order_summary?.or_dish[0]?._id,
+                                od_dish_status: value,
+                                od_dish_summary_id: order_summary._id
+                              })
+                            }
+                          >
+                            <SelectTrigger className='w-[140px]'>
+                              <SelectValue placeholder='Đang nấu' />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectLabel>Chọn trạng thái</SelectLabel>
+                                <SelectItem value='pending'>Chờ xử lý</SelectItem>
+                                <SelectItem value='processing'>Đang nấu</SelectItem>
+                                <SelectItem value='delivered'>Đã phục vụ</SelectItem>
+                                <SelectItem value='refuse'>Từ chối</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className='flex flex-col'>
+                          <span>{formatDateMongo(order_summary?.or_dish[0]?.createdAt)}</span>
+                          <span>{formatDateMongo(order_summary?.or_dish[0]?.updatedAt)}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {order_summary.or_dish.slice(1).map((order_dish_item, index2) => {
+                      return (
+                        <AccordionContent key={index2}>
+                          <div className='grid grid-cols-[450px_250px_200px_200px]'>
+                            <div className='flex gap-2 '>
+                              <Image
+                                src={order_dish_item.od_dish_duplicate_id.dish_duplicate_image.image_cloud}
+                                width={100}
+                                height={100}
+                                alt='vuducbo'
+                                className='w-[69px] h-[69px] rounded-lg object-cover'
+                              />
+                              <div className='-mt-1 flex flex-col'>
+                                <Label className=''>{order_dish_item.od_dish_duplicate_id.dish_duplicate_name}</Label>
+                                <Label className='italic'>
+                                  Giá:{' '}
+                                  {calculateFinalPrice(
+                                    order_dish_item.od_dish_duplicate_id.dish_duplicate_price,
+                                    order_dish_item.od_dish_duplicate_id.dish_duplicate_sale
+                                  )?.toLocaleString()}
+                                  đ x {order_dish_item.od_dish_quantity}
+                                </Label>
+                                <Label className='italic'>
+                                  Tổng:{' '}
+                                  {(
+                                    calculateFinalPrice(
+                                      order_dish_item.od_dish_duplicate_id.dish_duplicate_price,
+                                      order_dish_item.od_dish_duplicate_id.dish_duplicate_sale
+                                    ) * order_dish_item.od_dish_quantity
+                                  )?.toLocaleString()}
+                                  đ
+                                </Label>
+                              </div>
+                            </div>
+                            <div className='flex items-center'>
+                              <Label className=' -mt-1'>
+                                {order_dish_item.od_dish_guest_id.guest_name}{' '}
+                                {order_dish_item.od_dish_guest_id.guest_type === 'member'
+                                  ? ' (Thành viên)'
+                                  : ' (Chủ bàn)'}
+                              </Label>
+                            </div>
+                            <div className='flex items-center'>
+                              <Select
+                                value={order_dish_item.od_dish_status}
+                                onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
+                                  handleUpdateStatus({
+                                    _id: order_dish_item._id,
+                                    od_dish_status: value,
+                                    od_dish_summary_id: order_summary._id
+                                  })
+                                }
+                              >
+                                <SelectTrigger className='w-[140px]'>
+                                  <SelectValue placeholder='Đang nấu' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Chọn trạng thái</SelectLabel>
+                                    <SelectItem value='pending'>Chờ xử lý</SelectItem>
+                                    <SelectItem value='processing'>Đang nấu</SelectItem>
+                                    <SelectItem value='delivered'>Đã phục vụ</SelectItem>
+                                    <SelectItem value='refuse'>Từ chối</SelectItem>
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className='flex flex-col'>
+                              <span>{formatDateMongo(order_dish_item.createdAt)}</span>
+                              <span>{formatDateMongo(order_dish_item.updatedAt)}</span>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      )
+                    })}
+
+                    <AccordionTrigger className='-mt-5 -mb-5'>Xem chi tiết</AccordionTrigger>
+                  </AccordionItem>
+                </Accordion>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </div>
+      <Pagination
         pageIndex={pageIndex}
         pageSize={pageSize}
         setPageIndex={setPageIndex}

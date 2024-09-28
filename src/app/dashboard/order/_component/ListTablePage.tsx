@@ -60,7 +60,6 @@ export default function ListTablePage() {
 
 
 
-  console.log(toDate)
 
   return (
     <section className='mt-2'>

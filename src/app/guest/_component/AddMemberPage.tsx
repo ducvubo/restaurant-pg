@@ -14,14 +14,8 @@ export default function AddMemberPage() {
   const getToken = async () => {
     setLoading(true)
     const res: IBackendRes<string> = await generateTokenAddMember()
-    console.log(res)
     if (res.statusCode === 201 && res.data) {
       setLoading(false)
-      // toast({
-      //   title: 'Thành công',
-      //   description: 'Đặt hàng thành công',
-      //   variant: 'default'
-      // })
       setToken(res.data)
     } else if (res?.code === 400) {
       setLoading(false)
@@ -44,7 +38,7 @@ export default function AddMemberPage() {
       setLoading(false)
       toast({
         title: 'Thất bại',
-        description: 'Đã xảy ra lỗi, vui lòng thử lại sau ít phút',
+        description: res.message ? res.message : 'Đã xảy ra lỗi, vui lòng thử lại sau ít phút',
         variant: 'destructive'
       })
     }
@@ -53,7 +47,6 @@ export default function AddMemberPage() {
   useEffect(() => {
     getToken()
   }, [])
-  console.log(token)
 
   const url = `${process.env.NEXT_PUBLIC_URL_CLIENT}/guest/table/add-member?token=${token}`
 

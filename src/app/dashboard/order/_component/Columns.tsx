@@ -2,7 +2,7 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/ColumnHeader'
 import { OrderRestaurant } from '../order.interface'
-import { calculateFinalPrice, formatDateMongo, switchStatusOrderVi } from '@/app/utils'
+import { calculateFinalPrice, formatDateMongo, switchStatusOrderSummaryVi } from '@/app/utils'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { toast } from '@/hooks/use-toast'

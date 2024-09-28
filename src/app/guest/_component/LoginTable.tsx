@@ -55,11 +55,13 @@ export function LoginTableForm() {
         description: 'Đăng nhập thành công',
         variant: 'default'
       })
+
       runAppGuest({
-        guest_name: data.guest_name,
-        guest_restaurant_id: data.guest_restaurant_id,
-        guest_table_id: data.guest_table_id,
-        guest_type: 'owner'
+        guest_name: res.data.guest_name,
+        guest_restaurant_id: res.data.guest_restaurant_id,
+        guest_table_id: res.data.guest_table_id,
+        guest_type: 'owner',
+        order_id: res.data.order_id
       })
 
       router.push('/guest/order')

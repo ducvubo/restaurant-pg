@@ -2,7 +2,7 @@
 
 import { sendRequest } from '@/lib/api'
 import { cookies } from 'next/headers'
-import { IGuest, IOrderDish } from './guest.interface'
+import { IGuest, IOrderDishGuest } from './guest.interface'
 import { IDish } from '../dashboard/dishes/dishes.interface'
 
 export const loginGuest = async (payload: {
@@ -35,8 +35,14 @@ export const loginGuest = async (payload: {
         sameSite: 'lax',
         maxAge: Number(process.env.JWT_REFRESHTOKEN_GUEST_RESTAURANT_EXPIRE)
       })
-  }
 
+    const infor = await getInforGuest()
+    return {
+      data: infor.infor,
+      code: res.statusCode,
+      message: res.message
+    }
+  }
   return {
     code: res.statusCode,
     message: res.message
@@ -165,7 +171,7 @@ export const orderDish = async (payload: { od_dish_id: string; od_dish_quantity:
 }
 
 export const getListOrder = async () => {
-  const res: IBackendRes<IOrderDish[]> = await sendRequest({
+  const res: IBackendRes<IOrderDishGuest> = await sendRequest({
     url: `${process.env.URL_SERVER}/order-dish/list-order-guest`,
     method: 'GET',
     headers: {
@@ -194,9 +200,6 @@ export const addMember = async (payload: { token: string; guest_name: string }) 
   const res: IBackendRes<{
     access_token_guest: string
     refresh_token_guest: string
-    guest_name: string
-    guest_restaurant_id: string
-    guest_table_id: string
   }> = await sendRequest({
     url: `${process.env.URL_SERVER}/guest-restaurant/add-member`,
     method: 'POST',
@@ -223,12 +226,11 @@ export const addMember = async (payload: { token: string; guest_name: string }) 
         maxAge: Number(process.env.JWT_REFRESHTOKEN_GUEST_RESTAURANT_EXPIRE)
       })
 
+    const infor = await getInforGuest()
+
+
     return {
-      data: {
-        guest_name: res.data.guest_name,
-        guest_restaurant_id: res.data.guest_restaurant_id,
-        guest_table_id: res.data.guest_table_id
-      },
+      data: infor.infor,
       code: res.statusCode,
       message: res.message
     }

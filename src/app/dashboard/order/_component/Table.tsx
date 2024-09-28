@@ -16,7 +16,6 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { usePathname, useRouter } from 'next/navigation'
 import { DataTableViewOptions } from '@/components/ColumnToggle'
-import { DataTablePagination } from '@/components/Pagination'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -112,12 +111,12 @@ export function TableOrder<TData, TValue>({
         </div>
       </div>
       <div className='flex items-center justify-end space-x-2 py-4'>
-        <DataTablePagination
+        {/* <DataTablePagination
           table={table}
           meta={meta}
           onPageChange={(pageIndex, pageSize) => handlePageChange(pageIndex + 1, pageSize)}
           defaultRow={6}
-        />
+        /> */}
       </div>
     </div>
   )

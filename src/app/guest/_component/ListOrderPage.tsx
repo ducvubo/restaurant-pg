@@ -3,23 +3,21 @@ import { RootState } from '@/app/redux/store'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { getListOrder } from '../guest.api'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { IOrderDish } from '../guest.interface'
+import { IOrderDishGuest, OrDish } from '../guest.interface'
 import { calculateFinalPrice, switchStatusOrderVi } from '@/app/utils'
 
 export default function ListOrderPage() {
   const inforGuest = useSelector((state: RootState) => state.inforGuest)
-  const [listOrder, setlistOrder] = useState<IOrderDish[]>()
+  const [orderSummary, setOrderSummary] = useState<IOrderDishGuest>()
 
   const findListOrder = async () => {
-    const res: IBackendRes<IOrderDish[]> = await getListOrder()
-    if (res.statusCode === 200) {
-      setlistOrder(res.data)
+    const res: IBackendRes<IOrderDishGuest> = await getListOrder()
+    if (res.statusCode === 200 && res.data) {
+      setOrderSummary(res.data)
     }
   }
 
@@ -27,18 +25,38 @@ export default function ListOrderPage() {
     findListOrder()
   }, [])
 
-  const filteredDishes = listOrder?.filter((dish) => dish.od_dish_status !== 'paid')
-  const totalQuantity = filteredDishes?.reduce((total, dish) => total + dish.od_dish_quantity, 0)
-  const totalPrice = filteredDishes?.reduce(
-    (total, dish) =>
-      total +
-      dish.od_dish_quantity *
-        calculateFinalPrice(
-          dish.od_dish_duplicate_id.dish_duplicate_price,
-          dish.od_dish_duplicate_id.dish_duplicate_sale
-        ),
-    0
-  )
+  function calculateOrderSummary(orderSummary1: any) {
+    let totalQuantity = 0
+    let totalPrice = 0
+
+    orderSummary1?.or_dish.forEach((dish: any) => {
+      // Kiểm tra điều kiện loại bỏ các món có trạng thái 'refuse'
+      if (dish.od_dish_status !== 'refuse') {
+        totalQuantity += dish.od_dish_quantity
+
+        // Tính giá sau khi áp dụng giảm giá
+        const originalPrice = dish.od_dish_duplicate_id.dish_duplicate_price
+        const sale = dish.od_dish_duplicate_id.dish_duplicate_sale
+
+        let finalPrice = originalPrice
+
+        // Áp dụng giảm giá nếu có
+        if (sale.sale_type === 'fixed') {
+          finalPrice -= sale.sale_value // Giảm giá cố định
+        }
+
+        // Cộng dồn giá cho từng món ăn
+        totalPrice += finalPrice * dish.od_dish_quantity
+      }
+    })
+
+    return {
+      totalQuantity,
+      totalPrice
+    }
+  }
+
+  const { totalQuantity, totalPrice } = calculateOrderSummary(orderSummary)
 
   return (
     <div className='flex justify-center items-center'>
@@ -49,7 +67,7 @@ export default function ListOrderPage() {
           </CardTitle>
         </CardHeader>
         <div className='flex flex-col justify-between gap-3'>
-          {listOrder?.map((item, index) => (
+          {orderSummary?.or_dish?.map((item, index) => (
             <div key={index} className='flex gap-4'>
               <Image
                 src={item.od_dish_duplicate_id.dish_duplicate_image.image_cloud}
@@ -87,7 +105,16 @@ export default function ListOrderPage() {
             </div>
           ))}
           <span>
-            Đơn chưa thanh toán {totalQuantity} món * {totalPrice?.toLocaleString()} đ
+            {orderSummary?.od_dish_smr_status === 'paid' &&
+              'Đơn hàng của bạn đã được thanh toán, cảm ơn bạn đã sử dụng dịch vụ của chúng tôi'}
+            {orderSummary?.od_dish_smr_status === 'refuse' &&
+              'Đơn hàng của bạn bị từ chối order bạn không được order tiếp'}
+            {orderSummary?.od_dish_smr_status === 'ordering' && (
+              <>
+                Đơn của bạn chưa thanh toán: {totalQuantity} món với giá
+                <span className='italic font-bold'>{totalPrice?.toLocaleString()} đ</span>
+              </>
+            )}
           </span>
         </div>
       </div>

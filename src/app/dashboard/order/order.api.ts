@@ -1,7 +1,7 @@
 'use server'
 
 import { sendRequest } from '@/lib/api'
-import { IModelPaginateWithStatusCount, IUpdateStatusOrderDish, OrderRestaurant } from './order.interface'
+import { IModelPaginateWithStatusCount, IUpdateStatusOrderDish, IOrderRestaurant } from './order.interface'
 
 export const getListOrderDish = async ({
   current,
@@ -10,7 +10,7 @@ export const getListOrderDish = async ({
   fromDate,
   guest_name,
   tbl_name,
-  od_dish_status
+  od_dish_smr_status
 }: {
   current: number
   pageSize: number
@@ -18,10 +18,10 @@ export const getListOrderDish = async ({
   fromDate: Date
   guest_name?: string
   tbl_name?: string
-  od_dish_status: 'processing' | 'pending' | 'paid' | 'delivered' | 'refuse' | 'all'
+  od_dish_smr_status: 'ordering' | 'paid' | 'refuse' | 'all'
 }) => {
-  const res: IBackendRes<IModelPaginateWithStatusCount<OrderRestaurant>> = await sendRequest({
-    url: `${process.env.URL_SERVER}/order-dish/list-order-restaurant`,
+  const res: IBackendRes<IModelPaginateWithStatusCount<IOrderRestaurant>> = await sendRequest({
+    url: `${process.env.URL_SERVER}/order-dish-summary/list-order-restaurant`,
     method: 'GET',
     queryParams: {
       current,
@@ -30,7 +30,7 @@ export const getListOrderDish = async ({
       fromDate,
       guest_name,
       tbl_name,
-      od_dish_status
+      od_dish_smr_status
     }
   })
 
@@ -44,5 +44,18 @@ export const updateStatusOrder = async (payload: IUpdateStatusOrderDish) => {
     body: payload
   })
 
+  return res
+}
+
+export const updateStatusSummary = async (payload: {
+  _id: string
+  od_dish_smr_status: 'ordering' | 'paid' | 'refuse'
+}) => {
+  console.log(payload)
+  const res = await sendRequest({
+    url: `${process.env.URL_SERVER}/order-dish-summary/update-status`,
+    method: 'PATCH',
+    body: payload
+  })
   return res
 }

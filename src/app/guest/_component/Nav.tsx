@@ -17,7 +17,6 @@ export default function Nav() {
   const { setTheme } = useTheme()
   const inforGuest = useSelector((state: RootState) => state.inforGuest)
 
-  console.log(inforGuest)
 
   return (
     <header className='flex h-20 w-full shrink-0 items-center px-4 md:px-6 sticky top-0  z-10 dark:bg-[#121212] bg-white'>

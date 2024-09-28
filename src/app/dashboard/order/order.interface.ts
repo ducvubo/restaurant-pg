@@ -9,39 +9,32 @@ export interface IModelPaginateWithStatusCount<T> extends IModelPaginate<T> {
   } & IModelPaginate<T>['meta'] // Kế thừa các thuộc tính từ meta của IModelPaginate
 }
 
-export interface OrderRestaurant {
-  createdBy: CreatedBy
-  updatedBy: CreatedBy
+export interface IOrderRestaurant {
   _id: string
+  isDeleted: boolean
+  od_dish_smr_restaurant_id: string
+  od_dish_smr_guest_id: OdDishSmrGuestId
+  od_dish_smr_table_id: OdDishSmrTableId
+  od_dish_smr_status: 'ordering' | 'paid' | 'refuse'
   createdAt: string
   updatedAt: string
-  isDeleted: boolean
-  od_dish_restaurant_id: string
-  od_dish_guest_id: OdDishGuestId
-  od_dish_table_id: OdDishTableId
-  od_dish_duplicate_id: OdDishDuplicateId
-  od_dish_quantity: number
-  od_dish_status: string
+  or_dish: OrDish[]
 }
 
-export interface OdDishGuestId {
+export interface OdDishSmrGuestId {
   _id: string
   isDeleted: boolean
   guest_restaurant_id: string
   guest_table_id: string
   guest_name: string
+  guest_type: string
   guest_refresh_token: string
-  guest_type: 'owner' | 'member'
-  guest_owner: {
-    owner_id: string
-    owner_name: string
-  }
   createdAt: string
   updatedAt: string
   __v: number
 }
 
-export interface OdDishTableId {
+export interface OdDishSmrTableId {
   _id: string
   createdBy: CreatedBy
   isDeleted: boolean
@@ -51,15 +44,52 @@ export interface OdDishTableId {
   tbl_capacity: number
   tbl_status: string
   tbl_token: string
-
   createdAt: string
   updatedAt: string
   __v: number
+  updatedBy: UpdatedBy
 }
 
 export interface CreatedBy {
   _id: string
   email: string
+}
+
+export interface UpdatedBy {
+  _id: string
+  email: string
+}
+
+export interface OrDish {
+  _id: string
+  isDeleted: boolean
+  od_dish_summary_id: string
+  od_dish_guest_id: OdDishGuestId
+  od_dish_duplicate_id: OdDishDuplicateId
+  od_dish_quantity: number
+  od_dish_status: string
+  __v: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface OdDishGuestId {
+  _id: string
+  isDeleted: boolean
+  guest_restaurant_id: string
+  guest_table_id: string
+  guest_name: string
+  guest_type: string
+  guest_refresh_token: string
+  createdAt: string
+  updatedAt: string
+  __v: number
+  guest_owner?: GuestOwner
+}
+
+export interface GuestOwner {
+  owner_id: string
+  owner_name: string
 }
 
 export interface OdDishDuplicateId {
@@ -92,6 +122,7 @@ export interface DishDuplicateSale {
 }
 
 export interface IUpdateStatusOrderDish {
-  _id: string // ID của món ăn, phải là một ObjectId hợp lệ
-  od_dish_status: 'processing' | 'pending' | 'paid' | 'delivered' | 'refuse' // Trạng thái của món ăn
+  _id: string
+  od_dish_summary_id: string
+  od_dish_status: 'processing' | 'pending' | 'delivered' | 'refuse'
 }

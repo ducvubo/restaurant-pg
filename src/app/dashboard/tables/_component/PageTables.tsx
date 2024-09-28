@@ -16,7 +16,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { usePathname, useRouter } from 'next/navigation'
 import { DataTableViewOptions } from '@/components/ColumnToggle'
-import { DataTablePagination } from '@/components/Pagination'
+import { DataTablePagination } from '@/components/PaginationTable'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
