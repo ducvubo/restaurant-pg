@@ -4,7 +4,7 @@ import { RootState } from '@/app/redux/store'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { lishDishOrder, orderDish } from '../guest.api'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,7 @@ import { useLoading } from '@/context/LoadingContext'
 import { toast } from '@/hooks/use-toast'
 import { calculateFinalPrice } from '@/app/utils'
 import { useRouter } from 'next/navigation'
+import { deleteCookiesAndRedirectGuest } from '@/app/actions/action'
 
 export default function OrderPage() {
   const router = useRouter()
@@ -90,6 +91,14 @@ export default function OrderPage() {
           variant: 'destructive'
         })
       }
+    } else if (res.code === -10) {
+      setLoading(false)
+      toast({
+        title: 'Thông báo',
+        description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại, hoặc liên hệ nhân viên',
+        variant: 'destructive'
+      })
+      await deleteCookiesAndRedirectGuest()
     } else {
       setLoading(false)
       toast({
@@ -100,6 +109,55 @@ export default function OrderPage() {
     }
   }
 
+  // useEffect(() => {
+  //   const connectSocketWithCookie = async () => {
+  //     const cookie = await getCookie('access_token_guest')
+  //     if (!cookie) return
+
+  //     let socket = connectSocket(cookie, 'guest')
+
+  //     // Hàm xử lý khi connect thành công
+  //     function onConnect() {
+  //       socket.on('update-status-order-dish', updateStatus)
+  //       console.log('Connected:', socket.id)
+  //     }
+
+  //     // Hàm xử lý khi disconnect
+  //     function onDisconnect() {
+  //       console.log('Disconnected')
+  //     }
+
+  //     function updateStatus(data: any) {
+  //       console.log('data:::::::::::::::::::', data)
+  //     }
+
+  //     // Sử dụng socket.on để lắng nghe sự kiện connect và disconnect
+  //     socket.on('connect', onConnect)
+  //     socket.on('disconnect', onDisconnect)
+
+  //     // Thiết lập interval để reconnect sau 10 phút (600000ms)
+  //     const intervalId = setInterval(() => {
+  //       console.log('Reconnecting after 10 minutes...')
+  //       socket.disconnect() // Ngắt kết nối socket hiện tại
+  //       socket = connectSocket(cookie, 'guest') // Kết nối lại với token từ cookie
+
+  //       // Lắng nghe lại các sự kiện sau khi reconnect
+  //       socket.on('connect', onConnect)
+  //       socket.on('disconnect', onDisconnect)
+  //       socket.on('update-status-order-dish', updateStatus)
+  //     }, 600000) // 10 phút
+
+  //     // Cleanup khi component unmount
+  //     return () => {
+  //       socket.off('connect', onConnect)
+  //       socket.off('disconnect', onDisconnect)
+  //       clearInterval(intervalId) // Xóa interval khi component unmount
+  //       socket.disconnect() // Ngắt kết nối socket khi component unmount
+  //     }
+  //   }
+
+  //   connectSocketWithCookie() // Gọi hàm async
+  // }, [])
 
   return (
     <div className='flex justify-center items-center mx-1'>

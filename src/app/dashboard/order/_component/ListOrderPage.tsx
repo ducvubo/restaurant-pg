@@ -26,7 +26,7 @@ import { debounce } from 'lodash'
 import { IModelPaginateWithStatusCount, IStatusCount, IOrderRestaurant } from '../order.interface'
 import { calculateFinalPrice, calculateTotalPrice, formatDateMongo, switchStatusOrderSummaryVi } from '@/app/utils'
 import { toast } from '@/hooks/use-toast'
-import { deleteCookiesAndRedirect } from '@/app/actions/action'
+import { deleteCookiesAndRedirect, getCookie } from '@/app/actions/action'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useLoading } from '@/context/LoadingContext'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -34,6 +34,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import Image from 'next/image'
 import { Pagination } from '@/components/Pagination'
 import { ModalUpdateStatusSummary } from './ModalUpdateSummary'
+import { connectSocket } from '@/socket'
 
 const formatVietnameseDate = (date: Date) => {
   const day = date.getDate()
@@ -253,6 +254,55 @@ export default function ListOrderPage() {
     }
   }
 
+  // useEffect(() => {
+  //   const connectSocketWithCookie = async () => {
+  //     const cookie = await getCookie('access_token_guest')
+  //     if (!cookie) return
+
+  //     let socket = connectSocket(cookie, 'guest')
+
+  //     // Hàm xử lý khi connect thành công
+  //     function onConnect() {
+  //       socket.on('update-status-order-dish', updateStatus)
+  //       console.log('Connected:', socket.id)
+  //     }
+
+  //     // Hàm xử lý khi disconnect
+  //     function onDisconnect() {
+  //       console.log('Disconnected')
+  //     }
+
+  //     function updateStatus(data: any) {
+  //       console.log('data:::::::::::::::::::', data)
+  //     }
+
+  //     // Sử dụng socket.on để lắng nghe sự kiện connect và disconnect
+  //     socket.on('connect', onConnect)
+  //     socket.on('disconnect', onDisconnect)
+
+  //     // Thiết lập interval để reconnect sau 10 phút (600000ms)
+  //     const intervalId = setInterval(() => {
+  //       console.log('Reconnecting after 10 minutes...')
+  //       socket.disconnect() // Ngắt kết nối socket hiện tại
+  //       socket = connectSocket(cookie, 'guest') // Kết nối lại với token từ cookie
+
+  //       // Lắng nghe lại các sự kiện sau khi reconnect
+  //       socket.on('connect', onConnect)
+  //       socket.on('disconnect', onDisconnect)
+  //       socket.on('update-status-order-dish', updateStatus)
+  //     }, 600000) // 10 phút
+
+  //     // Cleanup khi component unmount
+  //     return () => {
+  //       socket.off('connect', onConnect)
+  //       socket.off('disconnect', onDisconnect)
+  //       clearInterval(intervalId) // Xóa interval khi component unmount
+  //       socket.disconnect() // Ngắt kết nối socket khi component unmount
+  //     }
+  //   }
+
+  //   connectSocketWithCookie() // Gọi hàm async
+  // }, [])
 
   return (
     <section className='mt-2'>

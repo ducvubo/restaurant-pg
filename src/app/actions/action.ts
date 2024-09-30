@@ -8,3 +8,13 @@ export async function deleteCookiesAndRedirect() {
   cookies().delete('refresh_token_epl')
   redirect('/auth/login')
 }
+
+export async function deleteCookiesAndRedirectGuest() {
+  cookies().delete('access_token_guest')
+  cookies().delete('refresh_token_guest')
+  redirect('/')
+}
+
+export const getCookie = async (name: string) => {
+  return await cookies().get(name)?.value
+}

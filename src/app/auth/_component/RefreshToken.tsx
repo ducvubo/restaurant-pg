@@ -1,10 +1,14 @@
 'use client'
-import React, { use, useLayoutEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { startAppRestaurant } from '../InforRestaurant.slice'
 import { useRouter } from 'next/navigation'
 import { getInfor, reFreshTokenNew } from '../auth.api'
 import { startAppEmployee } from '../InforEmployee.slice'
+import { getCookie } from '@/app/actions/action'
+import { connectSocket } from '@/socket'
+import { toast } from '@/hooks/use-toast'
+import { switchStatusOrderVi } from '@/app/utils'
 
 export default function RefreshToken() {
   const dispatch = useDispatch()
@@ -18,61 +22,139 @@ export default function RefreshToken() {
     dispatch(startAppEmployee(inforEmployee))
   }
 
-  const refreshToken = async () => {
-    // const lastRefreshTime = localStorage.getItem('last_refresh_token_time_restaurant_pg')
-    // const currentTime = Date.now()
+  // const refreshToken = async () => {
+  //   const res = await getInfor()
+  //   const currentPathname = window.location.pathname
 
-    // // Kiểm tra nếu lần cuối refresh token dưới 10 phút thì không thực hiện nữa
-    // if (lastRefreshTime && currentTime - parseInt(lastRefreshTime, 10) < 1000 * 60 * 8) {
-    //   console.log('Token đã được làm mới gần đây, bỏ qua việc làm mới')
-    //   const currentPathname = window.location.pathname
+  //   if (res?.code === 0 && res.data) {
 
-    //   const res = await getInfor()
-    //   if (res?.code === 0 && res.data) {
-    //     if (res.type === 'restaurant') {
-    //       runAppRestaurant(res.data)
-    //       if (!currentPathname.startsWith('/dashboard')) {
-    //         // router.push('/dashboard')
-    //       }
-    //     } else if (res.type === 'employee') {
-    //       runAppEmployee(res.data)
-    //       if (!currentPathname.startsWith('/dashboard')) {
-    //         // router.push('/dashboard')
-    //       }
-    //     }
-    //   }
-    // }
+  //     if (res.type === 'restaurant') {
+  //       runAppRestaurant(res.data)
+  //       if (!currentPathname.startsWith('/dashboard')) {
+  //         // router.push('/dashboard')
+  //       }
+  //     } else if (res.type === 'employee') {
+  //       runAppEmployee(res.data)
+  //       if (!currentPathname.startsWith('/dashboard')) {
+  //         // router.push('/dashboard')
+  //       }
+  //     }
+  //   }
+  // }
 
-    const res = await getInfor()
-    const currentPathname = window.location.pathname
+  // useLayoutEffect(() => {
+  //   refreshToken()
 
-    if (res?.code === 0 && res.data) {
-      // localStorage.setItem('last_refresh_token_time_restaurant_pg', currentTime.toString())
+  //   // Thiết lập interval để gọi API làm mới mỗi 10 phút
+  //   const interval = setInterval(() => {
+  //     refreshToken()
+  //   }, 1000 * 60 * 10)
 
-      if (res.type === 'restaurant') {
-        runAppRestaurant(res.data)
-        if (!currentPathname.startsWith('/dashboard')) {
-          // router.push('/dashboard')
+  //   return () => clearInterval(interval)
+  // }, [])
+
+  useEffect(() => {
+    let socket: any
+    let intervalId: NodeJS.Timeout
+
+    const connectSocketWithCookie = async () => {
+      const access_token = await getCookie('access_token_rtr')
+      const refresh_token = await getCookie('refresh_token_rtr')
+      const refresh_token_epl = await getCookie('refresh_token_epl')
+      const access_token_epl = await getCookie('access_token_epl')
+
+      if (!access_token && !refresh_token && !refresh_token_epl && !access_token_epl) return
+
+      if (socket) {
+        socket.disconnect()
+      }
+      if (access_token && refresh_token) {
+        socket = connectSocket(access_token, 'restaurant', refresh_token)
+      }
+
+      if (access_token_epl && refresh_token_epl) {
+        socket = connectSocket(access_token_epl, 'restaurant', refresh_token_epl)
+      }
+
+      function onConnect() {
+        socket.on('login_guest_table', loginGuestTable)
+        socket.on('order_dish_new', orderDishNew)
+      }
+
+      function onDisconnect() {
+        // console.log('Disconnected')
+      }
+
+      function loginGuestTable(data: { guest_name: string; tbl_name: string }) {
+        toast({
+          title: 'Thông báo',
+          description: `Vừa có khách hàng ${data.guest_name} vào ${data.tbl_name}`,
+          variant: 'default'
+        })
+        const currentPath = window.location.pathname
+        router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
+      }
+
+      function orderDishNew(data: null) {
+        toast({
+          title: 'Thông báo',
+          description: 'Có một order mới',
+          variant: 'default'
+        })
+        const currentPath = window.location.pathname
+        router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
+      }
+
+      socket.on('connect', onConnect)
+      socket.on('disconnect', onDisconnect)
+
+      return () => {
+        socket.off('connect', onConnect)
+        socket.off('disconnect', onDisconnect)
+        socket.off('login_guest_table', loginGuestTable)
+        socket.off('order_dish_new', orderDishNew)
+        socket.disconnect()
+      }
+    }
+
+    // Hàm làm mới token và kết nối lại socket nếu thành công
+    const refreshToken = async () => {
+      const res = await getInfor()
+      const currentPathname = window.location.pathname
+      if (res?.code === 0 && res.data) {
+        await connectSocketWithCookie()
+        if (res.type === 'restaurant') {
+          runAppRestaurant(res.data)
+          if (!currentPathname.startsWith('/dashboard')) {
+            // router.push('/dashboard')
+          }
+        } else if (res.type === 'employee') {
+          runAppEmployee(res.data)
+          if (!currentPathname.startsWith('/dashboard')) {
+            // router.push('/dashboard')
+          }
         }
-      } else if (res.type === 'employee') {
-        runAppEmployee(res.data)
-        if (!currentPathname.startsWith('/dashboard')) {
-          // router.push('/dashboard')
+      } else {
+        router.push('/')
+        if (socket) {
+          socket.disconnect()
         }
       }
     }
-  }
 
-  useLayoutEffect(() => {
     refreshToken()
 
-    // Thiết lập interval để gọi API làm mới mỗi 10 phút
-    const interval = setInterval(() => {
+    intervalId = setInterval(() => {
       refreshToken()
-    }, 1000 * 60 * 10)
+    }, 1000 * 60 * 10) // 10 phút
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => {
+      clearInterval(intervalId)
+      if (socket) {
+        socket.disconnect()
+      }
+    }
+  }, [dispatch, router])
 
   return <></>
 }

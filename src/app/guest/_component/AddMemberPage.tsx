@@ -6,6 +6,7 @@ import { useLoading } from '@/context/LoadingContext'
 import { toast } from '@/hooks/use-toast'
 import { QRCodeSVG } from 'qrcode.react'
 import Link from 'next/link'
+import { deleteCookiesAndRedirect, deleteCookiesAndRedirectGuest } from '@/app/actions/action'
 
 export default function AddMemberPage() {
   const { setLoading } = useLoading()
@@ -34,6 +35,14 @@ export default function AddMemberPage() {
           variant: 'destructive'
         })
       }
+    } else if (res.code === -10) {
+      setLoading(false)
+      toast({
+        title: 'Thông báo',
+        description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại, hoặc liên hệ nhân viên',
+        variant: 'destructive'
+      })
+      await deleteCookiesAndRedirectGuest()
     } else {
       setLoading(false)
       toast({

@@ -228,7 +228,6 @@ export const addMember = async (payload: { token: string; guest_name: string }) 
 
     const infor = await getInforGuest()
 
-
     return {
       data: infor.infor,
       code: res.statusCode,
@@ -241,3 +240,4 @@ export const addMember = async (payload: { token: string; guest_name: string }) 
     message: res.message
   }
 }
+

@@ -111,7 +111,7 @@ export function LoginForm() {
           title: 'Thành công',
           description: 'Đăng nhập thành công'
         })
-        router.push('/dashboard')
+        router.push('/dashboard/order/dish')
       } else if (res?.code === -5) {
         setLoading(false)
         if (Array.isArray(res.message)) {
@@ -152,7 +152,7 @@ export function LoginForm() {
           title: 'Thành công',
           description: 'Đăng nhập thành công'
         })
-        router.push('/dashboard')
+        router.push('/dashboard/order/dish')
       } else if (res?.code === -5) {
         setLoading(false)
         if (Array.isArray(res.message)) {
