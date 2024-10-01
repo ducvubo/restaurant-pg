@@ -117,7 +117,8 @@ export default function ListOrderPage() {
                   ).toLocaleString()}
                 </span>
               </div>
-              <div className='flex gap-2 items-end justify-end'>
+              <div className='flex gap-2 items-end justify-end flex-col'>
+                <span>Người gọi: {item.od_dish_guest_id.guest_name}</span>
                 <Badge className='cursor-default w-auto whitespace-nowrap' variant={'secondary'}>
                   {switchStatusOrderVi(item.od_dish_status)}
                 </Badge>

@@ -1,3 +1,5 @@
+import { OdDishSmrGuestId } from '../dashboard/order/order.interface'
+
 export interface IGuest {
   guest_restaurant_id: string
   guest_table_id: string
@@ -9,7 +11,7 @@ export interface IGuest {
 export interface IOrderDishGuest {
   _id: string
   od_dish_smr_restaurant_id: string
-  od_dish_smr_guest_id: string
+  od_dish_smr_guest_id: OdDishSmrGuestId
   od_dish_smr_table_id: string
   od_dish_smr_status: 'paid' | 'refuse' | 'ordering'
   or_dish: OrDish[]

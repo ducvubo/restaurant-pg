@@ -34,7 +34,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import Image from 'next/image'
 import { Pagination } from '@/components/Pagination'
 import { ModalUpdateStatusSummary } from './ModalUpdateSummary'
-import { connectSocket } from '@/socket'
+
+import { ScrollArea } from '@/components/ui/scroll-area'
+import AddOrder from './AddOrder'
 
 const formatVietnameseDate = (date: Date) => {
   const day = date.getDate()
@@ -254,387 +256,320 @@ export default function ListOrderPage() {
     }
   }
 
-  // useEffect(() => {
-  //   const connectSocketWithCookie = async () => {
-  //     const cookie = await getCookie('access_token_guest')
-  //     if (!cookie) return
-
-  //     let socket = connectSocket(cookie, 'guest')
-
-  //     // Hàm xử lý khi connect thành công
-  //     function onConnect() {
-  //       socket.on('update-status-order-dish', updateStatus)
-  //       console.log('Connected:', socket.id)
-  //     }
-
-  //     // Hàm xử lý khi disconnect
-  //     function onDisconnect() {
-  //       console.log('Disconnected')
-  //     }
-
-  //     function updateStatus(data: any) {
-  //       console.log('data:::::::::::::::::::', data)
-  //     }
-
-  //     // Sử dụng socket.on để lắng nghe sự kiện connect và disconnect
-  //     socket.on('connect', onConnect)
-  //     socket.on('disconnect', onDisconnect)
-
-  //     // Thiết lập interval để reconnect sau 10 phút (600000ms)
-  //     const intervalId = setInterval(() => {
-  //       console.log('Reconnecting after 10 minutes...')
-  //       socket.disconnect() // Ngắt kết nối socket hiện tại
-  //       socket = connectSocket(cookie, 'guest') // Kết nối lại với token từ cookie
-
-  //       // Lắng nghe lại các sự kiện sau khi reconnect
-  //       socket.on('connect', onConnect)
-  //       socket.on('disconnect', onDisconnect)
-  //       socket.on('update-status-order-dish', updateStatus)
-  //     }, 600000) // 10 phút
-
-  //     // Cleanup khi component unmount
-  //     return () => {
-  //       socket.off('connect', onConnect)
-  //       socket.off('disconnect', onDisconnect)
-  //       clearInterval(intervalId) // Xóa interval khi component unmount
-  //       socket.disconnect() // Ngắt kết nối socket khi component unmount
-  //     }
-  //   }
-
-  //   connectSocketWithCookie() // Gọi hàm async
-  // }, [])
-
   return (
     <section className='mt-2'>
-      <div className='flex gap-2'>
+      <ScrollArea className='h-[563px]'>
         <div className='flex gap-2'>
-          <Label className='mt-2'>Từ</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={'outline'}
-                className={cn('w-[180px] justify-start text-left font-normal', !toDate && 'text-muted-foreground')}
-              >
-                <CalendarIcon className='mr-2 h-4 w-4' />
-                {toDate ? formatVietnameseDate(toDate) : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align='start' className='flex w-auto flex-col space-y-2 p-2'>
-              <Select onValueChange={(value) => handleSelectToDate(addDays(new Date(), parseInt(value)))}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Chọn' />
-                </SelectTrigger>
-                <SelectContent position='popper'>
-                  <SelectItem value='0'>Ngày hôm này</SelectItem>
-                  <SelectItem value='-1'>Ngày hôm qua</SelectItem>
-                  <SelectItem value='-3'>3 ngày trước</SelectItem>
-                  <SelectItem value='-7'>7 ngày trước</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className='rounded-md border'>
-                <Calendar
-                  mode='single'
-                  selected={toDate}
-                  onSelect={handleSelectToDate}
-                  locale={vi}
-                  disabled={disableFutureDates}
-                />
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div className='flex gap-2'>
-          <Label className='mt-2'>Đến</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={'outline'}
-                className={cn('w-[180px] justify-start text-left font-normal', !fromDate && 'text-muted-foreground')}
-              >
-                <CalendarIcon className='mr-2 h-4 w-4' />
-                {fromDate ? formatVietnameseDate(fromDate) : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align='start' className='flex w-auto flex-col space-y-2 p-2'>
-              <Select onValueChange={(value) => handleSelectFromDate(addDays(new Date(), parseInt(value)))}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Chọn' />
-                </SelectTrigger>
-                <SelectContent position='popper'>
-                  <SelectItem value='0'>Ngày hôm này</SelectItem>
-                  <SelectItem value='-1'>Ngày hôm qua</SelectItem>
-                  <SelectItem value='-3'>3 ngày trước</SelectItem>
-                  <SelectItem value='-7'>7 ngày trước</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className='rounded-md border'>
-                <Calendar
-                  mode='single'
-                  selected={fromDate}
-                  onSelect={handleSelectFromDate}
-                  locale={vi}
-                  disabled={disableFutureDates}
-                />
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <Button className='w-20' variant={'outline'} onClick={handleReset}>
-          Reset
-        </Button>
-      </div>
-      <div className='flex gap-3 w-auto mt-2'>
-        <Input placeholder='Tên khách' className='w-32' onChange={(e) => setNameGuest(e.target.value)} />
-        <Input placeholder='Tên bàn' className='w-32' onChange={(e) => setTableName(e.target.value)} />
-
-        <Select onValueChange={(value: any) => setStatus(value)}>
-          <SelectTrigger className='w-[153px]'>
-            <SelectValue placeholder='Trạng thái' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Chọn trạng thái</SelectLabel>
-              <SelectItem value='all'>Tất cả</SelectItem>
-              <SelectItem value='pending'>Chờ xử lý</SelectItem>
-              <SelectItem value='processing'>Đang nấu</SelectItem>
-              <SelectItem value='delivered'>Đã phục vụ</SelectItem>
-              <SelectItem value='paid'>Đã thanh toán</SelectItem>
-              <SelectItem value='refuse'>Từ chối</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className='flex gap-3 mt-5'>
-        {countStatus.map((item) => (
-          <Badge
-            key={item.status}
-            className='whitespace-nowrap'
-            variant={item.status === 'refuse' ? 'destructive' : 'outline'}
-          >
-            {switchStatusOrderSummaryVi(item.status)}: {item.count}
-          </Badge>
-        ))}
-      </div>
-
-      <div className='flex flex-col gap-3 mt-2'>
-        {listOrder?.map((order_summary: IOrderRestaurant, index1) => {
-          return (
-            <Card className='w-full' key={index1}>
-              <CardHeader>
-                <div className='flex justify-between'>
-                  <div>
-                    <div className='flex gap-1'>
-                      <CardTitle className='mt-[1px]'>{order_summary.od_dish_smr_table_id.tbl_name}: </CardTitle>
-                      <CardTitle className='mt-[1px]'>{order_summary.od_dish_smr_guest_id.guest_name}</CardTitle>
-                      <CardDescription>({formatDateMongo(order_summary.createdAt)})</CardDescription>
-                    </div>
-                    <span className='italic'>
-                      Tổng hóa đơn: {calculateTotalPrice(order_summary)?.toLocaleString()}đ
-                    </span>
-                  </div>
-                  {/* <Select
-                    value={order_summary.od_dish_smr_status}
-                    onValueChange={(value: 'ordering' | 'paid' | 'refuse') =>
-                      handlUpdateStatusSummary({
-                        _id: order_summary._id,
-                        od_dish_smr_status: value
-                      })
-                    }
-                  >
-                    <SelectTrigger className='w-[140px] mr-[80px]'>
-                      <SelectValue placeholder='Chọn trạng thái' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Chọn trạng thái</SelectLabel>
-                        <SelectItem value='paid'>Đã thanh toán</SelectItem>
-                        <SelectItem value='refuse'>Từ chối</SelectItem>
-                        <SelectItem value='ordering'>Đang order</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select> */}
-                  <ModalUpdateStatusSummary order_summary={order_summary} />
+          <div className='flex gap-2'>
+            <Label className='mt-2'>Từ</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={'outline'}
+                  className={cn('w-[180px] justify-start text-left font-normal', !toDate && 'text-muted-foreground')}
+                >
+                  <CalendarIcon className='mr-2 h-4 w-4' />
+                  {toDate ? formatVietnameseDate(toDate) : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align='start' className='flex w-auto flex-col space-y-2 p-2'>
+                <Select onValueChange={(value) => handleSelectToDate(addDays(new Date(), parseInt(value)))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Chọn' />
+                  </SelectTrigger>
+                  <SelectContent position='popper'>
+                    <SelectItem value='0'>Ngày hôm này</SelectItem>
+                    <SelectItem value='-1'>Ngày hôm qua</SelectItem>
+                    <SelectItem value='-3'>3 ngày trước</SelectItem>
+                    <SelectItem value='-7'>7 ngày trước</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className='rounded-md border'>
+                  <Calendar
+                    mode='single'
+                    selected={toDate}
+                    onSelect={handleSelectToDate}
+                    locale={vi}
+                    disabled={disableFutureDates}
+                  />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <Accordion type='single' collapsible className='w-full'>
-                  <AccordionItem value='item-1'>
-                    <div className='grid grid-cols-[450px_250px_200px_200px] -mt-4 mb-2'>
-                      <Label className='font-bold -mt-1'>Món ăn</Label>
-                      <Label className='font-bold -mt-1'>Tên khách</Label>
-                      <Label className='font-bold -mt-1'>Trạng thái</Label>
-                      <Label className='font-bold -mt-1'>Tạo/ cập nhật</Label>
-                    </div>
+              </PopoverContent>
+            </Popover>
+          </div>
 
-                    {order_summary?.or_dish[0] && (
-                      <div className='grid grid-cols-[450px_250px_200px_200px] mb-4'>
-                        <div className='flex gap-2 '>
-                          <Image
-                            src={order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_image.image_cloud}
-                            width={100}
-                            height={100}
-                            alt='vuducbo'
-                            className='w-[69px] h-[69px] rounded-lg object-cover'
-                          />
-                          <div className='-mt-1 flex flex-col'>
-                            <Label className=''>
-                              {order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_name}
-                            </Label>
-                            <Label className='italic'>
-                              Giá:{' '}
-                              {calculateFinalPrice(
-                                order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_price,
-                                order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_sale
-                              )?.toLocaleString()}
-                              đ x {order_summary?.or_dish[0]?.od_dish_quantity}
-                            </Label>
-                            <Label className='italic'>
-                              Tổng:{' '}
-                              {(
-                                calculateFinalPrice(
+          <div className='flex gap-2'>
+            <Label className='mt-2'>Đến</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={'outline'}
+                  className={cn('w-[180px] justify-start text-left font-normal', !fromDate && 'text-muted-foreground')}
+                >
+                  <CalendarIcon className='mr-2 h-4 w-4' />
+                  {fromDate ? formatVietnameseDate(fromDate) : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align='start' className='flex w-auto flex-col space-y-2 p-2'>
+                <Select onValueChange={(value) => handleSelectFromDate(addDays(new Date(), parseInt(value)))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Chọn' />
+                  </SelectTrigger>
+                  <SelectContent position='popper'>
+                    <SelectItem value='0'>Ngày hôm này</SelectItem>
+                    <SelectItem value='-1'>Ngày hôm qua</SelectItem>
+                    <SelectItem value='-3'>3 ngày trước</SelectItem>
+                    <SelectItem value='-7'>7 ngày trước</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className='rounded-md border'>
+                  <Calendar
+                    mode='single'
+                    selected={fromDate}
+                    onSelect={handleSelectFromDate}
+                    locale={vi}
+                    disabled={disableFutureDates}
+                  />
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <Button className='w-20' variant={'outline'} onClick={handleReset}>
+            Reset
+          </Button>
+        </div>
+        <div className='flex gap-3 w-auto mt-2'>
+          <Input placeholder='Tên khách' className='w-32' onChange={(e) => setNameGuest(e.target.value)} />
+          <Input placeholder='Tên bàn' className='w-32' onChange={(e) => setTableName(e.target.value)} />
+
+          <Select onValueChange={(value: any) => setStatus(value)}>
+            <SelectTrigger className='w-[153px]'>
+              <SelectValue placeholder='Trạng thái' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Chọn trạng thái</SelectLabel>
+                <SelectItem value='all'>Tất cả</SelectItem>
+                <SelectItem value='pending'>Chờ xử lý</SelectItem>
+                <SelectItem value='processing'>Đang nấu</SelectItem>
+                <SelectItem value='delivered'>Đã phục vụ</SelectItem>
+                <SelectItem value='paid'>Đã thanh toán</SelectItem>
+                <SelectItem value='refuse'>Từ chối</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
+          <AddOrder />
+        </div>
+
+        <div className='flex gap-3 mt-5'>
+          {countStatus.map((item) => (
+            <Badge
+              key={item.status}
+              className='whitespace-nowrap'
+              variant={item.status === 'refuse' ? 'destructive' : 'outline'}
+            >
+              {switchStatusOrderSummaryVi(item.status)}: {item.count}
+            </Badge>
+          ))}
+        </div>
+
+        <div className='flex flex-col gap-3 mt-2'>
+          {listOrder?.map((order_summary: IOrderRestaurant, index1) => {
+            return (
+              <Card className='w-full' key={index1}>
+                <CardHeader>
+                  <div className='flex justify-between'>
+                    <div>
+                      <div className='flex gap-1'>
+                        <CardTitle className='mt-[1px]'>{order_summary.od_dish_smr_table_id.tbl_name}: </CardTitle>
+                        <CardTitle className='mt-[1px]'>{order_summary.od_dish_smr_guest_id.guest_name}</CardTitle>
+                        <CardDescription>({formatDateMongo(order_summary.createdAt)})</CardDescription>
+                      </div>
+                      <span className='italic'>
+                        Tổng hóa đơn: {calculateTotalPrice(order_summary)?.toLocaleString()}đ
+                      </span>
+                    </div>
+                    <ModalUpdateStatusSummary order_summary={order_summary} />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type='single' collapsible className='w-full'>
+                    <AccordionItem value='item-1'>
+                      <div className='grid grid-cols-[450px_250px_200px_200px] -mt-4 mb-2'>
+                        <Label className='font-bold -mt-1'>Món ăn</Label>
+                        <Label className='font-bold -mt-1'>Tên khách</Label>
+                        <Label className='font-bold -mt-1'>Trạng thái</Label>
+                        <Label className='font-bold -mt-1'>Tạo/ cập nhật</Label>
+                      </div>
+
+                      {order_summary?.or_dish[0] && (
+                        <div className='grid grid-cols-[450px_250px_200px_200px] mb-4'>
+                          <div className='flex gap-2 '>
+                            <Image
+                              src={order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_image.image_cloud}
+                              width={100}
+                              height={100}
+                              alt='vuducbo'
+                              className='w-[69px] h-[69px] rounded-lg object-cover'
+                            />
+                            <div className='-mt-1 flex flex-col'>
+                              <Label className=''>
+                                {order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_name}
+                              </Label>
+                              <Label className='italic'>
+                                Giá:{' '}
+                                {calculateFinalPrice(
                                   order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_price,
                                   order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_sale
-                                ) * order_summary?.or_dish[0]?.od_dish_quantity
-                              )?.toLocaleString()}
-                              đ
-                            </Label>
-                          </div>
-                        </div>
-                        <div className='flex items-center'>
-                          <Label className='-mt-1 text-sm'>
-                            {order_summary?.or_dish[0]?.od_dish_guest_id.guest_name}
-                            {order_summary?.or_dish[0]?.od_dish_guest_id.guest_type === 'member'
-                              ? ' (Thành viên)'
-                              : ' (Chủ bàn)'}
-                          </Label>
-                        </div>
-                        <div className='flex items-center'>
-                          <Select
-                            value={order_summary?.or_dish[0]?.od_dish_status}
-                            onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
-                              handleUpdateStatus({
-                                _id: order_summary?.or_dish[0]?._id,
-                                od_dish_status: value,
-                                od_dish_summary_id: order_summary._id
-                              })
-                            }
-                          >
-                            <SelectTrigger className='w-[140px]'>
-                              <SelectValue placeholder='Đang nấu' />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectLabel>Chọn trạng thái</SelectLabel>
-                                <SelectItem value='pending'>Chờ xử lý</SelectItem>
-                                <SelectItem value='processing'>Đang nấu</SelectItem>
-                                <SelectItem value='delivered'>Đã phục vụ</SelectItem>
-                                <SelectItem value='refuse'>Từ chối</SelectItem>
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className='flex flex-col'>
-                          <span>{formatDateMongo(order_summary?.or_dish[0]?.createdAt)}</span>
-                          <span>{formatDateMongo(order_summary?.or_dish[0]?.updatedAt)}</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {order_summary.or_dish.slice(1).map((order_dish_item, index2) => {
-                      return (
-                        <AccordionContent key={index2}>
-                          <div className='grid grid-cols-[450px_250px_200px_200px]'>
-                            <div className='flex gap-2 '>
-                              <Image
-                                src={order_dish_item.od_dish_duplicate_id.dish_duplicate_image.image_cloud}
-                                width={100}
-                                height={100}
-                                alt='vuducbo'
-                                className='w-[69px] h-[69px] rounded-lg object-cover'
-                              />
-                              <div className='-mt-1 flex flex-col'>
-                                <Label className=''>{order_dish_item.od_dish_duplicate_id.dish_duplicate_name}</Label>
-                                <Label className='italic'>
-                                  Giá:{' '}
-                                  {calculateFinalPrice(
-                                    order_dish_item.od_dish_duplicate_id.dish_duplicate_price,
-                                    order_dish_item.od_dish_duplicate_id.dish_duplicate_sale
-                                  )?.toLocaleString()}
-                                  đ x {order_dish_item.od_dish_quantity}
-                                </Label>
-                                <Label className='italic'>
-                                  Tổng:{' '}
-                                  {(
-                                    calculateFinalPrice(
-                                      order_dish_item.od_dish_duplicate_id.dish_duplicate_price,
-                                      order_dish_item.od_dish_duplicate_id.dish_duplicate_sale
-                                    ) * order_dish_item.od_dish_quantity
-                                  )?.toLocaleString()}
-                                  đ
-                                </Label>
-                              </div>
-                            </div>
-                            <div className='flex items-center'>
-                              <Label className=' -mt-1'>
-                                {order_dish_item.od_dish_guest_id.guest_name}{' '}
-                                {order_dish_item.od_dish_guest_id.guest_type === 'member'
-                                  ? ' (Thành viên)'
-                                  : ' (Chủ bàn)'}
+                                )?.toLocaleString()}
+                                đ x {order_summary?.or_dish[0]?.od_dish_quantity}
+                              </Label>
+                              <Label className='italic'>
+                                Tổng:{' '}
+                                {(
+                                  calculateFinalPrice(
+                                    order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_price,
+                                    order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_sale
+                                  ) * order_summary?.or_dish[0]?.od_dish_quantity
+                                )?.toLocaleString()}
+                                đ
                               </Label>
                             </div>
-                            <div className='flex items-center'>
-                              <Select
-                                value={order_dish_item.od_dish_status}
-                                onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
-                                  handleUpdateStatus({
-                                    _id: order_dish_item._id,
-                                    od_dish_status: value,
-                                    od_dish_summary_id: order_summary._id
-                                  })
-                                }
-                              >
-                                <SelectTrigger className='w-[140px]'>
-                                  <SelectValue placeholder='Đang nấu' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectGroup>
-                                    <SelectLabel>Chọn trạng thái</SelectLabel>
-                                    <SelectItem value='pending'>Chờ xử lý</SelectItem>
-                                    <SelectItem value='processing'>Đang nấu</SelectItem>
-                                    <SelectItem value='delivered'>Đã phục vụ</SelectItem>
-                                    <SelectItem value='refuse'>Từ chối</SelectItem>
-                                  </SelectGroup>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div className='flex flex-col'>
-                              <span>{formatDateMongo(order_dish_item.createdAt)}</span>
-                              <span>{formatDateMongo(order_dish_item.updatedAt)}</span>
-                            </div>
                           </div>
-                        </AccordionContent>
-                      )
-                    })}
+                          <div className='flex items-center'>
+                            <Label className='-mt-1 text-sm'>
+                              {order_summary?.or_dish[0]?.od_dish_guest_id.guest_name}
+                              {order_summary?.or_dish[0]?.od_dish_guest_id.guest_type === 'member'
+                                ? ' (Thành viên)'
+                                : ' (Chủ bàn)'}
+                            </Label>
+                          </div>
+                          <div className='flex items-center'>
+                            <Select
+                              value={order_summary?.or_dish[0]?.od_dish_status}
+                              onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
+                                handleUpdateStatus({
+                                  _id: order_summary?.or_dish[0]?._id,
+                                  od_dish_status: value,
+                                  od_dish_summary_id: order_summary._id
+                                })
+                              }
+                            >
+                              <SelectTrigger className='w-[140px]'>
+                                <SelectValue placeholder='Đang nấu' />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Chọn trạng thái</SelectLabel>
+                                  <SelectItem value='pending'>Chờ xử lý</SelectItem>
+                                  <SelectItem value='processing'>Đang nấu</SelectItem>
+                                  <SelectItem value='delivered'>Đã phục vụ</SelectItem>
+                                  <SelectItem value='refuse'>Từ chối</SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </div>
 
-                    <AccordionTrigger className='-mt-5 -mb-5'>Xem chi tiết</AccordionTrigger>
-                  </AccordionItem>
-                </Accordion>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
-      <Pagination
-        pageIndex={pageIndex}
-        pageSize={pageSize}
-        setPageIndex={setPageIndex}
-        setPageSize={setPageSize}
-        meta={meta}
-      />
+                          <div className='flex flex-col'>
+                            <span>{formatDateMongo(order_summary?.or_dish[0]?.createdAt)}</span>
+                            <span>{formatDateMongo(order_summary?.or_dish[0]?.updatedAt)}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {order_summary.or_dish.slice(1).map((order_dish_item, index2) => {
+                        return (
+                          <AccordionContent key={index2}>
+                            <div className='grid grid-cols-[450px_250px_200px_200px]'>
+                              <div className='flex gap-2 '>
+                                <Image
+                                  src={order_dish_item.od_dish_duplicate_id.dish_duplicate_image.image_cloud}
+                                  width={100}
+                                  height={100}
+                                  alt='vuducbo'
+                                  className='w-[69px] h-[69px] rounded-lg object-cover'
+                                />
+                                <div className='-mt-1 flex flex-col'>
+                                  <Label className=''>{order_dish_item.od_dish_duplicate_id.dish_duplicate_name}</Label>
+                                  <Label className='italic'>
+                                    Giá:{' '}
+                                    {calculateFinalPrice(
+                                      order_dish_item.od_dish_duplicate_id.dish_duplicate_price,
+                                      order_dish_item.od_dish_duplicate_id.dish_duplicate_sale
+                                    )?.toLocaleString()}
+                                    đ x {order_dish_item.od_dish_quantity}
+                                  </Label>
+                                  <Label className='italic'>
+                                    Tổng:{' '}
+                                    {(
+                                      calculateFinalPrice(
+                                        order_dish_item.od_dish_duplicate_id.dish_duplicate_price,
+                                        order_dish_item.od_dish_duplicate_id.dish_duplicate_sale
+                                      ) * order_dish_item.od_dish_quantity
+                                    )?.toLocaleString()}
+                                    đ
+                                  </Label>
+                                </div>
+                              </div>
+                              <div className='flex items-center'>
+                                <Label className=' -mt-1'>
+                                  {order_dish_item.od_dish_guest_id.guest_name}{' '}
+                                  {order_dish_item.od_dish_guest_id.guest_type === 'member'
+                                    ? ' (Thành viên)'
+                                    : ' (Chủ bàn)'}
+                                </Label>
+                              </div>
+                              <div className='flex items-center'>
+                                <Select
+                                  value={order_dish_item.od_dish_status}
+                                  onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
+                                    handleUpdateStatus({
+                                      _id: order_dish_item._id,
+                                      od_dish_status: value,
+                                      od_dish_summary_id: order_summary._id
+                                    })
+                                  }
+                                >
+                                  <SelectTrigger className='w-[140px]'>
+                                    <SelectValue placeholder='Đang nấu' />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectGroup>
+                                      <SelectLabel>Chọn trạng thái</SelectLabel>
+                                      <SelectItem value='pending'>Chờ xử lý</SelectItem>
+                                      <SelectItem value='processing'>Đang nấu</SelectItem>
+                                      <SelectItem value='delivered'>Đã phục vụ</SelectItem>
+                                      <SelectItem value='refuse'>Từ chối</SelectItem>
+                                    </SelectGroup>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className='flex flex-col'>
+                                <span>{formatDateMongo(order_dish_item.createdAt)}</span>
+                                <span>{formatDateMongo(order_dish_item.updatedAt)}</span>
+                              </div>
+                            </div>
+                          </AccordionContent>
+                        )
+                      })}
+
+                      <AccordionTrigger className='-mt-5 -mb-5'>Xem chi tiết</AccordionTrigger>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+        <Pagination
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          setPageIndex={setPageIndex}
+          setPageSize={setPageSize}
+          meta={meta}
+        />
+      </ScrollArea>
     </section>
   )
 }

@@ -2,6 +2,7 @@
 
 import { sendRequest } from '@/lib/api'
 import { IModelPaginateWithStatusCount, IUpdateStatusOrderDish, IOrderRestaurant } from './order.interface'
+import { ITable } from '../tables/table.interface'
 
 export const getListOrderDish = async ({
   current,
@@ -56,6 +57,23 @@ export const updateStatusSummary = async (payload: {
     url: `${process.env.URL_SERVER}/order-dish-summary/update-status`,
     method: 'PATCH',
     body: payload
+  })
+  return res
+}
+
+export const getListTableOrder = async () => {
+  const res: IBackendRes<ITable[]> = await sendRequest({
+    url: `${process.env.URL_SERVER}/tables/list-table-order`,
+    method: 'GET'
+  })
+
+  return res
+}
+
+export const getListOrdring = async () => {
+  const res: IBackendRes<IOrderRestaurant[]> = await sendRequest({
+    url: `${process.env.URL_SERVER}/order-dish-summary/list-ordering`,
+    method: 'GET'
   })
   return res
 }

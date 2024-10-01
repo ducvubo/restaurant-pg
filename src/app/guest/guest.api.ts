@@ -145,14 +145,13 @@ export const lishDishOrder = async ({ guest_restaurant_id }: { guest_restaurant_
   const res: IBackendRes<Omit<IDish, 'dish_status' | 'isDeleted'>[]> = await sendRequest({
     url: `${process.env.URL_SERVER}/dishes/list-dish-order/${guest_restaurant_id}`,
     method: 'GET',
-    headers: {
-      'x-at-guest': `Bearer ${cookies().get('access_token_guest')?.value}`,
-      'x-rf-guest': `Bearer ${cookies().get('refresh_token_guest')?.value}`
-    },
     nextOption: {
       cache: 'no-store'
     }
   })
+
+  console.log('guest_restaurant_id', guest_restaurant_id)
+
   return res
 }
 
@@ -240,4 +239,3 @@ export const addMember = async (payload: { token: string; guest_name: string }) 
     message: res.message
   }
 }
-
