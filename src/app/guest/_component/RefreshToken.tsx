@@ -57,7 +57,7 @@ export default function RefreshTokenPage() {
       const cookie = await getCookie('access_token_guest')
       if (!cookie) return
 
-      if (socket) {
+      if (socket && socket.connected) {
         socket.disconnect()
       }
       socket = connectSocket(cookie, 'guest')
@@ -69,7 +69,7 @@ export default function RefreshTokenPage() {
       }
 
       function onDisconnect() {
-        // console.log('Disconnected')
+        console.log('Disconnected')
       }
 
       function updateStatusOrderDish(data: {
