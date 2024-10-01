@@ -22,36 +22,6 @@ export default function RefreshToken() {
     dispatch(startAppEmployee(inforEmployee))
   }
 
-  // const refreshToken = async () => {
-  //   const res = await getInfor()
-  //   const currentPathname = window.location.pathname
-
-  //   if (res?.code === 0 && res.data) {
-
-  //     if (res.type === 'restaurant') {
-  //       runAppRestaurant(res.data)
-  //       if (!currentPathname.startsWith('/dashboard')) {
-  //         // router.push('/dashboard')
-  //       }
-  //     } else if (res.type === 'employee') {
-  //       runAppEmployee(res.data)
-  //       if (!currentPathname.startsWith('/dashboard')) {
-  //         // router.push('/dashboard')
-  //       }
-  //     }
-  //   }
-  // }
-
-  // useLayoutEffect(() => {
-  //   refreshToken()
-
-  //   // Thiết lập interval để gọi API làm mới mỗi 10 phút
-  //   const interval = setInterval(() => {
-  //     refreshToken()
-  //   }, 1000 * 60 * 10)
-
-  //   return () => clearInterval(interval)
-  // }, [])
 
   useEffect(() => {
     let socket: any

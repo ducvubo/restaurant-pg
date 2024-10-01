@@ -3,8 +3,6 @@ import { io, Socket } from 'socket.io-client'
 let socket: Socket | null = null
 
 export const connectSocket = (token: string, type: string, refresh_token = '') => {
-  console.log('token,', token)
-
   if (socket) {
     socket.disconnect() // Nếu socket đã tồn tại, ngắt kết nối cũ trước
   }
@@ -21,8 +19,8 @@ export const connectSocket = (token: string, type: string, refresh_token = '') =
     console.log('Connected to socket:', socket?.id)
   })
 
-  socket.on('disconnect', () => {
-    console.log('Disconnected from socket')
+  socket.on('disconnect', (reason) => {
+    console.log('Disconnected from socket', reason)
   })
 
   return socket

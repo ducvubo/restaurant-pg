@@ -42,7 +42,6 @@ export default function ListOrderPage() {
 
   useEffect(() => {
     findListOrder()
-    console.log('object')
   }, [a])
 
   function calculateOrderSummary(orderSummary1: any) {

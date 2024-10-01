@@ -17,37 +17,6 @@ export default function RefreshTokenPage() {
   const runAppGuest = (inforGuest: IGuest) => {
     dispatch(startAppGuest(inforGuest))
   }
-  // const refreshToken = async () => {
-  //   const res = await getInforGuest()
-
-  //   if (res?.code === 0 && res.infor) {
-  //     runAppGuest(res.infor)
-  //     if (window.location.pathname.startsWith('/guest/table')) {
-  //       router.push('/guest/order')
-  //     }
-
-  //     return {
-  //       code: 0
-  //     }
-  //   } else if (typeof window !== 'undefined') {
-  //     const currentPath = window.location.pathname
-
-  //     // Kiểm tra nếu không phải là trang '/guest/table'
-  //     if (res?.code !== 0 && !currentPath.startsWith('/guest/table')) {
-  //       router.push('/')
-  //     }
-  //   }
-  // }
-
-  // useLayoutEffect(() => {
-  //   refreshToken()
-  //   // Thiết lập interval để gọi API làm mới mỗi 10 phút
-  //   const interval = setInterval(() => {
-  //     refreshToken()
-  //   }, 1000 * 60 * 10)
-
-  //   return () => clearInterval(interval)
-  // }, [])
 
   useEffect(() => {
     let socket: any
@@ -57,10 +26,13 @@ export default function RefreshTokenPage() {
       const cookie = await getCookie('access_token_guest')
       if (!cookie) return
 
-      if (socket && socket.connected) {
+      if (socket) {
         socket.disconnect()
       }
-      socket = connectSocket(cookie, 'guest')
+      
+      if (cookie) {
+        socket = connectSocket(cookie, 'guest')
+      }
 
       function onConnect() {
         socket.on('update-status-order-dish', updateStatusOrderDish)
@@ -132,12 +104,14 @@ export default function RefreshTokenPage() {
         const currentPath = window.location.pathname
 
         if (socket) {
+          console.log('disconnect socket')
           socket.disconnect()
         }
 
         // Kiểm tra nếu không phải là trang '/guest/table'
         if (res?.code !== 0 && !currentPath.startsWith('/guest/table')) {
           router.push('/')
+          socket.disconnect()
         }
       }
     }
