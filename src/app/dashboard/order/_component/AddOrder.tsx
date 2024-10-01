@@ -99,7 +99,6 @@ export default function AddOrder() {
       const res: IBackendRes<Omit<IDish, 'dish_status' | 'isDeleted'>[]> = await lishDishOrder({
         guest_restaurant_id: inforEmployee.epl_restaurant_id ? inforEmployee.epl_restaurant_id : inforRestaurant._id
       })
-      console.log('res: ' + res)
       if (res.statusCode === 200 && res.data) {
         setListDish(res.data)
       }
@@ -164,7 +163,6 @@ export default function AddOrder() {
     // })
   }
 
-  console.log(listDish)
 
   return (
     <div>

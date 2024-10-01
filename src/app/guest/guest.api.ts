@@ -150,7 +150,6 @@ export const lishDishOrder = async ({ guest_restaurant_id }: { guest_restaurant_
     }
   })
 
-  console.log('guest_restaurant_id', guest_restaurant_id)
 
   return res
 }

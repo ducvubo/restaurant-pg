@@ -29,7 +29,7 @@ export default function RefreshTokenPage() {
       if (socket) {
         socket.disconnect()
       }
-      
+
       if (cookie) {
         socket = connectSocket(cookie, 'guest')
       }
@@ -41,7 +41,6 @@ export default function RefreshTokenPage() {
       }
 
       function onDisconnect() {
-        console.log('Disconnected')
       }
 
       function updateStatusOrderDish(data: {
@@ -54,7 +53,6 @@ export default function RefreshTokenPage() {
           variant: 'default'
         })
         const currentPath = window.location.pathname
-        console.log('currentPath', currentPath)
         router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
       }
 
@@ -104,7 +102,6 @@ export default function RefreshTokenPage() {
         const currentPath = window.location.pathname
 
         if (socket) {
-          console.log('disconnect socket')
           socket.disconnect()
         }
 

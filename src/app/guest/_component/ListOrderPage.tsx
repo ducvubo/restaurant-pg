@@ -38,7 +38,6 @@ export default function ListOrderPage() {
     }
   }
 
-  // console.log('a', a)
 
   useEffect(() => {
     findListOrder()
