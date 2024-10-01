@@ -14,7 +14,7 @@ export const POST = async (req: any) => {
     const buffer = Buffer.from(await file.arrayBuffer())
     const formDataToSend = new FormData()
     formDataToSend.append('file', new Blob([buffer]), file.name)
-    const response = await fetch(`${process.env.URL_SERVER}/upload`, {
+    const response = await fetch(`${process.env.URL_SERVER}/upload`, { 
       method: 'POST',
       headers: {
         folder_type
