@@ -87,7 +87,7 @@ export default function ListOrderPage() {
           </CardTitle>
         </CardHeader>
         <div className='flex flex-col justify-between gap-3'>
-          {orderSummary?.or_dish?.map((item, index) => (
+          {orderSummary?.or_dish?.map((item: any, index) => (
             <div key={index} className='flex gap-4'>
               <Image
                 src={item.od_dish_duplicate_id.dish_duplicate_image.image_cloud}
