@@ -78,7 +78,7 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
         await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/upload`, {
           method: 'POST',
           headers: {
-            folder_type: 'avatar_employees'
+            folder_type: 'avatar_employees' 
           },
           body: formData
         })
