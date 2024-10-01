@@ -1,10 +1,24 @@
-import React from 'react'
+// 'use client'
+// import React from 'react'
+// import ListOrderPage from '../../_component/ListOrderPage'
+
+// export default function page() {
+//   return (
+//     <div>
+//       <ListOrderPage />
+//     </div>
+//   )
+// }
+
+import React, { Suspense } from 'react'
 import ListOrderPage from '../../_component/ListOrderPage'
 
-export default function page() {
+export default function Page() {
   return (
     <div>
-      <ListOrderPage />
+      <Suspense fallback={<div>Loading...</div>}>
+        <ListOrderPage />
+      </Suspense>
     </div>
   )
 }
