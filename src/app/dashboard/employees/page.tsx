@@ -15,10 +15,10 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 import Link from 'next/link'
-import { columns } from './_component/Columns'
 import { redirect } from 'next/navigation'
 import LoginPage from '@/app/auth/login/page'
 import LogoutPage from '@/app/logout/page'
+import { columns } from './_component/columns'
 interface PageProps {
   searchParams: { [key: string]: string }
 }

@@ -10,15 +10,13 @@ import {
 import React, { Suspense } from 'react'
 import LoadingServer from '@/components/LoadingServer'
 import AddOrEdit from '../_component/AddOrEdit'
-import { redirect } from 'next/navigation'
-import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { IEmployee } from '../employees.interface'
 import { findOneEmployee, getAllEmployees } from '../employees.api'
 import { PageEmployees } from '../_component/PageEmployees'
-import { columns } from '../_component/Columns'
 import LogoutPage from '@/app/logout/page'
+import { columns } from '../_component/columns'
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
 })
