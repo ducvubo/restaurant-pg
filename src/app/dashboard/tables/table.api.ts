@@ -3,7 +3,7 @@
 import { sendRequest } from '@/lib/api'
 import { ITable } from './table.interface'
 
-export const createTable = async (payload: Omit<ITable, 'tbl_status' | '_id' | 'tbl_token'>) => {
+export const createTable = async (payload: any) => {
   const res: IBackendRes<ITable> = await sendRequest({
     url: `${process.env.URL_SERVER}/tables`,
     method: 'POST',
@@ -49,7 +49,7 @@ export const findTableById = async ({ _id }: { _id: string }) => {
   return res
 }
 
-export const updateTable = async (payload: Omit<ITable, 'tbl_status' | 'tbl_token'>) => {
+export const updateTable = async (payload: any) => {
   const res: IBackendRes<ITable> = await sendRequest({
     url: `${process.env.URL_SERVER}/tables`,
     method: 'PATCH',
