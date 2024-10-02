@@ -38,7 +38,6 @@ export default function ListOrderPage() {
     }
   }
 
-
   useEffect(() => {
     findListOrder()
   }, [a])
@@ -94,9 +93,9 @@ export default function ListOrderPage() {
                 alt='vuducbo'
                 className='w-20 h-20 object-cover rounded-lg'
               />
-              <div className='flex flex-col justify-start gap-1 w-full'>
+              <div className='flex flex-col justify-start w-full gap-1'>
                 <Label className='font-semibold min-h-[10px]'>{item.od_dish_duplicate_id.dish_duplicate_name}</Label>
-                <span>
+                <span className=' italic'>
                   Giá:
                   {calculateFinalPrice(
                     item.od_dish_duplicate_id.dish_duplicate_price,
@@ -105,7 +104,7 @@ export default function ListOrderPage() {
                   đ x {item.od_dish_quantity}
                 </span>
 
-                <span>
+                <span className=' italic'>
                   Tổng:{' '}
                   {(
                     calculateFinalPrice(
@@ -116,7 +115,7 @@ export default function ListOrderPage() {
                 </span>
               </div>
               <div className='flex gap-2 items-end justify-end flex-col'>
-                <span>Người gọi: {item.od_dish_guest_id.guest_name}</span>
+                <span className='text-sm'>Order: {item.od_dish_guest_id.guest_name}</span>
                 <Badge className='cursor-default w-auto whitespace-nowrap' variant={'secondary'}>
                   {switchStatusOrderVi(item.od_dish_status)}
                 </Badge>

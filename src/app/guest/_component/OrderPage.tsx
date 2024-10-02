@@ -109,56 +109,6 @@ export default function OrderPage() {
     }
   }
 
-  // useEffect(() => {
-  //   const connectSocketWithCookie = async () => {
-  //     const cookie = await getCookie('access_token_guest')
-  //     if (!cookie) return
-
-  //     let socket = connectSocket(cookie, 'guest')
-
-  //     // Hàm xử lý khi connect thành công
-  //     function onConnect() {
-  //       socket.on('update-status-order-dish', updateStatus)
-  //       console.log('Connected:', socket.id)
-  //     }
-
-  //     // Hàm xử lý khi disconnect
-  //     function onDisconnect() {
-  //       console.log('Disconnected')
-  //     }
-
-  //     function updateStatus(data: any) {
-  //       console.log('data:::::::::::::::::::', data)
-  //     }
-
-  //     // Sử dụng socket.on để lắng nghe sự kiện connect và disconnect
-  //     socket.on('connect', onConnect)
-  //     socket.on('disconnect', onDisconnect)
-
-  //     // Thiết lập interval để reconnect sau 10 phút (600000ms)
-  //     const intervalId = setInterval(() => {
-  //       console.log('Reconnecting after 10 minutes...')
-  //       socket.disconnect() // Ngắt kết nối socket hiện tại
-  //       socket = connectSocket(cookie, 'guest') // Kết nối lại với token từ cookie
-
-  //       // Lắng nghe lại các sự kiện sau khi reconnect
-  //       socket.on('connect', onConnect)
-  //       socket.on('disconnect', onDisconnect)
-  //       socket.on('update-status-order-dish', updateStatus)
-  //     }, 600000) // 10 phút
-
-  //     // Cleanup khi component unmount
-  //     return () => {
-  //       socket.off('connect', onConnect)
-  //       socket.off('disconnect', onDisconnect)
-  //       clearInterval(intervalId) // Xóa interval khi component unmount
-  //       socket.disconnect() // Ngắt kết nối socket khi component unmount
-  //     }
-  //   }
-
-  //   connectSocketWithCookie() // Gọi hàm async
-  // }, [])
-
   return (
     <div className='flex justify-center items-center mx-1'>
       <div className='border-none rounded-none'>
@@ -175,7 +125,7 @@ export default function OrderPage() {
                 width={100}
                 height={100}
                 alt={dish.dish_name}
-                className='w-20 h-20 object-cover rounded-lg'
+                className='w-20 h-20 min-h-20 min-w-20 object-cover rounded-lg'
               />
               <div className='flex flex-col justify-between gap-1 w-full'>
                 <Label className='font-bold text-lg min-h-[10px]'>{dish.dish_name}</Label>
@@ -212,7 +162,7 @@ export default function OrderPage() {
           <Button className='w-full' disabled={totalQuantity === 0} onClick={handleOrderDish}>
             {totalQuantity === 0 && totalPrice === 0
               ? 'Chọn món trước khi đặt hàng'
-              : `Đặt hàng ${totalQuantity} món với giá ${totalPrice.toLocaleString()} đ`}
+              : `Đặt ${totalQuantity} món với giá ${totalPrice.toLocaleString()} đ`}
           </Button>
         </div>
       </div>

@@ -8,7 +8,7 @@ const GlobalLoading = () => {
   if (!isLoading) return null
 
   return (
-    <div className='fixed inset-0 bg-gray-700 bg-opacity-50 flex items-center justify-center z-50'>
+    <div className='fixed inset-0 bg-gray-700 bg-opacity-50 flex items-center justify-center z-[999999999]'>
       {/* <div className='loader ease-linear rounded-full border-t-4 border-gray-200 h-12 w-12'></div> */}
       <StyledWrapper>
         <div aria-label='Orange and tan hamster running in a metal wheel' role='img' className='wheel-and-hamster'>
@@ -61,7 +61,7 @@ const StyledWrapper = styled.div`
 
   .wheel {
     background: radial-gradient(100% 100% at center, hsla(0, 0%, 60%, 0) 47.8%, hsl(0, 0%, 60%) 48%);
-    z-index: 2;
+    z-index: 100;
   }
 
   .hamster {
@@ -72,7 +72,7 @@ const StyledWrapper = styled.div`
     height: 3.75em;
     transform: rotate(4deg) translate(-0.8em, 1.85em);
     transform-origin: 50% 0;
-    z-index: 1;
+    z-index: 100;
   }
 
   .hamster__head {

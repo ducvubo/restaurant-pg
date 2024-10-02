@@ -34,7 +34,9 @@ import { Pagination } from '@/components/Pagination'
 import { ModalUpdateStatusSummary } from './ModalUpdateSummary'
 
 import { ScrollArea } from '@/components/ui/scroll-area'
-import AddOrder from './AddOrder'
+import AddOrder from './AddOrderSummary'
+import AddOrderDish from './AddOrderDish'
+import AddOrderSummary from './AddOrderSummary'
 
 const formatVietnameseDate = (date: Date) => {
   const day = date.getDate()
@@ -117,7 +119,7 @@ export default function ListOrderPage() {
   }
 
   const findListOrder = async () => {
-    setLoading(true)
+    // setLoading(true)
     const res: IBackendRes<IModelPaginateWithStatusCount<IOrderRestaurant>> = await getListOrderDish({
       current: pageIndex,
       pageSize: pageSize,
@@ -128,13 +130,13 @@ export default function ListOrderPage() {
       od_dish_smr_status: status
     })
     if (res.statusCode === 200 && res.data && res.data.result) {
-      setLoading(false)
+      // setLoading(false)
       setcountStatus(res.data?.meta.statusCount)
       setlistOrder(res.data.result)
       setMeta(res.data.meta)
     } else if (res.code === -10) {
       setlistOrder([])
-      setLoading(false)
+      // setLoading(false)
       toast({
         title: 'Thông báo',
         description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
@@ -143,7 +145,7 @@ export default function ListOrderPage() {
       await deleteCookiesAndRedirect()
     } else if (res.code === -11) {
       setlistOrder([])
-      setLoading(false)
+      // setLoading(false)
       toast({
         title: 'Thông báo',
         description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
@@ -151,7 +153,7 @@ export default function ListOrderPage() {
       })
     } else {
       setlistOrder([])
-      setLoading(false)
+      // setLoading(false)
       toast({
         title: 'Thất bại',
         description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
@@ -357,7 +359,7 @@ export default function ListOrderPage() {
             </SelectContent>
           </Select>
 
-          <AddOrder />
+          <AddOrderSummary />
         </div>
 
         <div className='flex gap-3 mt-5'>
@@ -388,7 +390,10 @@ export default function ListOrderPage() {
                         Tổng hóa đơn: {calculateTotalPrice(order_summary)?.toLocaleString()}đ
                       </span>
                     </div>
-                    <ModalUpdateStatusSummary order_summary={order_summary} />
+                    <div className='flex'>
+                      <ModalUpdateStatusSummary order_summary={order_summary} />
+                      <AddOrderDish order_summary={order_summary} />
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>

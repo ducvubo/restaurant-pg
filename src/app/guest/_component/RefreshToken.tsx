@@ -38,10 +38,10 @@ export default function RefreshTokenPage() {
         socket.on('update-status-order-dish', updateStatusOrderDish)
         socket.on('update_order_dish_summary', updateStatusOrderDistSumary)
         socket.on('add_member', addMember)
+        socket.on('order_dish_new_restaurant', orderDishNewRestaurant)
       }
 
-      function onDisconnect() {
-      }
+      function onDisconnect() {}
 
       function updateStatusOrderDish(data: {
         dish_duplicate_name: string
@@ -73,6 +73,16 @@ export default function RefreshTokenPage() {
         toast({
           title: 'Thông báo',
           description: `Bàn của bạn vừa thành viên mới: ${data.guest_name}`,
+          variant: 'default'
+        })
+      }
+
+      function orderDishNewRestaurant(data: null) {
+        const currentPath = window.location.pathname
+        router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
+        toast({
+          title: 'Thông báo',
+          description: 'Bàn của bạn vừa được nhân viên đặt món mới',
           variant: 'default'
         })
       }
