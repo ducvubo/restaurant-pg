@@ -43,7 +43,7 @@ export function getMenuListRestaurant(pathname: string): Group[] {
           submenus: [
             {
               href: '/dashboard/order/dish',
-              label: 'Danh sách đơn đặt món ăn',
+              label: 'Danh sách đơn đặt hàng',
               active: pathname === '/dashboard/order/dish'
             },
             {
@@ -165,7 +165,7 @@ export function getMenuListEmployee(pathname: string): Group[] {
           submenus: [
             {
               href: '/dashboard/order/dish',
-              label: 'Danh sách đơn đặt món ăn',
+              label: 'Danh sách đơn đặt hàng',
               active: pathname === '/dashboard/order/dish'
             },
             {

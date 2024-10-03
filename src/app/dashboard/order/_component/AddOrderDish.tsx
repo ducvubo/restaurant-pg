@@ -93,7 +93,7 @@ export default function AddOrderDish({ order_summary }: Props) {
       })
       router.push(`/dashboard/order/dish?a=${Math.floor(Math.random() * 100000) + 1}`)
       router.refresh()
-    } else if (res?.code === 400) {
+    } else if (res?.statusCode === 400) {
       setLoading(false)
       setIsModalOpen(false)
       if (Array.isArray(res.message)) {
@@ -111,6 +111,7 @@ export default function AddOrderDish({ order_summary }: Props) {
           variant: 'destructive'
         })
       }
+      return
     } else if (res.code === -10) {
       setIsModalOpen(false)
       setLoading(false)
@@ -135,7 +136,11 @@ export default function AddOrderDish({ order_summary }: Props) {
     <div>
       <Dialog onOpenChange={(isOpen) => setIsModalOpen(isOpen)} open={isModalOpen}>
         <DialogTrigger asChild>
-          <Button variant='outline' className='-ml-16 mr-[130px] w-32'>
+          <Button
+            variant='outline'
+            className='-ml-16 mr-[130px] w-32'
+            disabled={order_summary.od_dish_smr_status === 'ordering' ? false : true}
+          >
             Gọi món
           </Button>
         </DialogTrigger>

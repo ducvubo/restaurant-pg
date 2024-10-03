@@ -118,7 +118,9 @@ export default function RefreshTokenPage() {
         // Kiểm tra nếu không phải là trang '/guest/table'
         if (res?.code !== 0 && !currentPath.startsWith('/guest/table')) {
           router.push('/')
-          socket.disconnect()
+          if (socket) {
+            socket.disconnect()
+          }
         }
       }
     }

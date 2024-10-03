@@ -75,16 +75,16 @@ export const refreshTokenNew = async () => {
       secure: true,
       sameSite: 'lax',
       maxAge: Number(process.env.JWT_ACCESSTOKEN_GUEST_RESTAURANT_EXPIRE)
-    }),
-      await cookies().set({
-        name: 'refresh_token_guest',
-        value: res.data.refresh_token_guest,
-        path: '/',
-        httpOnly: true,
-        secure: true,
-        sameSite: 'lax',
-        maxAge: Number(process.env.JWT_REFRESHTOKEN_GUEST_RESTAURANT_EXPIRE)
-      })
+    })
+    // await cookies().set({
+    //   name: 'refresh_token_guest',
+    //   value: res.data.refresh_token_guest,
+    //   path: '/',
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: 'lax',
+    //   maxAge: Number(process.env.JWT_REFRESHTOKEN_GUEST_RESTAURANT_EXPIRE)
+    // })
 
     return {
       infor: res.data.infor,
@@ -149,7 +149,6 @@ export const lishDishOrder = async ({ guest_restaurant_id }: { guest_restaurant_
       cache: 'no-store'
     }
   })
-
 
   return res
 }
@@ -237,4 +236,18 @@ export const addMember = async (payload: { token: string; guest_name: string }) 
     code: res.statusCode,
     message: res.message
   }
+}
+
+export const setCookieRefreshTokenGuest = async (refreshToken: string) => {
+  await cookies().set({
+    name: 'refresh_token_guest',
+    value: refreshToken,
+    path: '/',
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+    maxAge: Number(process.env.JWT_REFRESHTOKEN_GUEST_RESTAURANT_EXPIRE)
+  })
+
+  return
 }

@@ -100,3 +100,14 @@ export const restaurantCreateOrderSummary = async ({ od_dish_smr_table_id }: { o
   })
   return res
 }
+
+export const getTokenOrderSummary = async ({ _id }: { _id: string }) => {
+  const res: IBackendRes<{ refresh_token: string }> = await sendRequest({
+    url: `${process.env.URL_SERVER}/guest-restaurant/get-token`,
+    method: 'POST',
+    body: { _id }
+  })
+
+  console.log("response", res)
+  return res
+}

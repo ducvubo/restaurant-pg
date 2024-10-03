@@ -37,6 +37,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import AddOrder from './AddOrderSummary'
 import AddOrderDish from './AddOrderDish'
 import AddOrderSummary from './AddOrderSummary'
+import GennerateQrOrder from './GetQrOrder'
+import GetQrOrder from './GetQrOrder'
 
 const formatVietnameseDate = (date: Date) => {
   const day = date.getDate()
@@ -76,6 +78,7 @@ export default function ListOrderPage() {
     totalPage: 1,
     totalItem: 0
   })
+  const [countStatus, setcountStatus] = useState<IStatusCount[]>([])
 
   const searchParam = useSearchParams().get('a')
 
@@ -95,8 +98,6 @@ export default function ListOrderPage() {
       totalItem: 0
     })
   }
-
-  const [countStatus, setcountStatus] = useState<IStatusCount[]>([])
 
   const handleSelectFromDate = (date: Date | undefined) => {
     if (date) {
@@ -256,9 +257,13 @@ export default function ListOrderPage() {
     }
   }
 
+  const sum = listOrder.reduce((accumulator, currentValue) => {
+    return accumulator + calculateTotalPrice(currentValue)
+  }, 0)
+
   return (
     <section className='mt-2'>
-      <ScrollArea className='h-[563px]'>
+      <ScrollArea className='h-[563px] pr-2'>
         <div className='flex gap-2'>
           <div className='flex gap-2'>
             <Label className='mt-2'>Từ</Label>
@@ -362,16 +367,22 @@ export default function ListOrderPage() {
           <AddOrderSummary />
         </div>
 
-        <div className='flex gap-3 mt-5'>
-          {countStatus.map((item) => (
-            <Badge
-              key={item.status}
-              className='whitespace-nowrap'
-              variant={item.status === 'refuse' ? 'destructive' : 'outline'}
-            >
-              {switchStatusOrderSummaryVi(item.status)}: {item.count}
-            </Badge>
-          ))}
+        <div className='flex gap-3 mt-5 justify-between'>
+          <div className='flex gap-3'>
+            {countStatus.map(
+              (item, index) =>
+                index !== 3 && (
+                  <Badge
+                    key={item.status}
+                    className='whitespace-nowrap'
+                    variant={item.status === 'refuse' ? 'destructive' : 'outline'}
+                  >
+                    {switchStatusOrderSummaryVi(item.status)}: {item.count}
+                  </Badge>
+                )
+            )}
+          </div>
+          <span className='mr-1 font-bold italic'>Tổng doanh thu: {countStatus[3]?.count?.toLocaleString()}đ</span>
         </div>
 
         <div className='flex flex-col gap-3 mt-2'>
@@ -393,6 +404,7 @@ export default function ListOrderPage() {
                     <div className='flex'>
                       <ModalUpdateStatusSummary order_summary={order_summary} />
                       <AddOrderDish order_summary={order_summary} />
+                      <GetQrOrder order_summary={order_summary} />
                     </div>
                   </div>
                 </CardHeader>

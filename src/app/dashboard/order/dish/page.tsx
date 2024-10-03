@@ -13,7 +13,7 @@ import ListOrderPage from '../_component/ListOrderPage'
 
 export default function PageListOrder() {
   return (
-    <ContentLayout title='Danh sách đơn đặt món ăn'>
+    <ContentLayout title='Danh sách đơn đặt hàng'>
       <Breadcrumb className='-mt-4'>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -23,7 +23,7 @@ export default function PageListOrder() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Danh sách đơn đặt món ăn</BreadcrumbPage>
+            <BreadcrumbPage>Danh sách đơn đặt hàng</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

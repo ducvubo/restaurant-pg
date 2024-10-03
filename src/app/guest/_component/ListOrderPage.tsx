@@ -91,7 +91,7 @@ export default function ListOrderPage() {
                 width={100}
                 height={100}
                 alt='vuducbo'
-                className='w-20 h-20 object-cover rounded-lg'
+                className='w-20 h-20 min-w-20 min-h-20 object-cover rounded-lg'
               />
               <div className='flex flex-col justify-start w-full gap-1'>
                 <Label className='font-semibold min-h-[10px]'>{item.od_dish_duplicate_id.dish_duplicate_name}</Label>
