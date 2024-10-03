@@ -23,7 +23,7 @@ export const getAllTables = async ({
   type: 'all' | 'recycle'
 }) => {
   const url = type === 'all' ? `${process.env.URL_SERVER}/tables` : `${process.env.URL_SERVER}/tables/recycle`
-  const res: IBackendRes<IModelPaginate<ITable[]>> = await sendRequest({
+  const res: IBackendRes<IModelPaginate<ITable>> = await sendRequest({
     url,
     method: 'GET',
     queryParams: {

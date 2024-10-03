@@ -23,7 +23,7 @@ interface PageProps {
 }
 
 async function Component({ searchParams }: PageProps) {
-  const res: IBackendRes<IModelPaginate<ITable[]>> = await getAllTables({
+  const res: IBackendRes<IModelPaginate<ITable>> = await getAllTables({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
     type: 'all'
@@ -46,7 +46,7 @@ async function Component({ searchParams }: PageProps) {
 
   return (
     <div>
-      <ContentLayout title='Danh sách nhân viên'>
+      <ContentLayout title='Danh sách bàn ăn'>
         <Breadcrumb className='-mt-4'>
           <BreadcrumbList>
             <BreadcrumbItem>
