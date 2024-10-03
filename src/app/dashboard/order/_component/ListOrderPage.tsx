@@ -257,9 +257,6 @@ export default function ListOrderPage() {
     }
   }
 
-  const sum = listOrder.reduce((accumulator, currentValue) => {
-    return accumulator + calculateTotalPrice(currentValue)
-  }, 0)
 
   return (
     <section className='mt-2'>
@@ -355,11 +352,9 @@ export default function ListOrderPage() {
               <SelectGroup>
                 <SelectLabel>Chọn trạng thái</SelectLabel>
                 <SelectItem value='all'>Tất cả</SelectItem>
-                <SelectItem value='pending'>Chờ xử lý</SelectItem>
-                <SelectItem value='processing'>Đang nấu</SelectItem>
-                <SelectItem value='delivered'>Đã phục vụ</SelectItem>
                 <SelectItem value='paid'>Đã thanh toán</SelectItem>
-                <SelectItem value='refuse'>Từ chối</SelectItem>
+                <SelectItem value='refuse'>Đã từ chối</SelectItem>
+                <SelectItem value='ordering'>Đang phục vụ</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -385,7 +380,7 @@ export default function ListOrderPage() {
           <span className='mr-1 font-bold italic'>Tổng doanh thu: {countStatus[3]?.count?.toLocaleString()}đ</span>
         </div>
 
-        <div className='flex flex-col gap-3 mt-2'>
+        <div className='flex flex-col gap-3 mt-2 mb-2'>
           {listOrder?.map((order_summary: IOrderRestaurant, index1) => {
             return (
               <Card className='w-full' key={index1}>
@@ -577,13 +572,15 @@ export default function ListOrderPage() {
             )
           })}
         </div>
-        <Pagination
-          pageIndex={pageIndex}
-          pageSize={pageSize}
-          setPageIndex={setPageIndex}
-          setPageSize={setPageSize}
-          meta={meta}
-        />
+        <div className='flex justify-end'>
+          <Pagination
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            setPageIndex={setPageIndex}
+            setPageSize={setPageSize}
+            meta={meta}
+          />
+        </div>
       </ScrollArea>
     </section>
   )

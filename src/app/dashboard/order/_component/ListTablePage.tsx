@@ -1,12 +1,5 @@
 'use client'
-import React, { useState } from 'react'
-import { CalendarIcon } from '@radix-ui/react-icons'
-import { addDays, format } from 'date-fns'
-import { vi } from 'date-fns/locale'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import React, { useCallback, useState, useEffect } from 'react'
 import {
   Select,
   SelectContent,
@@ -19,157 +12,184 @@ import {
 import { Label } from '@radix-ui/react-dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-
-const formatVietnameseDate = (date: Date) => {
-  const day = date.getDate()
-  const month = date.getMonth() + 1 // Tháng bắt đầu từ 0
-  const year = date.getFullYear()
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-
-  return `${day}/${month}/${year} - ${hours}:${minutes}`
-}
+import { Pagination } from '@/components/Pagination'
+import { useSearchParams } from 'next/navigation'
+import { IModelPaginateWithStatusCount, ITableOrderSummary } from '../order.interface'
+import { getListTableOrder } from '../order.api'
+import { toast } from '@/hooks/use-toast'
+import { deleteCookiesAndRedirect } from '@/app/actions/action'
+import { debounce } from 'lodash'
+import { FiLoader } from 'react-icons/fi'
+import { MdPaid } from 'react-icons/md'
+import { FaTrash } from 'react-icons/fa6'
+import { Separator } from '@/components/ui/separator'
+import { FiUsers } from 'react-icons/fi'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { DialogDetailTable } from './DialogDetailTable'
 export default function ListTablePage() {
-  const today = new Date()
-  const defaultToDate = new Date(today.setHours(0, 0, 0, 0)) // Set to 00:00
-  const defaultFromDate = new Date(today.setHours(23, 59, 0, 0)) // Set to 23:59
+  const [tableName, setTableName] = useState('')
+  const [status, setStatus] = useState<'enable' | 'disable' | 'serving' | 'reserve' | 'all'>('all')
+  const [pageIndex, setPageIndex] = React.useState(1)
+  const [pageSize, setPageSize] = React.useState(10)
+  const [meta, setMeta] = useState<{
+    current: number
+    pageSize: number
+    totalPage: number
+    totalItem: number
+  }>({
+    current: 1,
+    pageSize: 10,
+    totalPage: 1,
+    totalItem: 0
+  })
+  const [listTable, setListTable] = useState<ITableOrderSummary[]>([])
+  const [selectedTable, setSelectedTable] = useState<ITableOrderSummary | null>(null)
 
-  const [toDate, setToDate] = useState<Date>(defaultToDate)
-  const [fromDate, setFromDate] = useState<Date>(defaultFromDate)
+  const searchParam = useSearchParams().get('a')
 
-  const handleSelectFromDate = (date: Date | undefined) => {
-    if (date) {
-      const newDate = new Date(date)
-      newDate.setHours(23) // Đặt giờ là 23
-      newDate.setMinutes(59) // Đặt phút là 59
-      newDate.setSeconds(0) // Đặt giây là 0
-      setFromDate(newDate)
+  const findTableOrder = async () => {
+    const res: IBackendRes<IModelPaginateWithStatusCount<ITableOrderSummary>> = await getListTableOrder({
+      current: pageIndex,
+      pageSize: pageSize,
+      tbl_name: tableName ? tableName : undefined,
+      tbl_status: status
+    })
+    if (res.statusCode === 200 && res.data && res.data.result) {
+      setListTable(res.data.result)
+      setMeta(res.data.meta)
+    } else if (res.code === -10) {
+      setListTable([])
+      toast({
+        title: 'Thông báo',
+        description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
+        variant: 'destructive'
+      })
+      await deleteCookiesAndRedirect()
+    } else if (res.code === -11) {
+      setListTable([])
+      toast({
+        title: 'Thông báo',
+        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+        variant: 'destructive'
+      })
+    } else {
+      setListTable([])
+      toast({
+        title: 'Thất bại',
+        description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+        variant: 'destructive'
+      })
     }
   }
 
-  // Hàm thiết lập thời gian cho toDate là giờ hiện tại hoặc 00:00 nếu cần
-  const handleSelectToDate = (date: Date | undefined) => {
-    if (date) {
-      const newDate = new Date(date)
-      newDate.setHours(0) // Đặt giờ là 00:00
-      newDate.setMinutes(0)
-      newDate.setSeconds(0)
-      setToDate(newDate)
+  const debouncedFindListTable = useCallback(
+    debounce(() => {
+      findTableOrder()
+    }, 300), // 500ms là thời gian delay cho debounce
+    [tableName, status, pageIndex, pageSize] // Dependencies của debounce
+  )
+
+  useEffect(() => {
+    debouncedFindListTable()
+    return () => {
+      debouncedFindListTable.cancel()
     }
-  }
+  }, [tableName, status, pageIndex, pageSize, debouncedFindListTable])
 
+  useEffect(() => {
+    console.log('object')
+    debouncedFindListTable()
+    return () => {
+      debouncedFindListTable.cancel()
+    }
+  }, [searchParam])
 
+  useEffect(() => {
+    // Kiểm tra nếu selectedTable đã có, tìm lại item trong listTable dựa trên _id
+    if (selectedTable) {
+      const updatedTable = listTable.find((table) => table._id === selectedTable._id)
+      if (updatedTable) {
+        setSelectedTable(updatedTable) // Cập nhật selectedTable với giá trị mới
+      } else {
+        setSelectedTable(null) // Nếu không tìm thấy, reset selectedTable
+      }
+    }
+  }, [listTable])
 
+  console.log(listTable)
 
   return (
-    <section className='mt-2'>
-      <div className='flex gap-2'>
-        <div className='flex gap-2'>
-          <Label className='mt-2'>Từ</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={'outline'}
-                className={cn('w-[180px] justify-start text-left font-normal', !toDate && 'text-muted-foreground')}
-              >
-                <CalendarIcon className='mr-2 h-4 w-4' />
-                {toDate ? formatVietnameseDate(toDate) : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align='start' className='flex w-auto flex-col space-y-2 p-2'>
-              <Select onValueChange={(value) => handleSelectToDate(addDays(new Date(), parseInt(value)))}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Chọn' />
-                </SelectTrigger>
-                <SelectContent position='popper'>
-                  <SelectItem value='0'>Ngày hôm này</SelectItem>
-                  <SelectItem value='-1'>Ngày hôm qua</SelectItem>
-                  <SelectItem value='-3'>3 ngày trước</SelectItem>
-                  <SelectItem value='-7'>7 ngày trước</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className='rounded-md border'>
-                <Calendar mode='single' selected={toDate} onSelect={handleSelectToDate} locale={vi} />
-              </div>
-            </PopoverContent>
-          </Popover>
+    <section className='mt-2 h-[563px]'>
+      <ScrollArea className='h-[593px] pr-2 relative'>
+        <div className='flex gap-3 w-auto mt-2'>
+          <Input placeholder='Tên bàn' className='w-[180px]' onChange={(e) => setTableName(e.target.value)} />
+          <Select>
+            <SelectTrigger className='w-[180px]'>
+              <SelectValue placeholder='Trạng thái' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Chọn trạng thái</SelectLabel>
+                <SelectItem value='all'>Tất cả</SelectItem>
+                <SelectItem value='enable'>Đang hoạt động</SelectItem>
+                <SelectItem value='disable'>Ngưng hoạt động</SelectItem>
+                <SelectItem value='serving'>Đã đặt trước</SelectItem>
+                <SelectItem value='reserve'>Đang phục vụ</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
-        <div className='flex gap-2'>
-          <Label className='mt-2'>Đến</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={'outline'}
-                className={cn('w-[180px] justify-start text-left font-normal', !fromDate && 'text-muted-foreground')}
-              >
-                <CalendarIcon className='mr-2 h-4 w-4' />
-                {fromDate ? formatVietnameseDate(fromDate) : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align='start' className='flex w-auto flex-col space-y-2 p-2'>
-              <Select onValueChange={(value) => handleSelectFromDate(addDays(new Date(), parseInt(value)))}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Chọn' />
-                </SelectTrigger>
-                <SelectContent position='popper'>
-                  <SelectItem value='0'>Ngày hôm này</SelectItem>
-                  <SelectItem value='-1'>Ngày hôm qua</SelectItem>
-                  <SelectItem value='-3'>3 ngày trước</SelectItem>
-                  <SelectItem value='-7'>7 ngày trước</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className='rounded-md border'>
-                <Calendar mode='single' selected={fromDate} onSelect={handleSelectFromDate} locale={vi} />
-              </div>
-            </PopoverContent>
-          </Popover>
+        <div className='mt-2 grid grid-cols-8 gap-3'>
+          {listTable?.map((table, index) => {
+            return (
+              <Card className='w-28 h-28 cursor-pointer' key={index} onClick={() => setSelectedTable(table)}>
+                <CardContent className='flex flex-col'>
+                  <span className='my-1'>{table.tbl_name}</span>
+                  <Separator orientation='horizontal' className='w-28 -ml-6' />
+                  <div className='flex'>
+                    <div className='flex items-center'>
+                      <div className='flex gap-1 -ml-2 mr-2'>
+                        <FiUsers fontSize={'1.0em'} />
+                        <span className='text-sm'>{table.od_dish_smr_count.guest}</span>
+                      </div>
+                    </div>
+
+                    <Separator orientation='vertical' className='h-20 w-[2px]' />
+
+                    <div className='flex flex-col mt-1 gap-1 ml-1'>
+                      <div className='flex gap-1'>
+                        <FiLoader fontSize={'1.0em'} />
+                        <span className='text-sm'>{table.od_dish_smr_count.ordering}</span>
+                      </div>
+                      <div className='flex gap-1'>
+                        <FaTrash fontSize={'1.0em'} />
+                        <span className='text-sm'>{table.od_dish_smr_count.refuse}</span>
+                      </div>
+                      <div className='flex gap-1 '>
+                        <MdPaid fontSize={'1.0em'} />
+                        <span className='text-sm'>{table.od_dish_smr_count.paid}</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
 
-        <Button className='w-20'>Reset</Button>
-      </div>
-      <div className='flex gap-3 w-auto mt-2'>
-        <Input placeholder='Tên khách' className='w-32' />
-        <Select>
-          <SelectTrigger className='w-32'>
-            <SelectValue placeholder='Số bàn' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Chọn bàn</SelectLabel>
-              <SelectItem value='apple'>Apple</SelectItem>
-              <SelectItem value='banana'>Banana</SelectItem>
-              <SelectItem value='blueberry'>Blueberry</SelectItem>
-              <SelectItem value='grapes'>Grapes</SelectItem>
-              <SelectItem value='pineapple'>Pineapple</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-        <Select>
-          <SelectTrigger className='w-[153px]'>
-            <SelectValue placeholder='Trạng thái' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Chọn trạng thái</SelectLabel>
-              <SelectItem value='apple'>Apple</SelectItem>
-              <SelectItem value='banana'>Banana</SelectItem>
-              <SelectItem value='blueberry'>Blueberry</SelectItem>
-              <SelectItem value='grapes'>Grapes</SelectItem>
-              <SelectItem value='pineapple'>Pineapple</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-        <Button className='w-20'>Tìm</Button>
-      </div>
+        <div className='flex justify-end absolute bottom-10 right-0'>
+          <Pagination
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            setPageIndex={setPageIndex}
+            setPageSize={setPageSize}
+            meta={meta}
+          />
+        </div>
+      </ScrollArea>
 
-      <div className='mt-2 grid grid-cols-10 gap-3'>
-        {Array.from({ length: 50 }).map((_, index) => (
-          <Card className='w-20 h-20' key={index}>
-            <CardContent></CardContent>
-          </Card>
-        ))}
-      </div>
+      {selectedTable && <DialogDetailTable selectedTable={selectedTable} setSelectedTable={setSelectedTable} />}
     </section>
   )
 }

@@ -64,8 +64,8 @@ export function ModalUpdateStatusSummary({ order_summary }: Props) {
         variant: 'default'
       })
       setDialogOpen(false)
-      router.push(`/dashboard/order/dish?a=${Math.floor(Math.random() * 100000) + 1}`)
-      router.refresh()
+      const currentPath = window.location.pathname
+      router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
     } else if (res.statusCode === 400) {
       setLoading(false)
       if (Array.isArray(res.message)) {

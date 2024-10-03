@@ -10,15 +10,31 @@ export interface IModelPaginateWithStatusCount<T> extends IModelPaginate<T> {
 }
 
 export interface ICreateOrderDish {
-  od_dish_id: string;
-  od_dish_quantity: number;
+  od_dish_id: string
+  od_dish_quantity: number
 }
 
 export interface IRestaurantCreateOrderDish {
-  od_dish_summary_id: string;
-  order_dish: ICreateOrderDish[];
+  od_dish_summary_id: string
+  order_dish: ICreateOrderDish[]
 }
 
+export interface ITableOrderSummary {
+  _id: string
+  isDeleted: boolean
+  tbl_restaurant_id: string
+  tbl_name: string
+  tbl_description: string
+  tbl_capacity: number
+  tbl_status: 'enable' | 'disable' | 'serving' | 'reserve'
+  tbl_token: string
+  od_dish_smr_count: {
+    paid: number
+    refuse: number
+    ordering: number
+    guest: number
+  }
+}
 
 export interface IOrderRestaurant {
   _id: string
@@ -38,7 +54,7 @@ export interface OdDishSmrGuestId {
   guest_restaurant_id: string
   guest_table_id: string
   guest_name: string
-  guest_type: "member" | "owner"
+  guest_type: 'member' | 'owner'
   guest_refresh_token: string
   createdAt: string
   updatedAt: string

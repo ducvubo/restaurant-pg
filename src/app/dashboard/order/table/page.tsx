@@ -13,7 +13,7 @@ import ListTablePage from '../_component/ListTablePage'
 
 export default function page() {
   return (
-    <ContentLayout title='Danh sách các bàn ăn'>
+    <ContentLayout title='Danh sách đơn hàng theo bàn'>
       <Breadcrumb className='-mt-4'>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -23,7 +23,7 @@ export default function page() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Danh sách các bàn ăn</BreadcrumbPage>
+            <BreadcrumbPage>Danh sách đơn hàng theo bàn</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

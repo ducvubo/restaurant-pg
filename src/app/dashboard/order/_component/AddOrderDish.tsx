@@ -91,8 +91,8 @@ export default function AddOrderDish({ order_summary }: Props) {
         description: 'Đặt món ăn cho bàn thành công',
         variant: 'default'
       })
-      router.push(`/dashboard/order/dish?a=${Math.floor(Math.random() * 100000) + 1}`)
-      router.refresh()
+      const currentPath = window.location.pathname
+      router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
     } else if (res?.statusCode === 400) {
       setLoading(false)
       setIsModalOpen(false)

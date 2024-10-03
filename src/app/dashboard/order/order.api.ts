@@ -5,7 +5,8 @@ import {
   IModelPaginateWithStatusCount,
   IUpdateStatusOrderDish,
   IOrderRestaurant,
-  IRestaurantCreateOrderDish
+  IRestaurantCreateOrderDish,
+  ITableOrderSummary
 } from './order.interface'
 import { ITable } from '../tables/table.interface'
 
@@ -66,15 +67,6 @@ export const updateStatusSummary = async (payload: {
   return res
 }
 
-export const getListTableOrder = async () => {
-  const res: IBackendRes<ITable[]> = await sendRequest({
-    url: `${process.env.URL_SERVER}/tables/list-table-order`,
-    method: 'GET'
-  })
-
-  return res
-}
-
 export const getListOrdring = async () => {
   const res: IBackendRes<IOrderRestaurant[]> = await sendRequest({
     url: `${process.env.URL_SERVER}/order-dish-summary/list-ordering`,
@@ -108,6 +100,62 @@ export const getTokenOrderSummary = async ({ _id }: { _id: string }) => {
     body: { _id }
   })
 
-  console.log("response", res)
+  console.log('response', res)
+  return res
+}
+
+export const getListTableOrder = async ({
+  pageSize,
+  current,
+  tbl_name,
+  tbl_status
+}: {
+  pageSize: number
+  current: number
+  tbl_name?: string
+  tbl_status: 'enable' | 'disable' | 'serving' | 'reserve' | 'all'
+}) => {
+  const res: IBackendRes<IModelPaginateWithStatusCount<ITableOrderSummary>> = await sendRequest({
+    url: `${process.env.URL_SERVER}/tables/get-list-table-order`,
+    method: 'GET',
+    queryParams: {
+      pageSize,
+      current,
+      tbl_name,
+      tbl_status
+    }
+  })
+
+  return res
+}
+
+export const getListTableOrderSummary = async () => {
+  const res: IBackendRes<ITable[]> = await sendRequest({
+    url: `${process.env.URL_SERVER}/tables/list-table-order`,
+    method: 'GET'
+  })
+
+  return res
+}
+
+export const getListOrderSummaryByTable = async ({
+  od_dish_smr_table_id,
+  current,
+  pageSize
+}: {
+  od_dish_smr_table_id: string
+  current: number
+  pageSize: number
+}) => {
+  const res: IBackendRes<IModelPaginateWithStatusCount<IOrderRestaurant>> = await sendRequest({
+    url: `${process.env.URL_SERVER}/order-dish-summary/list-order-summary-by-table`,
+    method: 'GET',
+    queryParams: {
+      od_dish_smr_table_id,
+      current,
+      pageSize
+    }
+  })
+
   return res
 }

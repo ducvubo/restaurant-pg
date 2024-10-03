@@ -3,34 +3,21 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { use, useActionState, useEffect, useState } from 'react'
+
+import {  useEffect, useState } from 'react'
 import { ITable } from '../../tables/table.interface'
-import { getListOrdring, getListTableOrder, restaurantCreateOrderSummary } from '../order.api'
+import {  getListTableOrderSummary, restaurantCreateOrderSummary } from '../order.api'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
-import { cn } from '@/lib/utils'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { IDish } from '../../dishes/dishes.interface'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/app/redux/store'
-import { lishDishOrder } from '@/app/guest/guest.api'
 import { IOrderRestaurant } from '../order.interface'
 import { z } from 'zod'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import {useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { MdDeleteForever } from 'react-icons/md'
-import { IoMdAddCircle } from 'react-icons/io'
+import { Form, FormControl,FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useLoading } from '@/context/LoadingContext'
 import { useRouter } from 'next/navigation'
@@ -51,7 +38,7 @@ export default function AddOrderSummary() {
   })
 
   const listTableOrder = async () => {
-    const res: IBackendRes<ITable[]> = await getListTableOrder()
+    const res: IBackendRes<ITable[]> = await getListTableOrderSummary()
     console.log(res)
     if (res.statusCode === 200 && res.data) {
       setListTable(res.data)

@@ -53,7 +53,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
 
   if (id === 'recycle') {
-    const res: IBackendRes<IModelPaginate<ITable[]>> = await getAllTables({
+    const res: IBackendRes<IModelPaginate<ITable>> = await getAllTables({
       current: searchParams.page ? searchParams.page : '1',
       pageSize: searchParams.size ? searchParams.size : '10',
       type: 'recycle'
