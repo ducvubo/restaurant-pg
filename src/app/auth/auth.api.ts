@@ -23,6 +23,9 @@ export const login = async (payload: { restaurant_email: string; restaurant_pass
     method: 'POST',
     body: payload
   })
+
+  console.log('res:::::::::::::', res)
+
   if (res.statusCode === 201 && res.data) {
     const data = await Promise.all([
       await cookies().set({
@@ -207,6 +210,7 @@ export const loginEmployee = async (payload: {
     method: 'POST',
     body: payload
   })
+  console.log('res:::::::::::::', res)
   if (res.statusCode === 201 && res.data) {
     const data = await Promise.all([
       await cookies().set({

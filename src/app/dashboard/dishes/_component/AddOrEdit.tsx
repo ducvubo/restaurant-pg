@@ -78,7 +78,7 @@ export default function AddOrEdit({ id, inforDish }: Props) {
     image_custom: ''
   })
   const [isSaleEnabled, setIsSaleEnabled] = useState(false)
-  const [description, setDescription] = useState('')
+  const refDescription = useRef<any>('')
   const [finalPrice, setFinalPrice] = useState<any>(null)
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -225,7 +225,8 @@ export default function AddOrEdit({ id, inforDish }: Props) {
         }
 
         if (inforDish.dish_description) {
-          setDescription(inforDish.dish_description)
+          // setDescription(inforDish.dish_description)
+          refDescription.current = inforDish.dish_description
         }
       }
     }
@@ -241,7 +242,7 @@ export default function AddOrEdit({ id, inforDish }: Props) {
       dish_priority: data.dish_priority,
       dish_note: data.dish_note,
       dish_short_description: data.dish_short_description,
-      dish_description: description
+      dish_description: refDescription.current.getContent()
     }
     if (!isSaleEnabled) {
       delete payload.dish_sale
@@ -501,7 +502,7 @@ export default function AddOrEdit({ id, inforDish }: Props) {
             </FormItem>
           )}
         />
-        <EditorTiny data={description} setData={setDescription} defaultData={description} />
+        <EditorTiny editorRef={refDescription} />
         {/* <div dangerouslySetInnerHTML={{ __html: description }} /> */}
         <Button type='submit'>{id === 'add' ? 'Thêm bàn mới' : 'Chỉnh sửa'}</Button>
       </form>

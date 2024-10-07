@@ -8,7 +8,9 @@ import {
   LucideIcon,
   Salad,
   HandPlatter,
-  ListOrdered
+  ListOrdered,
+  TicketCheck,
+  StickyNote
 } from 'lucide-react'
 
 type Submenu = {
@@ -137,6 +139,32 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               href: '/dashboard/guest',
               label: 'Danh sách khách hàng',
               active: pathname === '/dashboard/guest'
+            }
+          ]
+        },
+        {
+          href: '/dashboard/book-table',
+          label: 'Đặt bàn',
+          active: pathname.includes('/book-table'),
+          icon: TicketCheck,
+          submenus: [
+            {
+              href: '/dashboard/book-table',
+              label: 'Danh sách đặt bàn',
+              active: pathname === '/dashboard/book-table'
+            }
+          ]
+        },
+        {
+          href: '/dashboard/blog',
+          label: 'Đặt bàn',
+          active: pathname.includes('/blog'),
+          icon: StickyNote,
+          submenus: [
+            {
+              href: '/dashboard/blog/add',
+              label: 'Viết blog',
+              active: pathname === '/dashboard/blog/add'
             }
           ]
         }
