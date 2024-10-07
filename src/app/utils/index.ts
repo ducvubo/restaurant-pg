@@ -9,8 +9,6 @@ const getRandomNonce = (num: number) => {
 const keyToken = process.env.KEY_SECRET_API_ENDPOINT
 const versionToken = 'v1'
 export function genSignEndPoint() {
-  console.log('keyToken', keyToken)
-
   const headers: any = {}
   const stime = Date.now()
   const nonce = getRandomNonce(20).toString()
