@@ -61,7 +61,7 @@ export default function EditorTiny({ width = '100%', height = '400px', editorRef
   }
 
   return (
-    <div style={{ width, height }}>
+    <div style={{ width, marginBottom: '20px' }}>
       <Editor
         apiKey={`${process.env.NEXT_PUBLIC_API_KEY_TINY_CME}`}
         onInit={(evt, editor) => (editorRef.current = editor)}
@@ -126,7 +126,10 @@ export default function EditorTiny({ width = '100%', height = '400px', editorRef
           table_default_attributes: {
             border: '1px solid #ccc',
             'border-collapse': 'collapse'
-          }
+          },
+          resize: 'both',
+          height: height,
+          width: '100%',
         }}
         initialValue={editorRef.current ? editorRef.current : ''}
       />

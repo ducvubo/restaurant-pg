@@ -156,15 +156,15 @@ export function getMenuListRestaurant(pathname: string): Group[] {
           ]
         },
         {
-          href: '/dashboard/blog',
-          label: 'Đặt bàn',
-          active: pathname.includes('/blog'),
+          href: '/dashboard/blogs',
+          label: 'Quản lý blog',
+          active: pathname.includes('/blogs'),
           icon: StickyNote,
           submenus: [
             {
-              href: '/dashboard/blog/add',
+              href: '/dashboard/blogs/add',
               label: 'Viết blog',
-              active: pathname === '/dashboard/blog/add'
+              active: pathname === '/dashboard/blogs/add'
             }
           ]
         }

@@ -78,7 +78,7 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
         await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/upload`, {
           method: 'POST',
           headers: {
-            folder_type: 'avatar_employees' 
+            folder_type: 'avatar_employees'
           },
           body: formData
         })
@@ -102,7 +102,7 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
       }
       if (res.statusCode === 422 || res.statusCode === 400) {
         setLoading_upload_avatar(false)
-
+        setFile_avatar(null)
         setAvatar({
           image_cloud: '',
           image_custom: ''

@@ -153,7 +153,7 @@ export default function AddOrEdit({ id, inforDish }: Props) {
       }
       if (res.statusCode === 422 || res.statusCode === 400) {
         setLoading_upload_image(false)
-
+        setFile_Image(null)
         setImage({
           image_cloud: '',
           image_custom: ''
