@@ -3,13 +3,17 @@ import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 're
 import { Editor } from '@tinymce/tinymce-react'
 import { debounce } from 'lodash'
 import { toast } from '@/hooks/use-toast'
+import { useTheme } from 'next-themes'
+import { cn } from '@/lib/utils'
 
 interface Props {
   width?: string // Thêm thuộc tính width
   height?: string // Thêm thuộc tính height,
   editorRef: any
+  className?: string
 }
-export default function EditorTiny({ width = '100%', height = '400px', editorRef }: Props) {
+export default function EditorTiny({ width = '100%', height = '400px', editorRef, className }: Props) {
+  const { theme } = useTheme()
   const handleImageUpload: any = (blobInfo: any, progress: any, failure: any) => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest()
@@ -61,11 +65,14 @@ export default function EditorTiny({ width = '100%', height = '400px', editorRef
   }
 
   return (
-    <div style={{ width, marginBottom: '20px' }}>
+    <div style={{ width }} className={cn(className)}>
       <Editor
+        key={theme}
         apiKey={`${process.env.NEXT_PUBLIC_API_KEY_TINY_CME}`}
         onInit={(evt, editor) => (editorRef.current = editor)}
         init={{
+          skin: theme === 'dark' ? 'oxide-dark' : 'oxide',
+          content_css: theme === 'dark' ? 'dark' : 'default',
           plugins: [
             'anchor',
             'autolink',
@@ -129,7 +136,7 @@ export default function EditorTiny({ width = '100%', height = '400px', editorRef
           },
           resize: 'both',
           height: height,
-          width: '100%',
+          width: '100%'
         }}
         initialValue={editorRef.current ? editorRef.current : ''}
       />

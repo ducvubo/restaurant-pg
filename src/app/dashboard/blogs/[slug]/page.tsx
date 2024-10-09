@@ -13,6 +13,10 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import LogoutPage from '@/app/logout/page'
 import AddOrEdit from '../_compoent/AddOrEdit'
+import { IBlog } from '../blog.interface'
+import { findBLogById, getAllBlog } from '../blog.api'
+import { PageBlog } from '../_compoent/PageBlog'
+import { columns } from '../_compoent/Columns'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -46,103 +50,97 @@ async function Component({ searchParams, params }: PageProps) {
     )
   }
 
-  // if (id === 'recycle') {
-  //   const res: IBackendRes<IModelPaginate<ITable>> = await getAllTables({
-  //     current: searchParams.page ? searchParams.page : '1',
-  //     pageSize: searchParams.size ? searchParams.size : '10',
-  //     type: 'recycle'
-  //   })
+  if (id === 'recycle') {
+    const res: IBackendRes<IModelPaginate<IBlog>> = await getAllBlog({
+      current: searchParams.page ? searchParams.page : '1',
+      pageSize: searchParams.size ? searchParams.size : '10',
+      type: 'recycle'
+    })
 
-  //   if (res.code === -10) {
-  //     return <LogoutPage />
-  //   }
-  //   if (res.code === -11) {
-  //     return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
-  //   }
-  //   if (!res || !res.data) {
-  //     return (
-  //       <>
-  //         <div>Error fetching data</div>
-  //       </>
-  //     )
-  //   }
-  //   if (res.statusCode === 200) {
-  //     const data = res.data.result.flat()
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <>
+          <div>Error fetching data</div>
+        </>
+      )
+    }
+    if (res.statusCode === 200) {
+      // const data = res.data.result.flat()
 
-  //     return (
-  //       <div>
-  //         <ContentLayout title='Danh sách bàn đã xóa'>
-  //           <Breadcrumb className='-mt-4'>
-  //             <BreadcrumbList>
-  //               <BreadcrumbItem>
-  //                 <BreadcrumbLink asChild>
-  //                   <Link href='/dashboard'>Dashboard</Link>
-  //                 </BreadcrumbLink>
-  //               </BreadcrumbItem>
-  //               <BreadcrumbSeparator />
-  //               <BreadcrumbItem>
-  //                 <BreadcrumbPage>Danh sách bàn đã xóa</BreadcrumbPage>
-  //               </BreadcrumbItem>
-  //             </BreadcrumbList>
-  //           </Breadcrumb>
-  //           <PageTables data={data} columns={columns} meta={res.data.meta} />
-  //         </ContentLayout>
-  //       </div>
-  //     )
-  //   }
-  // }
+      return (
+        <div>
+          <ContentLayout title='Danh sách bàn đã xóa'>
+            <Breadcrumb className='-mt-4'>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href='/dashboard'>Dashboard</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Danh sách bàn đã xóa</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <PageBlog data={res.data.result} columns={columns} meta={res.data.meta} />
+          </ContentLayout>
+        </div>
+      )
+    }
+  }
 
-  // const res: IBackendRes<ITable> = await findTableById({ _id: id })
+  const res: IBackendRes<IBlog> = await findBLogById({ _id: id })
 
-  // if (res.statusCode === 404) {
-  //   return (
-  //     <ToastServer
-  //       message='Không tìm thấy bàn'
-  //       title='Lỗi'
-  //       variant='destructive'
-  //       route='/dashboard/tables?page=1&size=10'
-  //     />
-  //   )
-  // }
+  if (res.statusCode === 404) {
+    return (
+      <ToastServer message='Không tìm blog' title='Lỗi' variant='destructive' route='/dashboard/blogs?page=1&size=10' />
+    )
+  }
 
-  // if (res.code === -10) {
-  //   return <LogoutPage />
-  //   // redirect('/login')
-  // }
-  // if (res.code === -11) {
-  //   return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
-  // }
-  // if (!res || !res.data) {
-  //   return (
-  //     <>
-  //       <div>Error fetching data</div>
-  //     </>
-  //   )
-  // }
-  // return (
-  //   <ContentLayout title='Chỉnh sửa thông tin bàn'>
-  //     <Breadcrumb className='-mt-4'>
-  //       <BreadcrumbList>
-  //         <BreadcrumbItem>
-  //           <BreadcrumbLink asChild>
-  //             <Link href='/dashboard'>Dashboard</Link>
-  //           </BreadcrumbLink>
-  //         </BreadcrumbItem>
-  //         <BreadcrumbSeparator />
-  //         <BreadcrumbItem>
-  //           <BreadcrumbLink asChild>
-  //             <Link href='/dashboard/tables'>Danh sách bàn</Link>
-  //           </BreadcrumbLink>
-  //         </BreadcrumbItem>
-  //         <BreadcrumbSeparator />
-  //         <BreadcrumbItem>
-  //           <BreadcrumbPage>Chỉnh sửa thông tin bàn</BreadcrumbPage>
-  //         </BreadcrumbItem>
-  //       </BreadcrumbList>
-  //     </Breadcrumb>
-  //     <AddOrEdit id={id} inforTable={res.data} />
-  //   </ContentLayout>
-  // )
+  if (res.code === -10) {
+    return <LogoutPage />
+  }
+  if (res.code === -11) {
+    return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+  }
+  if (!res || !res.data) {
+    return (
+      <>
+        <div>Error fetching data</div>
+      </>
+    )
+  }
+  return (
+    <ContentLayout title='Chỉnh sửa blog'>
+      <Breadcrumb className='-mt-4'>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href='/dashboard'>Dashboard</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href='/dashboard/tables'>blog</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Chỉnh sửa blog</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <AddOrEdit id={id} inforBlog={res.data} />
+    </ContentLayout>
+  )
 }
 
 export default function Page(props: PageProps) {

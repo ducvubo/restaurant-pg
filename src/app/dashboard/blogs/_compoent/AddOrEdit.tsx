@@ -19,11 +19,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { InputTags } from '@/components/InputTag'
-import { createBlog } from '../blog.api'
+import { createBlog, updateBlog } from '../blog.api'
+import { IBlog } from '../blog.interface'
 
 interface Props {
   id: string
-  inforBlog?: any
+  inforBlog?: IBlog
 }
 const FormSchema = z.object({
   blg_title: z.string().nonempty({ message: 'Vui lòng nhập tên' }),
@@ -46,8 +47,8 @@ export default function AddOrEdit({ id, inforBlog }: Props) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      blg_title: inforBlog?.blg_title ?? '',
-      blg_thumbnail: inforBlog?.blg_thumbnail ?? ''
+      blg_title: '',
+      blg_thumbnail: ''
     }
   })
 
@@ -129,17 +130,42 @@ export default function AddOrEdit({ id, inforBlog }: Props) {
       })
     }
   }, [file_image])
-    //aaa
+
+  useEffect(() => {
+    if (id === 'add') {
+      return
+    } else {
+      if (inforBlog) {
+        form.setValue('blg_title', inforBlog.blg_title)
+
+        if (inforBlog.blg_thumbnail) {
+          setImage({
+            image_cloud: inforBlog.blg_thumbnail.image_cloud,
+            image_custom: inforBlog.blg_thumbnail.image_custom
+          })
+        }
+
+        if (inforBlog.blg_content) {
+          refContent.current = inforBlog.blg_content
+        }
+
+        setBlg_Tag(inforBlog.blg_tag.map((tag) => (typeof tag === 'string' ? tag : tag.tag_name)))
+      }
+    }
+  }, [inforBlog, id])
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setLoading(true)
-    const payload: any = {
+    const payload: Omit<IBlog, 'blg_restaurant_id' | '_id' | 'isDeleted' | 'blg_status' | 'blg_verify'> = {
       blg_title: data.blg_title,
       blg_thumbnail: image,
       blg_content: refContent.current.getContent(),
       blg_tag: blg_tag
     }
 
-    const res: IBackendRes<any> = await createBlog(payload)
+    let res: IBackendRes<IBlog>
+
+    res = id === 'add' ? await createBlog(payload) : await updateBlog({ ...payload, _id: id })
     if (res.statusCode === 201 || res.statusCode === 200) {
       setLoading(false)
       toast({
@@ -295,7 +321,7 @@ export default function AddOrEdit({ id, inforBlog }: Props) {
             <Label>Nội dung bài viết</Label>
             <Button type='submit'>{id === 'add' ? 'Thêm blog mới' : 'Chỉnh sửa'}</Button>
           </div>
-          <EditorTiny editorRef={refContent} height='1000px' />
+          <EditorTiny editorRef={refContent} height='500px' className='mb-48' width='1170px' />
         </div>
       </form>
     </Form>

@@ -23,7 +23,7 @@ interface PageProps {
 }
 
 async function Component({ searchParams }: PageProps) {
-  const res: IBackendRes<IModelPaginate<IDish[]>> = await getAllDish({
+  const res: IBackendRes<IModelPaginate<IDish>> = await getAllDish({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
     type: 'all'
@@ -42,7 +42,7 @@ async function Component({ searchParams }: PageProps) {
       </>
     )
   }
-  const data = res.data.result.flat()
+  // const data = res.data.result.flat()
 
   return (
     <div>
@@ -60,7 +60,7 @@ async function Component({ searchParams }: PageProps) {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <PageDishes data={data} columns={columns} meta={res.data.meta} />
+        <PageDishes data={res.data.result} columns={columns} meta={res.data.meta} />
       </ContentLayout>
     </div>
   )

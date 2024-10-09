@@ -22,7 +22,7 @@ export const getAllDish = async ({
   type: 'all' | 'recycle'
 }) => {
   const url = type === 'all' ? `${process.env.URL_SERVER}/dishes` : `${process.env.URL_SERVER}/dishes/recycle`
-  const res: IBackendRes<IModelPaginate<IDish[]>> = await sendRequest({
+  const res: IBackendRes<IModelPaginate<IDish>> = await sendRequest({
     url,
     method: 'GET',
     queryParams: {

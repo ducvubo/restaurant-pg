@@ -165,6 +165,16 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               href: '/dashboard/blogs/add',
               label: 'Viết blog',
               active: pathname === '/dashboard/blogs/add'
+            },
+            {
+              href: '/dashboard/blogs',
+              label: 'Danh sách blog',
+              active: pathname === '/dashboard/blogs'
+            },
+            {
+              href: '/dashboard/blogs/recycle',
+              label: 'Danh sách đã xóa',
+              active: pathname === '/dashboard/blogs/recycle'
             }
           ]
         }
