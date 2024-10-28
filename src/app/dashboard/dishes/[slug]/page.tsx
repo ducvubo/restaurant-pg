@@ -52,7 +52,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
 
   if (id === 'recycle') {
-    const res: IBackendRes<IModelPaginate<IDish[]>> = await getAllDish({
+    const res: IBackendRes<IModelPaginate<IDish>> = await getAllDish({
       current: searchParams.page ? searchParams.page : '1',
       pageSize: searchParams.size ? searchParams.size : '10',
       type: 'recycle'
