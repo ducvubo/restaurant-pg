@@ -49,6 +49,10 @@ export default function RefreshToken() {
       function onConnect() {
         socket.on('login_guest_table', loginGuestTable)
         socket.on('order_dish_new', orderDishNew)
+        socket.on('update-status-order-dish', () => {
+          const currentPath = window.location.pathname
+          router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
+        })
       }
 
       function onDisconnect() {

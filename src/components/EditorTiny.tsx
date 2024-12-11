@@ -67,6 +67,7 @@ export default function EditorTiny({ width = '100%', height = '400px', editorRef
   return (
     <div style={{ width }} className={cn(className)}>
       <Editor
+       
         key={theme}
         apiKey={`${process.env.NEXT_PUBLIC_API_KEY_TINY_CME}`}
         onInit={(evt, editor) => (editorRef.current = editor)}

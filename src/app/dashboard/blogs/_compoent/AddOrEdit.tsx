@@ -220,7 +220,7 @@ export default function AddOrEdit({ id, inforBlog }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
         <div>
           <FormField
             control={form.control}
@@ -316,12 +316,12 @@ export default function AddOrEdit({ id, inforBlog }: Props) {
           <Label>Tag</Label>
           <InputTags value={blg_tag} onChange={setBlg_Tag} placeholder='Tag...' className='w-full' />
         </div>
-        <div className='flex flex-col gap-2 pb-10'>
+        <div className='flex flex-col gap-2 pb-10 w-full'>
           <div className='flex justify-between items-end'>
             <Label>Nội dung bài viết</Label>
             <Button type='submit'>{id === 'add' ? 'Thêm blog mới' : 'Chỉnh sửa'}</Button>
           </div>
-          <EditorTiny editorRef={refContent} height='500px' className='mb-48' width='1170px' />
+          <EditorTiny editorRef={refContent} height='500px' className='mb-48' />
         </div>
       </form>
     </Form>
