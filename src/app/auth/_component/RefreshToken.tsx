@@ -49,10 +49,25 @@ export default function RefreshToken() {
       function onConnect() {
         socket.on('login_guest_table', loginGuestTable)
         socket.on('order_dish_new', orderDishNew)
+        socket.on('order_dish_new_with_restaurant', () => {
+          const currentPath = window.location.pathname
+          router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
+        })
         socket.on('update-status-order-dish', () => {
           const currentPath = window.location.pathname
           router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
         })
+        socket.on('order_dish_sumary_new_restaurant', (data: any) => {
+          switchStatusOrderVi(data)
+          const currentPath = window.location.pathname
+          router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
+        })
+        socket.on('order_dish_sumary_update_status', (data: any) => {
+          switchStatusOrderVi(data)
+          const currentPath = window.location.pathname
+          router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
+        })
+        
       }
 
       function onDisconnect() {
