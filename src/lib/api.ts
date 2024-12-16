@@ -79,6 +79,7 @@ export const sendRequest = async <T>(props: IRequest) => {
     url = `${url}?${queryString.stringify(queryParams)}`
   }
 
+
   return fetch(url, options).then(async (res: any) => {
     if (!id_user_guest) {
       const newIdUserGuest = res.headers.get('id_user_guest')

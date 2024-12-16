@@ -100,7 +100,6 @@ export const getTokenOrderSummary = async ({ _id }: { _id: string }) => {
     body: { _id }
   })
 
-  console.log('response', res)
   return res
 }
 

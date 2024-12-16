@@ -51,14 +51,14 @@ export function getMenuListRestaurant(pathname: string): Group[] {
             {
               href: '/dashboard/order/table',
               label: 'Đơn đặt theo bàn',
-              active: pathname === '/dashboard/order'
+              active: pathname === '/dashboard/order',
             }
           ]
         }
       ]
     },
     {
-      groupLabel: 'Chủ cửa hàng',
+      groupLabel: 'Quản lý',
       menus: [
         {
           href: '',
@@ -103,6 +103,29 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               href: '/dashboard/tables/recycle?page=1&size=10',
               label: 'Danh sách đã xóa',
               active: pathname === '/dashboard/tables/recycle'
+            }
+          ]
+        },
+        {
+          href: '/dashboard/categories',
+          label: 'Danh mục',
+          active: pathname.includes('/categories'),
+          icon: HandPlatter,
+          submenus: [
+            {
+              href: '/dashboard/categories',
+              label: 'Danh sách danh mục',
+              active: pathname === '/dashboard/categories'
+            },
+            {
+              href: '/dashboard/categories/add',
+              label: 'Thêm danh mục',
+              active: pathname === '/dashboard/categories/add'
+            },
+            {
+              href: '/dashboard/categories/recycle?page=1&size=10',
+              label: 'Danh sách đã xóa',
+              active: pathname === '/dashboard/categories/recycle'
             }
           ]
         },
@@ -156,8 +179,31 @@ export function getMenuListRestaurant(pathname: string): Group[] {
           ]
         },
         {
+          href: '/dashboard/foods',
+          label: 'Món ăn online',
+          active: pathname.includes('/foods'),
+          icon: Salad,
+          submenus: [
+            {
+              href: '/dashboard/foods/add',
+              label: 'Thêm món mới',
+              active: pathname === '/dashboard/foods/add'
+            },
+            {
+              href: '/dashboard/foods',
+              label: 'Danh sách món ăn',
+              active: pathname === '/dashboard/foods'
+            },
+            {
+              href: '/dashboard/foods/recycle',
+              label: 'Danh sách đã xóa',
+              active: pathname === '/dashboard/foods/recycle'
+            }
+          ]
+        },
+        {
           href: '/dashboard/blogs',
-          label: 'Quản lý blog',
+          label: 'Blog',
           active: pathname.includes('/blogs'),
           icon: StickyNote,
           submenus: [
@@ -209,13 +255,13 @@ export function getMenuListEmployee(pathname: string): Group[] {
       ]
     },
     {
-      groupLabel: 'Nhân viên',
+      groupLabel: 'Quan lý',
       menus: [
         {
           href: '/dashboard/tables',
           label: 'Bàn ăn',
           active: pathname.includes('/tables'),
-          icon: HandPlatter,
+          icon: Bookmark,
           submenus: [
             {
               href: '/dashboard/tables',
@@ -231,6 +277,29 @@ export function getMenuListEmployee(pathname: string): Group[] {
               href: '/dashboard/tables/recycle?page=1&size=10',
               label: 'Danh sách đã xóa',
               active: pathname === '/dashboard/tables/recycle'
+            }
+          ]
+        },
+        {
+          href: '/dashboard/categories',
+          label: 'Danh mục',
+          active: pathname.includes('/categories'),
+          icon: HandPlatter,
+          submenus: [
+            {
+              href: '/dashboard/categories',
+              label: 'Danh sách danh mục',
+              active: pathname === '/dashboard/categories'
+            },
+            {
+              href: '/dashboard/categories/add',
+              label: 'Thêm danh mục',
+              active: pathname === '/dashboard/categories/add'
+            },
+            {
+              href: '/dashboard/categories/recycle?page=1&size=10',
+              label: 'Danh sách đã xóa',
+              active: pathname === '/dashboard/categories/recycle'
             }
           ]
         },

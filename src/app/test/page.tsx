@@ -18,7 +18,6 @@ export default function Page() {
     }
   }, [refDescription])
 
-  console.log(htmlContent)
 
   return (
     <div>

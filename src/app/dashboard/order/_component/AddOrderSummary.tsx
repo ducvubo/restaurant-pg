@@ -39,7 +39,6 @@ export default function AddOrderSummary() {
 
   const listTableOrder = async () => {
     const res: IBackendRes<ITable[]> = await getListTableOrderSummary()
-    console.log("res:::::::::",res)
     if (res.statusCode === 200 && res.data) {
       setListTable(res.data)
     } else if (res.code === -10) {

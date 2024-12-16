@@ -24,7 +24,6 @@ export const getListBookTable = async ({
       fromDate
     }
   })
-  console.log(res)
   return res
 }
 

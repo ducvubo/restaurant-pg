@@ -1,6 +1,4 @@
-import { sign } from 'crypto'
 import md5 from 'md5'
-import { redirect } from 'next/navigation'
 
 const getRandomNonce = (num: number) => {
   return Math.floor((Math.random() + Math.floor(Math.random() * 9 + 1)) * Math.pow(10, num - 1))

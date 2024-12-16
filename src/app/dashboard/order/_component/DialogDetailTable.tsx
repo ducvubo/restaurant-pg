@@ -190,7 +190,6 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
     }
   }, [searchParam, selectedTable])
 
-  console.log('listOrder', selectedTable)
   //od_dish_smr_count
   return (
     <Dialog open={!!selectedTable} onOpenChange={() => setSelectedTable(null)}>

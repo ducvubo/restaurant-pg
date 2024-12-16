@@ -97,7 +97,6 @@ export default function ListTablePage() {
   }, [tableName, status, pageIndex, pageSize, debouncedFindListTable])
 
   useEffect(() => {
-    console.log('object')
     debouncedFindListTable()
     return () => {
       debouncedFindListTable.cancel()
@@ -116,7 +115,6 @@ export default function ListTablePage() {
     }
   }, [listTable])
 
-  console.log(listTable)
 
   return (
     <section className='mt-2 h-[563px]'>
