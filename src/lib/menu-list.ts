@@ -51,7 +51,7 @@ export function getMenuListRestaurant(pathname: string): Group[] {
             {
               href: '/dashboard/order/table',
               label: 'Đơn đặt theo bàn',
-              active: pathname === '/dashboard/order',
+              active: pathname === '/dashboard/order'
             }
           ]
         }
@@ -61,7 +61,7 @@ export function getMenuListRestaurant(pathname: string): Group[] {
       groupLabel: 'Quản lý',
       menus: [
         {
-          href: '',
+          href: 'dashboard/employees',
           label: 'Quản lý nhân viên',
           active: pathname.includes('/employees'),
           icon: SquarePen,
@@ -152,6 +152,7 @@ export function getMenuListRestaurant(pathname: string): Group[] {
             }
           ]
         },
+
         {
           href: '/dashboard/guest',
           label: 'Khách hàng',
@@ -323,6 +324,29 @@ export function getMenuListEmployee(pathname: string): Group[] {
               href: '/dashboard/dishes/recycle?page=1&size=10',
               label: 'Danh sách đã xóa',
               active: pathname === '/dashboard/dishes/recycle'
+            }
+          ]
+        },
+        {
+          href: '/dashboard/foods',
+          label: 'Món ăn online',
+          active: pathname.includes('/foods'),
+          icon: Salad,
+          submenus: [
+            {
+              href: '/dashboard/foods/add',
+              label: 'Thêm món mới',
+              active: pathname === '/dashboard/foods/add'
+            },
+            {
+              href: '/dashboard/foods',
+              label: 'Danh sách món ăn',
+              active: pathname === '/dashboard/foods'
+            },
+            {
+              href: '/dashboard/foods/recycle',
+              label: 'Danh sách đã xóa',
+              active: pathname === '/dashboard/foods/recycle'
             }
           ]
         },

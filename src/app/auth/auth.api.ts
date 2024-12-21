@@ -18,6 +18,9 @@ export const getInforRestaurant = async ({ access_token_rtr, refresh_token_rtr }
 }
 
 export const login = async (payload: { restaurant_email: string; restaurant_password: string }) => {
+
+
+  
   const res: IBackendRes<IToken> = await sendRequest({
     url: `${process.env.URL_SERVER}/restaurants/login`,
     method: 'POST',

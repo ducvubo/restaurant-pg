@@ -317,7 +317,7 @@ export default function AddOrEdit({ id, inforCategory }: Props) {
             </FormItem>
           )}
         />
-        <Button type='submit'>{id === 'add' ? 'Thêm danh mục mới' : 'Chỉnh sửa'}</Button>
+        <Button  type='submit'>{id === 'add' ? 'Thêm danh mục mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>
   )

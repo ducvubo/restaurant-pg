@@ -14,10 +14,9 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { ICategories } from '../category.interface'
 import { findCategoryById, getAllCategories } from '../category.api'
-import { PageTables } from '../_component/PageTables'
+import { PageCategories } from '../_component/PageCategories'
 import { columns } from '../_component/Columns'
 import LogoutPage from '@/app/logout/page'
-import { ITable } from '../../tables/table.interface'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -90,7 +89,7 @@ async function Component({ searchParams, params }: PageProps) {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-            <PageTables data={data} columns={columns} meta={res.data.meta} />
+            <PageCategories data={data} columns={columns} meta={res.data.meta} />
           </ContentLayout>
         </div>
       )

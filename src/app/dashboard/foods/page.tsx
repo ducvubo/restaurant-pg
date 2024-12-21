@@ -14,10 +14,11 @@ import {
 } from '@/components/ui/breadcrumb'
 import Link from 'next/link'
 import { columns } from './_component/Columns'
-import { PageTables } from './_component/PageTables'
+import { PageTables } from './_component/PageFoods'
 import LogoutPage from '@/app/logout/page'
 import { IFood } from './food.interface'
 import { getAllFoods } from './food.api'
+import { Card } from '@/components/ui/card'
 interface PageProps {
   searchParams: { [key: string]: string }
 }
@@ -28,7 +29,6 @@ async function Component({ searchParams }: PageProps) {
     pageSize: searchParams.size ? searchParams.size : '10',
     type: 'all'
   })
-
 
   if (res.code === -10) {
     return <LogoutPage />
@@ -46,24 +46,22 @@ async function Component({ searchParams }: PageProps) {
   const data = res.data.result.flat()
 
   return (
-    <div>
-      <ContentLayout title='Danh sách món ăn'>
-        <Breadcrumb className='-mt-4'>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href='/dashboard'>Dashboard</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Danh sách món ăn</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <PageTables data={data} columns={columns} meta={res.data.meta} />
-      </ContentLayout>
-    </div>
+    <ContentLayout title='Danh sách món ăn'>
+      <Breadcrumb className='-mt-4'>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href='/dashboard'>Dashboard</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Danh sách món ăn</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <PageTables data={data} columns={columns} meta={res.data.meta} />
+    </ContentLayout>
   )
 }
 

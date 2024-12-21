@@ -1,7 +1,5 @@
 'use client'
 import { ColumnDef } from '@tanstack/react-table'
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -14,21 +12,13 @@ import {
 import Link from 'next/link'
 import { DataTableColumnHeader } from '@/components/ColumnHeader'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useLoading } from '@/context/LoadingContext'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { ICategories } from '../category.interface'
 import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../category.api'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
+import { MoreHorizontal } from 'lucide-react'
+
 export const columns: ColumnDef<ICategories>[] = [
   {
     accessorKey: 'cat_res_name',
@@ -36,12 +26,12 @@ export const columns: ColumnDef<ICategories>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Tên danh mục' />,
     enableHiding: true
   },
-  {
-    accessorKey: 'cat_res_slug',
-    id: 'Slug',
-    header: () => <div>Slug</div>,
-    enableHiding: true
-  },
+  // {
+  //   accessorKey: 'cat_res_slug',
+  //   id: 'Slug',
+  //   header: () => <div>Slug</div>,
+  //   enableHiding: true
+  // },
   {
     accessorKey: 'cat_res_icon',
     id: 'Icon',

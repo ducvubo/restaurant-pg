@@ -72,6 +72,7 @@ export default function EditorTiny({ width = '100%', height = '400px', editorRef
         apiKey={`${process.env.NEXT_PUBLIC_API_KEY_TINY_CME}`}
         onInit={(evt, editor) => (editorRef.current = editor)}
         init={{
+          branding: false,
           skin: theme === 'dark' ? 'oxide-dark' : 'oxide',
           content_css: theme === 'dark' ? 'dark' : 'default',
           plugins: [

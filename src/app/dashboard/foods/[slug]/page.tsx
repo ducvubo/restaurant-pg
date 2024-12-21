@@ -12,11 +12,14 @@ import LoadingServer from '@/components/LoadingServer'
 import AddOrEdit from '../_component/AddOrEdit'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { ITable } from '../table.interface'
-import { findTableById, getAllTables } from '../table.api'
-import { PageTables } from '../_component/PageTables'
+import { findFoodById, getAllFoods } from '../food.api'
+import { PageTables } from '../_component/PageFoods'
 import { columns } from '../_component/Columns'
 import LogoutPage from '@/app/logout/page'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Button } from '@/components/ui/button'
+import { IFood } from '../food.interface'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -31,8 +34,8 @@ async function Component({ searchParams, params }: PageProps) {
   const id = params.slug
   if (id === 'add') {
     return (
-      <ContentLayout title='Thêm món ăn ăn'>
-        <Breadcrumb className='-mt-4'>
+      <ContentLayout title='Thêm món ăn'>
+        {/* <Breadcrumb className=''>
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
@@ -41,17 +44,17 @@ async function Component({ searchParams, params }: PageProps) {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Thêm món ăn ăn</BreadcrumbPage>
+              <BreadcrumbPage>Thêm món ăn</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
-        </Breadcrumb>
+        </Breadcrumb> */}
         <AddOrEdit id='add' />
       </ContentLayout>
     )
   }
 
   if (id === 'recycle') {
-    const res: IBackendRes<IModelPaginate<ITable>> = await getAllTables({
+    const res: IBackendRes<IModelPaginate<IFood>> = await getAllFoods({
       current: searchParams.page ? searchParams.page : '1',
       pageSize: searchParams.size ? searchParams.size : '10',
       type: 'recycle'
@@ -76,7 +79,7 @@ async function Component({ searchParams, params }: PageProps) {
       return (
         <div>
           <ContentLayout title='Danh sách món ăn đã xóa'>
-            <Breadcrumb className='-mt-4'>
+            {/* <Breadcrumb className='-mt-4'>
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
@@ -88,7 +91,7 @@ async function Component({ searchParams, params }: PageProps) {
                   <BreadcrumbPage>Danh sách món ăn đã xóa</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
-            </Breadcrumb>
+            </Breadcrumb> */}
             <PageTables data={data} columns={columns} meta={res.data.meta} />
           </ContentLayout>
         </div>
@@ -96,7 +99,7 @@ async function Component({ searchParams, params }: PageProps) {
     }
   }
 
-  const res: IBackendRes<ITable> = await findTableById({ _id: id })
+  const res: IBackendRes<IFood> = await findFoodById(id)
 
   if (res.statusCode === 404) {
     return (
@@ -104,7 +107,7 @@ async function Component({ searchParams, params }: PageProps) {
         message='Không tìm thấy món ăn'
         title='Lỗi'
         variant='destructive'
-        route='/dashboard/tables?page=1&size=10'
+        route='/dashboard/foods?page=1&size=10'
       />
     )
   }
@@ -125,28 +128,29 @@ async function Component({ searchParams, params }: PageProps) {
   }
   return (
     <ContentLayout title='Chỉnh sửa thông tin món ăn'>
-      <Breadcrumb className='-mt-4'>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href='/dashboard'>Dashboard</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href='/dashboard/tables'>Danh sách món ăn</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Chỉnh sửa thông tin món ăn</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <AddOrEdit id={id} inforTable={res.data} />
+      {/* <Breadcrumb className='-mt-4'>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href='/dashboard'>Dashboard</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href='/dashboard/foods'>Danh sách món ăn</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Chỉnh sửa thông tin món ăn</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb> */}
+      <AddOrEdit id={id} inforFood={res.data} />
     </ContentLayout>
   )
+  // }
 }
 
 export default function Page(props: PageProps) {

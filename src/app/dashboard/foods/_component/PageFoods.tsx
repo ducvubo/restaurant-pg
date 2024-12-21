@@ -64,26 +64,23 @@ export function PageTables<TData, TValue>({ columns, meta, data }: DataTableProp
   }
 
   React.useEffect(() => {
-    router.push(`/dashboard/categories/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`)
+    router.push(`/dashboard/foods/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`)
   }, [pageIndex, pageSize, router])
 
   return (
     <div className='flex flex-col h-[570px]'>
       <div className='flex items-center py-4'>
-        <h1 className='font-semibold text-2xl'>Danh sách danh mục</h1>
+        <h1 className='font-semibold text-2xl'>Danh sách món ăn online</h1>
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>
-        {/* Container for the table with fixed height */}
         <div className='overflow-y-auto h-full'>
           <Table className='min-w-full'>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className='h-[45px]'>
-                  {/* Giảm chiều cao hàng */}
                   {headerGroup.headers.map((header) => (
                     <TableHead key={header.id} className='py-[5px] '>
-                      {/* Giảm padding trong header */}
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   ))}
@@ -94,10 +91,8 @@ export function PageTables<TData, TValue>({ columns, meta, data }: DataTableProp
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className='h-10'>
-                    {/* Giảm chiều cao hàng */}
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className='py-[5px]'>
-                        {/* Giảm padding trong ô */}
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}

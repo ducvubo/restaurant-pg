@@ -16,7 +16,7 @@ import Link from 'next/link'
 import { columns } from './_component/Columns'
 import { ICategories } from './category.interface'
 import { getAllCategories } from './category.api'
-import { PageTables } from './_component/PageTables'
+import { PageCategories } from './_component/PageCategories'
 import LogoutPage from '@/app/logout/page'
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -60,7 +60,7 @@ async function Component({ searchParams }: PageProps) {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <PageTables data={data} columns={columns} meta={res.data.meta} />
+        <PageCategories data={data} columns={columns} meta={res.data.meta} />
       </ContentLayout>
     </div>
   )

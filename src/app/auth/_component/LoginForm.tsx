@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import { IEmployee } from '@/app/dashboard/employees/employees.interface'
 import { endAppEmployee, startAppEmployee } from '../InforEmployee.slice'
+import { Card, CardContent } from '@/components/ui/card'
 
 const FormSchema = z.object({
   email: z
@@ -37,18 +38,6 @@ const FormSchema = z.object({
     message: 'Mật khẩu có ít nhất 8 kí tự'
   })
 })
-
-const languages = [
-  { label: 'English', value: 'en' },
-  { label: 'French', value: 'fr' },
-  { label: 'German', value: 'de' },
-  { label: 'Spanish', value: 'es' },
-  { label: 'Portuguese', value: 'pt' },
-  { label: 'Russian', value: 'ru' },
-  { label: 'Japanese', value: 'ja' },
-  { label: 'Korean', value: 'ko' },
-  { label: 'Chinese', value: 'zh' }
-] as const
 
 interface IRestaurantSearch {
   restaurant_name: string
@@ -96,7 +85,7 @@ export function LoginForm() {
   }
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    setLoading(true)
+    // setLoading(true)
     if (type === 'restaurant') {
       const payload = {
         restaurant_email: data.email,
@@ -182,88 +171,177 @@ export function LoginForm() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
-        <FormField
-          control={form.control}
-          name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder='Email...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='password'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                {/* <Input placeholder='Password...' {...field} /> */}
-                <PasswordInput placeholder='Password...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    // <Form {...form}>
+    //   <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
+    //     <FormField
+    //       control={form.control}
+    //       name='email'
+    //       render={({ field }) => (
+    //         <FormItem>
+    //           <FormLabel>Email</FormLabel>
+    //           <FormControl>
+    //             <Input placeholder='Email...' {...field} />
+    //           </FormControl>
+    //           <FormMessage />
+    //         </FormItem>
+    //       )}
+    //     />
+    //     <FormField
+    //       control={form.control}
+    //       name='password'
+    //       render={({ field }) => (
+    //         <FormItem>
+    //           <FormLabel>Password</FormLabel>
+    //           <FormControl>
+    //             <PasswordInput placeholder='Password...' {...field} />
+    //           </FormControl>
+    //           <FormMessage />
+    //         </FormItem>
+    //       )}
+    //     />
 
-        {type === 'employee' && (
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button variant='outline' role='combobox' aria-expanded={open} className='w-[500px] justify-between'>
-                {restaurantId
-                  ? filteredRestaurants.find((restaurant) => restaurant._id === restaurantId)?.restaurant_name
-                  : 'Chọn nhà hàng...'}
-                <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className='w-[500px] p-0'>
-              <Command>
-                <CommandInput
-                  placeholder='Tìm nhà hàng...'
-                  className='h-9'
-                  onInput={(e) => handleRestaurantSearch(e.currentTarget.value)}
-                />
-                <CommandList>
-                  <div className='overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground'>
-                    {filteredRestaurants?.map((restaurant) => {
-                      return (
-                        <div
-                          className='relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50'
-                          onClick={() => {
-                            setRestaurantId(restaurant._id)
-                            setOpen(false)
-                          }}
-                        >
-                          {restaurant.restaurant_name}
+    //     {type === 'employee' && (
+    //       <Popover open={open} onOpenChange={setOpen}>
+    //         <PopoverTrigger asChild>
+    //           <Button variant='outline' role='combobox' aria-expanded={open} className='w-[500px] justify-between'>
+    //             {restaurantId
+    //               ? filteredRestaurants.find((restaurant) => restaurant._id === restaurantId)?.restaurant_name
+    //               : 'Chọn nhà hàng...'}
+    //             <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+    //           </Button>
+    //         </PopoverTrigger>
+    //         <PopoverContent className='w-[500px] p-0'>
+    //           <Command>
+    //             <CommandInput
+    //               placeholder='Tìm nhà hàng...'
+    //               className='h-9'
+    //               onInput={(e) => handleRestaurantSearch(e.currentTarget.value)}
+    //             />
+    //             <CommandList>
+    //               <div className='overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground'>
+    //                 {filteredRestaurants?.map((restaurant) => {
+    //                   return (
+    //                     <div
+    //                       className='relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50'
+    //                       onClick={() => {
+    //                         setRestaurantId(restaurant._id)
+    //                         setOpen(false)
+    //                       }}
+    //                     >
+    //                       {restaurant.restaurant_name}
+    //                     </div>
+    //                   )
+    //                 })}
+    //               </div>
+    //             </CommandList>
+    //           </Command>
+    //         </PopoverContent>
+    //       </Popover>
+    //     )}
+
+    //     <RadioGroup value={type} onValueChange={(value: 'restaurant' | 'employee') => setType(value)}>
+    //       <div className='flex items-center space-x-2'>
+    //         <RadioGroupItem value='restaurant' id='r2' />
+    //         <Label htmlFor='r1'>Nhà hàng</Label>
+    //       </div>
+    //       <div className='flex items-center space-x-2'>
+    //         <RadioGroupItem value='employee' id='r1' />
+    //         <Label htmlFor='r2'>Nhân viên</Label>
+    //       </div>
+    //     </RadioGroup>
+
+    //     <Button type='submit'>Đăng nhập</Button>
+    //   </form>
+    // </Form>
+
+    <Card>
+      <CardContent>
+        <Form {...form}>
+          <div className='flex justify-center items-center min-h-screen'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='w-full max-w-lg space-y-6'>
+              <FormField
+                control={form.control}
+                name='email'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Email...' {...field} className='input' />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='password'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <PasswordInput placeholder='Password...' {...field} className='input' />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {type === 'employee' && (
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant='outline' role='combobox' aria-expanded={open} className='w-full justify-between'>
+                      {restaurantId
+                        ? filteredRestaurants.find((restaurant) => restaurant._id === restaurantId)?.restaurant_name
+                        : 'Chọn nhà hàng...'}
+                      <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-full p-0'>
+                    <Command>
+                      <CommandInput
+                        placeholder='Tìm nhà hàng...'
+                        className='h-9'
+                        onInput={(e) => handleRestaurantSearch(e.currentTarget.value)}
+                      />
+                      <CommandList>
+                        <div className='overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground'>
+                          {filteredRestaurants?.map((restaurant) => {
+                            return (
+                              <div
+                                className='relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50'
+                                onClick={() => {
+                                  setRestaurantId(restaurant._id)
+                                  setOpen(false)
+                                }}
+                              >
+                                {restaurant.restaurant_name}
+                              </div>
+                            )
+                          })}
                         </div>
-                      )
-                    })}
-                  </div>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        )}
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              )}
 
-        <RadioGroup value={type} onValueChange={(value: 'restaurant' | 'employee') => setType(value)}>
-          <div className='flex items-center space-x-2'>
-            <RadioGroupItem value='restaurant' id='r2' />
-            <Label htmlFor='r1'>Nhà hàng</Label>
+              <RadioGroup value={type} onValueChange={(value: 'restaurant' | 'employee') => setType(value)}>
+                <div className='flex items-center space-x-2'>
+                  <RadioGroupItem value='restaurant' id='r2' />
+                  <Label htmlFor='r1'>Nhà hàng</Label>
+                </div>
+                <div className='flex items-center space-x-2'>
+                  <RadioGroupItem value='employee' id='r1' />
+                  <Label htmlFor='r2'>Nhân viên</Label>
+                </div>
+              </RadioGroup>
+              <Button type='submit' className='btn-primary'>
+                Đăng nhập
+              </Button>
+            </form>
           </div>
-          <div className='flex items-center space-x-2'>
-            <RadioGroupItem value='employee' id='r1' />
-            <Label htmlFor='r2'>Nhân viên</Label>
-          </div>
-        </RadioGroup>
-
-        <Button type='submit'>Đăng nhập</Button>
-      </form>
-    </Form>
+        </Form>
+      </CardContent>
+    </Card>
   )
 }

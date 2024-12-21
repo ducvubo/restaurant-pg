@@ -29,7 +29,7 @@ interface DataTableProps<TData, TValue> {
   }
 }
 
-export function PageTables<TData, TValue>({ columns, meta, data }: DataTableProps<TData, TValue>) {
+export function PageCategories<TData, TValue>({ columns, meta, data }: DataTableProps<TData, TValue>) {
   const router = useRouter()
   const pathname = usePathname().split('/').pop()
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -64,13 +64,13 @@ export function PageTables<TData, TValue>({ columns, meta, data }: DataTableProp
   }
 
   React.useEffect(() => {
-    router.push(`/dashboard/foods/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`)
+    router.push(`/dashboard/categories/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`)
   }, [pageIndex, pageSize, router])
 
   return (
     <div className='flex flex-col h-[570px]'>
       <div className='flex items-center py-4'>
-        <h1 className='font-semibold text-2xl'>Danh sách món ăn online</h1>
+        <h1 className='font-semibold text-2xl'>Danh sách danh mục</h1>
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>

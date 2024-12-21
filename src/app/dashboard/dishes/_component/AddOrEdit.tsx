@@ -105,15 +105,12 @@ export default function AddOrEdit({ id, inforDish }: Props) {
   const saleValue = watch('dish_sale.sale_value')
 
   useEffect(() => {
-    // Chỉ tính giá khi cả giá trị giá gốc và giá trị giảm giá đã được nhập
     if (dishPrice && saleValue) {
       let calculatedPrice = dishPrice
 
       if (saleType === 'percentage') {
-        // Tính giá sau khi giảm theo % (saleValue là phần trăm)
         calculatedPrice = dishPrice - (dishPrice * saleValue) / 100
       } else if (saleType === 'fixed') {
-        // Tính giá sau khi giảm theo số tiền cụ thể
         calculatedPrice = dishPrice - saleValue
       }
 
@@ -304,7 +301,7 @@ export default function AddOrEdit({ id, inforDish }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
         <div>
           <FormField
             control={form.control}
@@ -504,7 +501,7 @@ export default function AddOrEdit({ id, inforDish }: Props) {
         />
         <EditorTiny editorRef={refDescription} />
         {/* <div dangerouslySetInnerHTML={{ __html: description }} /> */}
-        <Button type='submit'>{id === 'add' ? 'Thêm bàn mới' : 'Chỉnh sửa'}</Button>
+        <Button type='submit'>{id === 'add' ? 'Thêm món ăn mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>
   )
