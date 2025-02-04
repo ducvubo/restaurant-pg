@@ -11,11 +11,7 @@ export function ContentLayout({ title, children }: ContentLayoutProps) {
   return (
     <div>
       <Navbar title={title} />
-      <Card className='m-4'>
-        <ScrollArea className='h-[600px]'>
-          <div className='container pt-8 pb-8 px-4 sm:px-8'>{children}</div>
-        </ScrollArea>
-      </Card>
+      <div className='pt-4 pb-4 px-4 sm:px-8 w-full'>{children}</div>
     </div>
   )
 }

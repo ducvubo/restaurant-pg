@@ -16,5 +16,5 @@ export async function deleteCookiesAndRedirectGuest() {
 }
 
 export const getCookie = async (name: string) => {
-  return await cookies().get(name)?.value
+  return cookies().get(name)?.value
 }

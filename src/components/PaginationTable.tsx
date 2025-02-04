@@ -14,7 +14,7 @@ interface DataTablePaginationProps<TData> {
     totalItem: number
   }
   defaultRow?: number
-  onPageChange: (pageIndex: number, pageSize: number) => void // Hàm để gọi API khi thay đổi trang
+  onPageChange: (pageIndex: number, pageSize: number) => void 
 }
 
 export function DataTablePagination<TData>({ table, meta, onPageChange, defaultRow }: DataTablePaginationProps<TData>) {
@@ -30,7 +30,6 @@ export function DataTablePagination<TData>({ table, meta, onPageChange, defaultR
     setPageSize(meta.pageSize)
     table.setPageSize(meta.pageSize)
   }, [meta, table])
-
   return (
     <div className='flex items-center justify-between px-2 -mb-10'>
       <div className='flex items-center space-x-6 lg:space-x-8'>
@@ -64,7 +63,7 @@ export function DataTablePagination<TData>({ table, meta, onPageChange, defaultR
             variant='outline'
             className='hidden h-8 w-8 p-0 lg:flex'
             onClick={() => setPageIndex(0)}
-            disabled={pageIndex === 0}
+            disabled={pageIndex === 0 }
           >
             <span className='sr-only'>Go to first page</span>
             <DoubleArrowLeftIcon className='h-4 w-4' />
@@ -73,7 +72,7 @@ export function DataTablePagination<TData>({ table, meta, onPageChange, defaultR
             variant='outline'
             className='h-8 w-8 p-0'
             onClick={() => setPageIndex((old) => Math.max(old - 1, 0))}
-            disabled={pageIndex === 0}
+            disabled={pageIndex === 0 }
           >
             <span className='sr-only'>Go to previous page</span>
             <ChevronLeftIcon className='h-4 w-4' />
@@ -82,7 +81,7 @@ export function DataTablePagination<TData>({ table, meta, onPageChange, defaultR
             variant='outline'
             className='h-8 w-8 p-0'
             onClick={() => setPageIndex((old) => Math.min(old + 1, meta.totalPage - 1))}
-            disabled={pageIndex === meta.totalPage - 1}
+            disabled={pageIndex === meta.totalPage - 1 }
           >
             <span className='sr-only'>Go to next page</span>
             <ChevronRightIcon className='h-4 w-4' />
@@ -91,7 +90,7 @@ export function DataTablePagination<TData>({ table, meta, onPageChange, defaultR
             variant='outline'
             className='hidden h-8 w-8 p-0 lg:flex'
             onClick={() => setPageIndex(meta.totalPage - 1)}
-            disabled={pageIndex === meta.totalPage - 1}
+            disabled={pageIndex === meta.totalPage - 1 }
           >
             <span className='sr-only'>Go to last page</span>
             <DoubleArrowRightIcon className='h-4 w-4' />

@@ -1,5 +1,5 @@
 'use client'
-import { IDish } from '@/app/dashboard/dishes/dishes.interface'
+import { IDish } from '@/app/dashboard/(food)/dishes/dishes.interface'
 import { RootState } from '@/app/redux/store'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'

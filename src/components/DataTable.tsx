@@ -107,7 +107,7 @@ export function PageTables<TData, TValue>({ columns, meta, data,url }: DataTable
               ) : (
                 <TableRow className='h-8'>
                   <TableCell colSpan={columns.length} className='h-24 text-center'>
-                    No results.
+                    Không có dữ liệu!!!
                   </TableCell>
                 </TableRow>
               )}

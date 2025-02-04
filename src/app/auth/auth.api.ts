@@ -3,7 +3,7 @@
 import { sendRequest } from '@/lib/api'
 import { IToken, IRestaurant } from './auth.interface'
 import { cookies } from 'next/headers'
-import { IEmployee } from '../dashboard/employees/employees.interface'
+import { IEmployee } from '../dashboard/(employee)/employees/employees.interface'
 
 export const getInforRestaurant = async ({ access_token_rtr, refresh_token_rtr }: IToken) => {
   const res: IBackendRes<IRestaurant> = await sendRequest({
@@ -18,15 +18,11 @@ export const getInforRestaurant = async ({ access_token_rtr, refresh_token_rtr }
 }
 
 export const login = async (payload: { restaurant_email: string; restaurant_password: string }) => {
-
-
-  
   const res: IBackendRes<IToken> = await sendRequest({
     url: `${process.env.URL_SERVER}/restaurants/login`,
     method: 'POST',
     body: payload
   })
-
 
   if (res.statusCode === 201 && res.data) {
     const data = await Promise.all([
@@ -91,6 +87,11 @@ export const login = async (payload: { restaurant_email: string; restaurant_pass
     return {
       message: res.message,
       code: -5
+    }
+  } else {
+    return {
+      message: res.message,
+      code: -4
     }
   }
 }

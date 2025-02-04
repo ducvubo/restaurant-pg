@@ -3,6 +3,7 @@ import { IRestaurant } from './auth.interface'
 
 export const initialState: IRestaurant = {
   _id: '',
+  restaurant_id: '',
   restaurant_email: '',
   restaurant_phone: '',
   restaurant_category: '',
@@ -80,7 +81,8 @@ const inforRestaurantSlice = createSlice({
         (state.restaurant_description = action.payload.restaurant_description),
         (state.restaurant_verify = action.payload.restaurant_verify),
         (state.restaurant_state = action.payload.restaurant_state),
-        (state.restaurant_slug = action.payload.restaurant_slug)
+        (state.restaurant_slug = action.payload.restaurant_slug),
+        (state.restaurant_id = action.payload._id)
     },
     endAppRestaurant: (state, action) => {
       return initialState

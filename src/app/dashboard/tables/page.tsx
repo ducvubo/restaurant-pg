@@ -47,19 +47,6 @@ async function Component({ searchParams }: PageProps) {
   return (
     <div>
       <ContentLayout title='Danh sách bàn ăn'>
-        <Breadcrumb className='-mt-4'>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href='/dashboard'>Dashboard</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Danh sách bàn ăn</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
         <PageTables data={data} columns={columns} meta={res.data.meta} />
       </ContentLayout>
     </div>

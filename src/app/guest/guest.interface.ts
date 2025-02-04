@@ -1,4 +1,4 @@
-import { OdDishSmrGuestId } from '../dashboard/order/order.interface'
+import { OdDishSmrGuestId } from '../dashboard/(order)/order/order.interface'
 
 export interface IGuest {
   guest_restaurant_id: string

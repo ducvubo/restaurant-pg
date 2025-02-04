@@ -67,7 +67,6 @@ export default function EditorTiny({ width = '100%', height = '400px', editorRef
   return (
     <div style={{ width }} className={cn(className)}>
       <Editor
-       
         key={theme}
         apiKey={`${process.env.NEXT_PUBLIC_API_KEY_TINY_CME}`}
         onInit={(evt, editor) => (editorRef.current = editor)}
@@ -112,7 +111,8 @@ export default function EditorTiny({ width = '100%', height = '400px', editorRef
             'autocorrect',
             'typography',
             'inlinecss',
-            'markdown'
+            'markdown',
+            'preview'
           ],
           toolbar:
             'undo redo |  | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',

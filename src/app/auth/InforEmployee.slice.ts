@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IEmployee } from '../dashboard/employees/employees.interface'
+import { IEmployee } from '../dashboard/(employee)/employees/employees.interface'
 
 export const initialState: IEmployee = {
   _id: '',
+  restaurant_id: '',
   epl_restaurant_id: '',
   epl_name: '',
   epl_email: '',
@@ -28,7 +29,8 @@ const inforEmployeeSlice = createSlice({
         (state.epl_phone = action.payload.epl_phone),
         (state.epl_gender = action.payload.epl_gender),
         (state.epl_address = action.payload.epl_address),
-        (state.epl_avatar = action.payload.epl_avatar)
+        (state.epl_avatar = action.payload.epl_avatar),
+        (state.restaurant_id = action.payload.epl_restaurant_id)
     },
     endAppEmployee: (state, action) => {
       return initialState

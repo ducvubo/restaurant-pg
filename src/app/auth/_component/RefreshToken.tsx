@@ -22,7 +22,6 @@ export default function RefreshToken() {
     dispatch(startAppEmployee(inforEmployee))
   }
 
-
   useEffect(() => {
     let socket: any
     let intervalId: NodeJS.Timeout
@@ -67,7 +66,6 @@ export default function RefreshToken() {
           const currentPath = window.location.pathname
           router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
         })
-        
       }
 
       function onDisconnect() {

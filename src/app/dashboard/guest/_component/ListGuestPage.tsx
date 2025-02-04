@@ -70,7 +70,6 @@ export function PageGuest<TData, TValue>({ columns, meta, data }: DataTableProps
   return (
     <div className='flex flex-col h-[570px]'>
       <div className='flex items-center py-4'>
-        <h1 className='font-semibold text-2xl'>Danh sách bàn ăn</h1>
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>
@@ -106,7 +105,7 @@ export function PageGuest<TData, TValue>({ columns, meta, data }: DataTableProps
               ) : (
                 <TableRow className='h-8'>
                   <TableCell colSpan={columns.length} className='h-24 text-center'>
-                    No results.
+                    Không có dữ liệu!!!
                   </TableCell>
                 </TableRow>
               )}

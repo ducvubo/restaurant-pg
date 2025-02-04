@@ -3,7 +3,7 @@
 import { sendRequest } from '@/lib/api'
 import { cookies } from 'next/headers'
 import { IGuest, IOrderDishGuest } from './guest.interface'
-import { IDish } from '../dashboard/dishes/dishes.interface'
+import { IDish } from '../dashboard/(food)/dishes/dishes.interface'
 
 export const loginGuest = async (payload: {
   guest_name: string

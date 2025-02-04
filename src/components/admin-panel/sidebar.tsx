@@ -9,7 +9,7 @@ import { useSidebarToggle } from '@/hooks/use-sidebar-toggle'
 import { SidebarToggle } from '@/components/admin-panel/sidebar-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { IRestaurant } from '@/app/auth/auth.interface'
-import { IEmployee } from '@/app/dashboard/employees/employees.interface'
+import { IEmployee } from '@/app/dashboard/(employee)/employees/employees.interface'
 
 interface Props {
   inforRestaurant: IRestaurant
@@ -37,7 +37,7 @@ export function Sidebar({ inforEmployee, inforRestaurant }: Props) {
           variant='link'
           asChild
         >
-          <Link href='/dashboard' className='flex items-center gap-2'>
+          <Link href='/dashboard/infor' className='flex items-center gap-2'>
             {/* <PanelsTopLeft className='w-6 h-6 mr-1' /> */}
             <Avatar>
               <AvatarImage

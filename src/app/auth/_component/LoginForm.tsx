@@ -22,7 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
-import { IEmployee } from '@/app/dashboard/employees/employees.interface'
+import { IEmployee } from '@/app/dashboard/(employee)/employees/employees.interface'
 import { endAppEmployee, startAppEmployee } from '../InforEmployee.slice'
 import { Card, CardContent } from '@/components/ui/card'
 
@@ -53,7 +53,7 @@ export function LoginForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      email: 'Tressie12@hotmail.com',
+      email: 'vuducbo@gmail.com',
       password: 'Duc17052003*'
     }
   })
@@ -92,6 +92,7 @@ export function LoginForm() {
         restaurant_password: data.password
       }
       const res = await login(payload)
+      console.log('🚀 ~ onSubmit ~ res:', res)
       if (res?.code === 0 && res.data) {
         setLoading(false)
         runAppRestaurant(res.data)

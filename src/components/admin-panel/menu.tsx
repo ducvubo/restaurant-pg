@@ -87,7 +87,7 @@ export function Menu({ isOpen }: MenuProps) {
               )}
             </li>
           ))}
-          <li className='w-full grow flex items-end'>
+          {/* <li className='w-full grow flex items-end'>
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
@@ -103,7 +103,7 @@ export function Menu({ isOpen }: MenuProps) {
                 {isOpen === false && <TooltipContent side='right'>Sign out</TooltipContent>}
               </Tooltip>
             </TooltipProvider>
-          </li>
+          </li> */}
         </ul>
       </nav>
     </ScrollArea>

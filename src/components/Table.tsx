@@ -73,8 +73,8 @@ export function TableCompnonent<TData, TValue>({
     }
   }
   return (
-    <div className='flex flex-col -mt-5 ' style={{ height: `${height}px` }}>
-      <div className='flex items-center'>
+    <div className='flex flex-col -mt-9 gap-2' style={{ height: `${height}px` }}>
+      <div className='flex items-center justify-end'>
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>
@@ -105,7 +105,7 @@ export function TableCompnonent<TData, TValue>({
               ) : (
                 <TableRow className='h-8'>
                   <TableCell colSpan={columns.length} className='h-24 text-center'>
-                    No results.
+                    Không có dữ liệu!!!
                   </TableCell>
                 </TableRow>
               )}

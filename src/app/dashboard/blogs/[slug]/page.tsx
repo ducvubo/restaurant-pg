@@ -32,19 +32,6 @@ async function Component({ searchParams, params }: PageProps) {
   if (id === 'add') {
     return (
       <ContentLayout title='Viết blog'>
-        <Breadcrumb className='-mt-4'>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href='/dashboard'>Dashboard</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Viết blog</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
         <AddOrEdit id='add' />
       </ContentLayout>
     )
@@ -75,20 +62,7 @@ async function Component({ searchParams, params }: PageProps) {
 
       return (
         <div>
-          <ContentLayout title='Danh sách bàn đã xóa'>
-            <Breadcrumb className='-mt-4'>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href='/dashboard'>Dashboard</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Danh sách bàn đã xóa</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+          <ContentLayout title='Danh sách blog đã xóa'>
             <PageBlog data={res.data.result} columns={columns} meta={res.data.meta} />
           </ContentLayout>
         </div>
@@ -119,25 +93,6 @@ async function Component({ searchParams, params }: PageProps) {
   }
   return (
     <ContentLayout title='Chỉnh sửa blog'>
-      <Breadcrumb className='-mt-4'>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href='/dashboard'>Dashboard</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href='/dashboard/tables'>blog</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Chỉnh sửa blog</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
       <AddOrEdit id={id} inforBlog={res.data} />
     </ContentLayout>
   )

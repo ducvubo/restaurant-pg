@@ -10,7 +10,10 @@ import {
   HandPlatter,
   ListOrdered,
   TicketCheck,
-  StickyNote
+  StickyNote,
+  Album,
+  Pizza,
+  Component
 } from 'lucide-react'
 
 type Submenu = {
@@ -52,6 +55,11 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               href: '/dashboard/order/table',
               label: 'Đơn đặt theo bàn',
               active: pathname === '/dashboard/order'
+            },
+            {
+              href: '/dashboard/book-table',
+              label: 'Danh sách đặt bàn',
+              active: pathname === '/dashboard/book-table'
             }
           ]
         }
@@ -67,19 +75,24 @@ export function getMenuListRestaurant(pathname: string): Group[] {
           icon: SquarePen,
           submenus: [
             {
-              href: '/dashboard/employees/add',
-              label: 'Thêm nhân viên',
-              active: pathname === '/dashboard/employees/add'
-            },
-            {
               href: '/dashboard/employees?page=1&size=10',
-              label: 'Danh sách nhân viên',
+              label: 'Quản lý nhân viên',
               active: pathname === '/dashboard/employees'
             },
             {
-              href: '/dashboard/employees/recycle?page=1&size=10',
-              label: 'Danh sách đã xóa',
-              active: pathname === '/dashboard/employees/recycle'
+              href: '/dashboard/labels?page=1&size=10',
+              label: 'Quản lý nhãn',
+              active: pathname === '/dashboard/labels'
+            },
+            {
+              href: '/dashboard/working-shifts?page=1&size=10',
+              label: 'Quản lý ca làm việc',
+              active: pathname === '/dashboard/working-shifts'
+            },
+            {
+              href: '/dashboard/work-schedules',
+              label: 'Quản lý lịch làm việc',
+              active: pathname === '/dashboard/work-schedules'
             }
           ]
         },
@@ -91,41 +104,8 @@ export function getMenuListRestaurant(pathname: string): Group[] {
           submenus: [
             {
               href: '/dashboard/tables',
-              label: 'Danh sách bàn ăn',
+              label: 'Quản lý bàn ăn',
               active: pathname === '/dashboard/tables'
-            },
-            {
-              href: '/dashboard/tables/add',
-              label: 'Thêm bàn ăn',
-              active: pathname === '/dashboard/tables/add'
-            },
-            {
-              href: '/dashboard/tables/recycle?page=1&size=10',
-              label: 'Danh sách đã xóa',
-              active: pathname === '/dashboard/tables/recycle'
-            }
-          ]
-        },
-        {
-          href: '/dashboard/categories',
-          label: 'Danh mục',
-          active: pathname.includes('/categories'),
-          icon: HandPlatter,
-          submenus: [
-            {
-              href: '/dashboard/categories',
-              label: 'Danh sách danh mục',
-              active: pathname === '/dashboard/categories'
-            },
-            {
-              href: '/dashboard/categories/add',
-              label: 'Thêm danh mục',
-              active: pathname === '/dashboard/categories/add'
-            },
-            {
-              href: '/dashboard/categories/recycle?page=1&size=10',
-              label: 'Danh sách đã xóa',
-              active: pathname === '/dashboard/categories/recycle'
             }
           ]
         },
@@ -136,23 +116,27 @@ export function getMenuListRestaurant(pathname: string): Group[] {
           icon: Salad,
           submenus: [
             {
+              href: '/dashboard/categories',
+              label: 'Quản lý danh mục',
+              active: pathname === '/dashboard/categories'
+            },
+            {
               href: '/dashboard/dishes',
-              label: 'Danh sách món ăn',
+              label: 'Quản lý món ăn',
               active: pathname === '/dashboard/dishes'
             },
             {
-              href: '/dashboard/dishes/add',
-              label: 'Thêm món ăn',
-              active: pathname === '/dashboard/dishes/add'
+              href: '/dashboard/foods',
+              label: 'Quản lý món ăn online',
+              active: pathname === '/dashboard/foods'
             },
             {
-              href: '/dashboard/dishes/recycle?page=1&size=10',
-              label: 'Danh sách đã xóa',
-              active: pathname === '/dashboard/dishes/recycle'
+              href: '/dashboard/food-combos',
+              label: 'Quản lý combo món ăn',
+              active: pathname === '/dashboard/food-combos'
             }
           ]
         },
-
         {
           href: '/dashboard/guest',
           label: 'Khách hàng',
@@ -167,61 +151,53 @@ export function getMenuListRestaurant(pathname: string): Group[] {
           ]
         },
         {
-          href: '/dashboard/book-table',
-          label: 'Đặt bàn',
-          active: pathname.includes('/book-table'),
-          icon: TicketCheck,
-          submenus: [
-            {
-              href: '/dashboard/book-table',
-              label: 'Danh sách đặt bàn',
-              active: pathname === '/dashboard/book-table'
-            }
-          ]
-        },
-        {
-          href: '/dashboard/foods',
-          label: 'Món ăn online',
-          active: pathname.includes('/foods'),
-          icon: Salad,
-          submenus: [
-            {
-              href: '/dashboard/foods/add',
-              label: 'Thêm món mới',
-              active: pathname === '/dashboard/foods/add'
-            },
-            {
-              href: '/dashboard/foods',
-              label: 'Danh sách món ăn',
-              active: pathname === '/dashboard/foods'
-            },
-            {
-              href: '/dashboard/foods/recycle',
-              label: 'Danh sách đã xóa',
-              active: pathname === '/dashboard/foods/recycle'
-            }
-          ]
-        },
-        {
           href: '/dashboard/blogs',
           label: 'Blog',
           active: pathname.includes('/blogs'),
           icon: StickyNote,
           submenus: [
             {
-              href: '/dashboard/blogs/add',
-              label: 'Viết blog',
-              active: pathname === '/dashboard/blogs/add'
-            },
-            {
               href: '/dashboard/blogs',
               label: 'Danh sách blog',
               active: pathname === '/dashboard/blogs'
+            }
+          ]
+        },
+        {
+          href: '/dashboard/warehouse',
+          label: 'Quản lý kho',
+          active: pathname.includes('/warehouse'),
+          icon: LayoutGrid,
+          submenus: [
+            {
+              href: '/dashboard/suppliers',
+              label: 'Nhà cung cấp',
+              active: pathname === '/dashboard/suppliers'
             },
             {
-              href: '/dashboard/blogs/recycle',
-              label: 'Danh sách đã xóa',
-              active: pathname === '/dashboard/blogs/recycle'
+              href: '/dashboard/cat-ingredients',
+              label: 'Danh mục nguyên liệu',
+              active: pathname === '/dashboard/cat-ingredients'
+            },
+            {
+              href: '/dashboard/units',
+              label: 'Đơn vị đo',
+              active: pathname === '/dashboard/units'
+            },
+            {
+              href: '/dashboard/ingredients',
+              label: 'Nguyên liệu',
+              active: pathname === '/dashboard/ingredients'
+            },
+            {
+              href: '/dashboard/stock-in',
+              label: 'Nhập kho',
+              active: pathname === '/dashboard/stock-in'
+            },
+            {
+              href: '/dashboard/stock-out',
+              label: 'Xuất kho',
+              active: pathname === '/dashboard/stock-out'
             }
           ]
         }

@@ -17,6 +17,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { usePathname, useRouter } from 'next/navigation'
 import { DataTableViewOptions } from '@/components/ColumnToggle'
 import { DataTablePagination } from '@/components/PaginationTable'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -69,12 +71,13 @@ export function PageTables<TData, TValue>({ columns, meta, data }: DataTableProp
 
   return (
     <div className='flex flex-col h-[570px]'>
-      <div className='flex items-center py-4'>
-        <h1 className='font-semibold text-2xl'>Danh sách bàn ăn</h1>
+      <div className='flex justify-end gap-2 items-center py-4'>
+        <Button variant={'outline'}><Link href={'/dashboard/tables/add'}>Thêm</Link></Button>
+        <Button variant={'outline'}><Link href={'/dashboard/tables/recycle'}  >Danh sách đã xóa</Link></Button>
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>
-        {/* Container for the table with fixed height */}
+       
         <div className='overflow-y-auto h-full'>
           <Table className='min-w-full'>
             <TableHeader>
@@ -106,7 +109,7 @@ export function PageTables<TData, TValue>({ columns, meta, data }: DataTableProp
               ) : (
                 <TableRow className='h-8'>
                   <TableCell colSpan={columns.length} className='h-24 text-center'>
-                    No results.
+                    Không có dữ liệu!!!
                   </TableCell>
                 </TableRow>
               )}

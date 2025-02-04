@@ -6,6 +6,7 @@ export interface IToken {
 
 export interface IRestaurant {
   _id: string
+  restaurant_id: string
   restaurant_email: string
   restaurant_phone: string
   restaurant_category: string

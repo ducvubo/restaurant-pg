@@ -32,19 +32,6 @@ async function Component({ searchParams, params }: PageProps) {
   if (id === 'add') {
     return (
       <ContentLayout title='Thêm bàn ăn'>
-        <Breadcrumb className='-mt-4'>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href='/dashboard'>Dashboard</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Thêm bàn ăn</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
         <AddOrEdit id='add' />
       </ContentLayout>
     )
@@ -76,19 +63,6 @@ async function Component({ searchParams, params }: PageProps) {
       return (
         <div>
           <ContentLayout title='Danh sách bàn đã xóa'>
-            <Breadcrumb className='-mt-4'>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href='/dashboard'>Dashboard</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Danh sách bàn đã xóa</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
             <PageTables data={data} columns={columns} meta={res.data.meta} />
           </ContentLayout>
         </div>
@@ -125,25 +99,6 @@ async function Component({ searchParams, params }: PageProps) {
   }
   return (
     <ContentLayout title='Chỉnh sửa thông tin bàn'>
-      <Breadcrumb className='-mt-4'>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href='/dashboard'>Dashboard</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href='/dashboard/tables'>Danh sách bàn</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Chỉnh sửa thông tin bàn</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
       <AddOrEdit id={id} inforTable={res.data} />
     </ContentLayout>
   )

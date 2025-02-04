@@ -124,3 +124,11 @@ export const calculateTotalPrice = (data: any) => {
 
   return totalPrice
 }
+
+export const formatDate = (date: Date) => {
+  //21/09/2021
+  const day = date.getDate().toString().padStart(2, '0')
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}/${month}/${year}`
+}
