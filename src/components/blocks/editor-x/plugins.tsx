@@ -210,7 +210,7 @@ export function Plugins({}) {
         <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
 
         <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />
-        <TypingPerfPlugin />
+        {/* <TypingPerfPlugin /> */}
         <TabFocusPlugin />
         <AutocompletePlugin />
         <AutoLinkPlugin />
@@ -227,8 +227,8 @@ export function Plugins({}) {
         <ListMaxIndentLevelPlugin />
       </div>
       <div className='clear-both flex h-10 items-center justify-between border-t p-1'>
-        <MaxLengthPlugin maxLength={maxLength} />
-        <CharacterLimitPlugin maxLength={maxLength} charset='UTF-16' />
+        {/* <MaxLengthPlugin maxLength={maxLength} />
+        <CharacterLimitPlugin maxLength={maxLength} charset='UTF-16' /> */}
         <div className='flex justify-end'>
           <SpeechToTextPlugin />
           <ShareContentPlugin />

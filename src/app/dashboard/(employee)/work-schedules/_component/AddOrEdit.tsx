@@ -31,7 +31,7 @@ import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { SerializedEditorState } from 'lexical'
-import { Editor } from '@/components/blocks/editor-00/editor'
+import { Editor } from '@/components/blocks/editor-x/editor'
 interface IProps {
   id: string
   inforWorkSchedule?: IWorkSchedule
@@ -180,7 +180,7 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
       <DialogTrigger asChild>
         <Button variant='outline'>Thêm</Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[425px]'>
+      <DialogContent className='w-full'>
         <DialogHeader>
           <DialogTitle>Thêm lịch làm việc</DialogTitle>
           {/* <DialogDescription>Make changes to your profile here. Click save when you're done.</DialogDescription> */}

@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  InitialConfigType,
-  LexicalComposer,
-} from '@lexical/react/LexicalComposer'
+import { InitialConfigType, LexicalComposer } from '@lexical/react/LexicalComposer'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { EditorState, SerializedEditorState } from 'lexical'
 
@@ -21,14 +18,14 @@ const editorConfig: InitialConfigType = {
   nodes,
   onError: (error: Error) => {
     console.error(error)
-  },
+  }
 }
 
 export function Editor({
   editorState,
   editorSerializedState,
   onChange,
-  onSerializedChange,
+  onSerializedChange
 }: {
   editorState?: EditorState
   editorSerializedState?: SerializedEditorState
@@ -36,14 +33,12 @@ export function Editor({
   onSerializedChange?: (editorSerializedState: SerializedEditorState) => void
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border bg-background shadow">
+    <div className='overflow-hidden rounded-lg border bg-background shadow'>
       <LexicalComposer
         initialConfig={{
           ...editorConfig,
           ...(editorState ? { editorState } : {}),
-          ...(editorSerializedState
-            ? { editorState: JSON.stringify(editorSerializedState) }
-            : {}),
+          ...(editorSerializedState ? { editorState: JSON.stringify(editorSerializedState) } : {})
         }}
       >
         <TooltipProvider>
