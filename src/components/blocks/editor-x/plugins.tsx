@@ -106,7 +106,7 @@ export function Plugins({}) {
   }
 
   return (
-    <div className='relative'>
+    <div className='relative h-[65%]'>
       <ToolbarPlugin>
         {({ blockType }) => (
           <div className='vertical-align-middle sticky top-0 z-10 flex gap-2 overflow-auto border-b p-1'>
@@ -160,7 +160,7 @@ export function Plugins({}) {
           </div>
         )}
       </ToolbarPlugin>
-      <div className='relative'>
+      <div className='relative h-full'>
         <AutoFocusPlugin />
         <RichTextPlugin
           contentEditable={
@@ -168,7 +168,7 @@ export function Plugins({}) {
               <div className='' ref={onRef}>
                 <ContentEditable
                   placeholder={placeholder}
-                  className='ContentEditable__root relative block min-h-72 overflow-auto min-h-full px-8 py-4 focus:outline-none h-[830px]'
+                  className='ContentEditable__root relative block w-full overflow-auto  px-8 py-4 focus:outline-none h-full'
                 />
               </div>
             </div>

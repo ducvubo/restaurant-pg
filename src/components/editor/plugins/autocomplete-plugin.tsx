@@ -20,14 +20,11 @@ import {
   $setSelection,
   COMMAND_PRIORITY_LOW,
   KEY_ARROW_RIGHT_COMMAND,
-  KEY_TAB_COMMAND,
+  KEY_TAB_COMMAND
 } from 'lexical'
 
 import { useSharedAutocompleteContext } from '@/registry/new-york/editor/context/shared-autocomplete-context'
-import {
-  $createAutocompleteNode,
-  AutocompleteNode,
-} from '@/registry/new-york/editor/nodes/autocomplete-node'
+import { $createAutocompleteNode, AutocompleteNode } from '@/registry/new-york/editor/nodes/autocomplete-node'
 
 import { addSwipeRightListener } from '@/registry/new-york/editor/utils/swipe'
 
@@ -69,9 +66,7 @@ function $search(selection: null | BaseSelection): [boolean, string] {
 function useQuery(): (searchText: string) => SearchPromise {
   return useCallback((searchText: string) => {
     const server = new AutocompleteServer()
-    console.time('query')
     const response = server.query(searchText)
-    console.timeEnd('query')
     return response
   }, [])
 }
@@ -87,8 +82,7 @@ export function AutocompletePlugin(): JSX.Element | null {
     let lastSuggestion: null | string = null
     let searchPromise: null | SearchPromise = null
     function $clearSuggestion() {
-      const autocompleteNode =
-        autocompleteNodeKey !== null ? $getNodeByKey(autocompleteNodeKey) : null
+      const autocompleteNode = autocompleteNodeKey !== null ? $getNodeByKey(autocompleteNodeKey) : null
       if (autocompleteNode !== null && autocompleteNode.isAttached()) {
         autocompleteNode.remove()
         autocompleteNodeKey = null
@@ -101,10 +95,7 @@ export function AutocompletePlugin(): JSX.Element | null {
       lastSuggestion = null
       setSuggestion(null)
     }
-    function updateAsyncSuggestion(
-      refSearchPromise: SearchPromise,
-      newSuggestion: null | string
-    ) {
+    function updateAsyncSuggestion(refSearchPromise: SearchPromise, newSuggestion: null | string) {
       if (searchPromise !== refSearchPromise || newSuggestion === null) {
         // Outdated or no suggestion
         return
@@ -113,11 +104,7 @@ export function AutocompletePlugin(): JSX.Element | null {
         () => {
           const selection = $getSelection()
           const [hasMatch, match] = $search(selection)
-          if (
-            !hasMatch ||
-            match !== lastMatch ||
-            !$isRangeSelection(selection)
-          ) {
+          if (!hasMatch || match !== lastMatch || !$isRangeSelection(selection)) {
             // Outdated
             return
           }
@@ -202,24 +189,11 @@ export function AutocompletePlugin(): JSX.Element | null {
     const rootElem = editor.getRootElement()
 
     return mergeRegister(
-      editor.registerNodeTransform(
-        AutocompleteNode,
-        $handleAutocompleteNodeTransform
-      ),
+      editor.registerNodeTransform(AutocompleteNode, $handleAutocompleteNodeTransform),
       editor.registerUpdateListener(handleUpdate),
-      editor.registerCommand(
-        KEY_TAB_COMMAND,
-        $handleKeypressCommand,
-        COMMAND_PRIORITY_LOW
-      ),
-      editor.registerCommand(
-        KEY_ARROW_RIGHT_COMMAND,
-        $handleKeypressCommand,
-        COMMAND_PRIORITY_LOW
-      ),
-      ...(rootElem !== null
-        ? [addSwipeRightListener(rootElem, handleSwipeRight)]
-        : []),
+      editor.registerCommand(KEY_TAB_COMMAND, $handleKeypressCommand, COMMAND_PRIORITY_LOW),
+      editor.registerCommand(KEY_ARROW_RIGHT_COMMAND, $handleKeypressCommand, COMMAND_PRIORITY_LOW),
+      ...(rootElem !== null ? [addSwipeRightListener(rootElem, handleSwipeRight)] : []),
       unmountSuggestion
     )
   }, [editor, query, setSuggestion])
@@ -257,8 +231,7 @@ class AutocompleteServer {
           ? String.fromCharCode(char0 + 32) + searchText.substring(1)
           : searchText
         const match = this.DATABASE.find(
-          (dictionaryWord) =>
-            dictionaryWord.startsWith(caseInsensitiveSearchText) ?? null
+          (dictionaryWord) => dictionaryWord.startsWith(caseInsensitiveSearchText) ?? null
         )
         if (match === undefined) {
           return resolve(null)
@@ -276,7 +249,7 @@ class AutocompleteServer {
 
     return {
       dismiss,
-      promise,
+      promise
     }
   }
 }
@@ -2523,5 +2496,5 @@ const DICTIONARY = [
   'swaziland',
   'varieties',
   'mediawiki',
-  'configurations',
+  'configurations'
 ]

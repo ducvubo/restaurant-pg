@@ -9,6 +9,7 @@ export const createEmployee = async (payload: Omit<IEmployee, 'epl_status' | '_i
     method: 'POST',
     body: payload
   })
+  console.log('🚀 ~ createEmployee ~ res:', res)
   return res
 }
 
