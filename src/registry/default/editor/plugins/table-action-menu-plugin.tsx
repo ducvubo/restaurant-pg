@@ -246,7 +246,7 @@ function TableActionMenu({
           throw new Error('Expected to find tableElement in DOM')
         }
 
-        const tableObserver = getTableObserverFromTableElement(tableElement)
+        const tableObserver: any = getTableObserverFromTableElement(tableElement)
         if (tableObserver !== null) {
           tableObserver.clearHighlight()
         }

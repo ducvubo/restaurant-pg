@@ -1,3 +1,2 @@
-import { type Registry } from "shadcn/registry"
 
-export const charts: Registry["items"] = []
+export const charts: any = []

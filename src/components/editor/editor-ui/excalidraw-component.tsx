@@ -28,7 +28,7 @@ import type { ExcalidrawInitialElements } from '@/registry/new-york/editor/edito
 import { ExcalidrawModal } from '@/registry/new-york/editor/editor-ui/excalidraw-modal'
 import { ImageResizer } from '@/registry/new-york/editor/editor-ui/image-resizer'
 
-export function ExcalidrawComponent({
+export default function ExcalidrawComponent({
   nodeKey,
   data,
   width,

@@ -1,7 +1,7 @@
 'use server'
 
 import { sendRequest } from '@/lib/api'
-import { IStockIn, IUnit } from './stock-in.interface'
+import { IStockIn } from './stock-in.interface'
 import { ISupplier } from '../suppliers/supplier.interface'
 import { IEmployee } from '../../(employee)/employees/employees.interface'
 import { IIngredient } from '../ingredients/ingredient.interface'

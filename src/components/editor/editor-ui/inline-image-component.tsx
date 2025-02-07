@@ -185,7 +185,7 @@ export function UpdateInlineImageDialog({
   )
 }
 
-export function InlineImageComponent({
+export default function InlineImageComponent({
   src,
   altText,
   nodeKey,

@@ -1,6 +1,5 @@
-import { type Registry } from "shadcn/registry"
 
-export const examples: Registry["items"] = [
+export const examples: any = [
   {
     name: "rich-text-editor-demo",
     type: "registry:example",

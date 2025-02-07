@@ -16,4 +16,4 @@ const useLayoutEffectImpl: typeof useLayoutEffect = CAN_USE_DOM
   ? useLayoutEffect
   : useEffect
 
-export useLayoutEffectImpl
+export default useLayoutEffectImpl

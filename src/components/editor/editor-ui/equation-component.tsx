@@ -32,7 +32,7 @@ type EquationComponentProps = {
   nodeKey: NodeKey
 }
 
-export function EquationComponent({
+export default function EquationComponent({
   equation,
   inline,
   nodeKey,

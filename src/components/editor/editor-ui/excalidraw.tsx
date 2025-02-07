@@ -1,3 +1,3 @@
 import { Excalidraw } from '@excalidraw/excalidraw'
 
-export Excalidraw
+export default Excalidraw

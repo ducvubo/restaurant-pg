@@ -1,6 +1,5 @@
-import { type Registry } from "shadcn/registry"
 
-export const hooks: Registry["items"] = [
+export const hooks: any = [
   {
     name: "use-mobile",
     type: "registry:hook",

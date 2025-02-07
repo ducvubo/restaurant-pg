@@ -1,4 +1,3 @@
-import { type Registry } from "shadcn/registry"
 import { z } from "zod"
 
 import { blocks } from "@/registry/registry-blocks"
@@ -25,4 +24,4 @@ export const registry = {
     ...internal,
     ...examples,
   ],
-} satisfies Registry
+} satisfies any

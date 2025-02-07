@@ -57,4 +57,4 @@ function EquationEditor(
   )
 }
 
-export forwardRef(EquationEditor)
+export default forwardRef(EquationEditor)

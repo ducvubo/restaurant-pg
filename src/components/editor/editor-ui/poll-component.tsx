@@ -124,7 +124,7 @@ function PollOptionComponent({
   )
 }
 
-export function PollComponent({
+export default function PollComponent({
   question,
   options,
   nodeKey,

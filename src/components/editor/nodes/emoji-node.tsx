@@ -47,7 +47,7 @@ export class EmojiNode extends TextNode {
   }
 
   updateDOM(
-    prevNode: TextNode,
+    prevNode: any,
     dom: HTMLElement,
     config: EditorConfig
   ): boolean {

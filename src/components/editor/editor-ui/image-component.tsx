@@ -131,7 +131,7 @@ function BrokenImage(): JSX.Element {
   )
 }
 
-export function ImageComponent({
+export default function ImageComponent({
   src,
   altText,
   nodeKey,

@@ -262,7 +262,7 @@ export class InlineImageNode extends DecoratorNode<JSX.Element> {
     return (
       <Suspense fallback={null}>
         <InlineImageComponent
-          src={this.__src}
+          src={this.__src as any}
           altText={this.__altText}
           width={this.__width}
           height={this.__height}

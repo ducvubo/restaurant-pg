@@ -1,6 +1,5 @@
-import { type Registry } from "shadcn/registry"
 
-export const themes: Registry["items"] = [
+export const themes: any= [
   {
     name: "theme-daylight",
     type: "registry:theme",
