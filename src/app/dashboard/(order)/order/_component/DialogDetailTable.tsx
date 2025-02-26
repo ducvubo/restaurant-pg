@@ -281,29 +281,33 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                 </Label>
                               </div>
                               <div className='flex items-center'>
-                                <Select
-                                  value={order_summary?.or_dish[0]?.od_dish_status}
-                                  onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
-                                    handleUpdateStatus({
-                                      _id: order_summary?.or_dish[0]?._id,
-                                      od_dish_status: value,
-                                      od_dish_summary_id: order_summary._id
-                                    })
-                                  }
-                                >
-                                  <SelectTrigger className='w-[120px]'>
-                                    <SelectValue placeholder='Đang nấu' />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectGroup>
-                                      <SelectLabel>Chọn trạng thái</SelectLabel>
-                                      <SelectItem value='pending'>Chờ xử lý</SelectItem>
-                                      <SelectItem value='processing'>Đang nấu</SelectItem>
-                                      <SelectItem value='delivered'>Đã phục vụ</SelectItem>
-                                      <SelectItem value='refuse'>Từ chối</SelectItem>
-                                    </SelectGroup>
-                                  </SelectContent>
-                                </Select>
+                                {order_summary?.or_dish[0]?.od_dish_status === 'guest_cancel' ? (
+                                  <Badge variant={'destructive'}> Khách hủy</Badge>
+                                ) : (
+                                  <Select
+                                    value={order_summary?.or_dish[0]?.od_dish_status}
+                                    onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
+                                      handleUpdateStatus({
+                                        _id: order_summary?.or_dish[0]?._id,
+                                        od_dish_status: value,
+                                        od_dish_summary_id: order_summary._id
+                                      })
+                                    }
+                                  >
+                                    <SelectTrigger className='w-[120px]'>
+                                      <SelectValue placeholder='Đang nấu' />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectGroup>
+                                        <SelectLabel>Chọn trạng thái</SelectLabel>
+                                        <SelectItem value='pending'>Chờ xử lý</SelectItem>
+                                        <SelectItem value='processing'>Đang nấu</SelectItem>
+                                        <SelectItem value='delivered'>Đã phục vụ</SelectItem>
+                                        <SelectItem value='refuse'>Từ chối</SelectItem>
+                                      </SelectGroup>
+                                    </SelectContent>
+                                  </Select>
+                                )}
                               </div>
                             </div>
                           )}
@@ -353,7 +357,36 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                     </Label>
                                   </div>
                                   <div className='flex items-center'>
-                                    <Select
+                                    {
+                                      order_dish_item.od_dish_status === 'guest_cancel' ? (
+                                        <Badge variant={'destructive'}> Khách hủy</Badge>
+                                      ) : (
+                                        <Select
+                                          value={order_dish_item.od_dish_status}
+                                          onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
+                                            handleUpdateStatus({
+                                              _id: order_dish_item._id,
+                                              od_dish_status: value,
+                                              od_dish_summary_id: order_summary._id
+                                            })
+                                          }
+                                        >
+                                          <SelectTrigger className='w-[120px]'>
+                                            <SelectValue placeholder='Đang nấu' />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectGroup>
+                                              <SelectLabel>Chọn trạng thái</SelectLabel>
+                                              <SelectItem value='pending'>Chờ xử lý</SelectItem>
+                                              <SelectItem value='processing'>Đang nấu</SelectItem>
+                                              <SelectItem value='delivered'>Đã phục vụ</SelectItem>
+                                              <SelectItem value='refuse'>Từ chối</SelectItem>
+                                            </SelectGroup>
+                                          </SelectContent>
+                                        </Select>
+                                      )
+                                    }
+                                    {/* <Select
                                       value={order_dish_item.od_dish_status}
                                       onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
                                         handleUpdateStatus({
@@ -375,7 +408,7 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                           <SelectItem value='refuse'>Từ chối</SelectItem>
                                         </SelectGroup>
                                       </SelectContent>
-                                    </Select>
+                                    </Select> */}
                                   </div>
                                 </div>
                               </AccordionContent>

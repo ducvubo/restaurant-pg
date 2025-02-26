@@ -106,7 +106,7 @@ export const calculateTotalPrice = (data: any) => {
 
   data.or_dish.forEach((dish: any) => {
     // Loại trừ các món có trạng thái 'refuse'
-    if (dish.od_dish_status !== 'refuse') {
+    if (dish.od_dish_status !== 'refuse' && dish.od_dish_status !== 'guest_cancel') {
       const price = dish.od_dish_duplicate_id.dish_duplicate_price
       const sale = dish.od_dish_duplicate_id.dish_duplicate_sale
       const quantity = dish.od_dish_quantity
