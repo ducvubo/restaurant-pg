@@ -1,6 +1,7 @@
 import md5 from 'md5'
 
 import { v2 as cloudinary } from 'cloudinary'
+import { ca } from 'date-fns/locale'
 
 const getRandomNonce = (num: number) => {
   return Math.floor((Math.random() + Math.floor(Math.random() * 9 + 1)) * Math.pow(10, num - 1))
@@ -76,6 +77,8 @@ export const switchStatusOrderVi = (status: string) => {
       return ' Từ chối'
     case 'delivered':
       return 'Đã phục vụ'
+    case 'guest_cancel':
+      return 'Khách hủy'
     default:
       return 'Trạng thái không hợp lệ'
   }

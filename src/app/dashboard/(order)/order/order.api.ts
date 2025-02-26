@@ -40,7 +40,6 @@ export const getListOrderDish = async ({
       od_dish_smr_status
     }
   })
-
   return res
 }
 

@@ -167,6 +167,23 @@ export const orderDish = async (payload: { od_dish_id: string; od_dish_quantity:
   return res
 }
 
+export const cancelOrder = async (payload: { od_dish_id: string }) => {
+  console.log('🚀 ~ cancelOrder ~ od_dish_id:', payload.od_dish_id)
+  const res: IBackendRes<any> = await sendRequest({
+    url: `${process.env.URL_SERVER}/order-dish/cancle-order`,
+    method: 'PATCH',
+    headers: {
+      'x-at-guest': `Bearer ${cookies().get('access_token_guest')?.value}`,
+      'x-rf-guest': `Bearer ${cookies().get('refresh_token_guest')?.value}`
+    },
+    body: {
+      _id: payload.od_dish_id
+    }
+  })
+  console.log('🚀 ~ cancelOrder ~ res:', res)
+  return res
+}
+
 export const getListOrder = async () => {
   const res: IBackendRes<IOrderDishGuest> = await sendRequest({
     url: `${process.env.URL_SERVER}/order-dish/list-order-guest`,

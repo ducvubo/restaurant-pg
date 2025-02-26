@@ -2,7 +2,7 @@
 import { RootState } from '@/app/redux/store'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { getListOrder } from '../guest.api'
+import { cancelOrder, getListOrder } from '../guest.api'
 import { CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
 import { Label } from '@/components/ui/label'
@@ -43,33 +43,49 @@ export default function ListOrderPage() {
   }, [a])
 
   function calculateOrderSummary(orderSummary1: any) {
+    console.log('🚀 ~ calculateOrderSummary ~ orderSummary1:', orderSummary1)
     let totalQuantity = 0
     let totalPrice = 0
 
-    orderSummary1?.or_dish.forEach((dish: any) => {
-      // Kiểm tra điều kiện loại bỏ các món có trạng thái 'refuse'
-      if (dish.od_dish_status !== 'refuse') {
-        totalQuantity += dish.od_dish_quantity
+    orderSummary1?.or_dish
+      .filter((item: any) => item.od_dish_status !== 'guest_cancel')
+      .forEach((dish: any) => {
+        if (dish.od_dish_status !== 'refuse') {
+          totalQuantity += dish.od_dish_quantity
+          const originalPrice = dish.od_dish_duplicate_id.dish_duplicate_price
+          const sale = dish.od_dish_duplicate_id.dish_duplicate_sale
 
-        // Tính giá sau khi áp dụng giảm giá
-        const originalPrice = dish.od_dish_duplicate_id.dish_duplicate_price
-        const sale = dish.od_dish_duplicate_id.dish_duplicate_sale
+          let finalPrice = originalPrice
 
-        let finalPrice = originalPrice
+          if (sale.sale_type === 'fixed') {
+            finalPrice -= sale.sale_value
+          }
 
-        // Áp dụng giảm giá nếu có
-        if (sale.sale_type === 'fixed') {
-          finalPrice -= sale.sale_value // Giảm giá cố định
+          totalPrice += finalPrice * dish.od_dish_quantity
         }
-
-        // Cộng dồn giá cho từng món ăn
-        totalPrice += finalPrice * dish.od_dish_quantity
-      }
-    })
-
+      })
     return {
       totalQuantity,
       totalPrice
+    }
+  }
+
+  const gusetCancelOrder = async (od_dish_id: string) => {
+    console.log('🚀 ~ gusetCancelOrder ~ od_dish_id:', od_dish_id)
+    const res: IBackendRes<any> = await cancelOrder({ od_dish_id: od_dish_id })
+    if (res.statusCode === 200) {
+      toast({
+        title: 'Thông báo',
+        description: `Đơn hàng đã được hủy thành công`,
+        variant: 'default'
+      })
+      findListOrder()
+    } else {
+      toast({
+        title: 'Thông báo',
+        description: `Đơn hàng không thể hủy, vui lòng liên hệ nhân viên`,
+        variant: 'destructive'
+      })
     }
   }
 
@@ -116,9 +132,20 @@ export default function ListOrderPage() {
               </div>
               <div className='flex gap-2 items-end justify-end flex-col'>
                 <span className='text-sm'>Order: {item.od_dish_guest_id.guest_name}</span>
-                <Badge className='cursor-default w-auto whitespace-nowrap' variant={'secondary'}>
-                  {switchStatusOrderVi(item.od_dish_status)}
-                </Badge>
+                <div className='flex gap-2'>
+                  {item.od_dish_status === 'pending' && (
+                    <Badge
+                      onClick={() => gusetCancelOrder(item._id)}
+                      className='cursor-default w-auto whitespace-nowrap'
+                      variant={'destructive'}
+                    >
+                      Hủy
+                    </Badge>
+                  )}
+                  <Badge className='cursor-default w-auto whitespace-nowrap' variant={'secondary'}>
+                    {switchStatusOrderVi(item.od_dish_status)}
+                  </Badge>
+                </div>
               </div>
             </div>
           ))}

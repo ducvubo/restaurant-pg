@@ -66,6 +66,11 @@ export default function RefreshToken() {
           const currentPath = window.location.pathname
           router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
         })
+
+        socket.on('guest-cancel-order', () => {
+          const currentPath = window.location.pathname
+          router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
+        })
       }
 
       function onDisconnect() {

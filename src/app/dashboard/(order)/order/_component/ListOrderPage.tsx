@@ -131,6 +131,7 @@ export default function ListOrderPage() {
       od_dish_smr_status: status
     })
     if (res.statusCode === 200 && res.data && res.data.result) {
+      console.log('🚀 ~ findListOrder ~ res.data:', res.data)
       // setLoading(false)
       setcountStatus(res.data?.meta.statusCount)
       setlistOrder(res.data.result)
@@ -257,10 +258,9 @@ export default function ListOrderPage() {
     }
   }
 
-
   return (
     <section className='mt-2 h-full'>
-      <ScrollArea style={{ height: 'calc(100vh - 6rem)'}}  className=' pr-3'>
+      <ScrollArea style={{ height: 'calc(100vh - 6rem)' }} className=' pr-3'>
         <div className='flex gap-2'>
           <div className='flex gap-2'>
             <Label className='mt-2'>Từ</Label>
@@ -456,7 +456,34 @@ export default function ListOrderPage() {
                             </Label>
                           </div>
                           <div className='flex items-center'>
-                            <Select
+                            {order_summary?.or_dish[0]?.od_dish_status === 'guest_cancel' ? (
+                              <Badge variant='destructive'>Khách hủy</Badge>
+                            ) : (
+                              <Select
+                                value={order_summary?.or_dish[0]?.od_dish_status}
+                                onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
+                                  handleUpdateStatus({
+                                    _id: order_summary?.or_dish[0]?._id,
+                                    od_dish_status: value,
+                                    od_dish_summary_id: order_summary._id
+                                  })
+                                }
+                              >
+                                <SelectTrigger className='w-[140px]'>
+                                  <SelectValue placeholder='Đang nấu' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Chọn trạng thái</SelectLabel>
+                                    <SelectItem value='pending'>Chờ xử lý</SelectItem>
+                                    <SelectItem value='processing'>Đang nấu</SelectItem>
+                                    <SelectItem value='delivered'>Đã phục vụ</SelectItem>
+                                    <SelectItem value='refuse'>Từ chối</SelectItem>
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
+                            )}
+                            {/* <Select
                               value={order_summary?.or_dish[0]?.od_dish_status}
                               onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
                                 handleUpdateStatus({
@@ -478,7 +505,7 @@ export default function ListOrderPage() {
                                   <SelectItem value='refuse'>Từ chối</SelectItem>
                                 </SelectGroup>
                               </SelectContent>
-                            </Select>
+                            </Select> */}
                           </div>
 
                           <div className='flex flex-col'>
@@ -531,7 +558,35 @@ export default function ListOrderPage() {
                                 </Label>
                               </div>
                               <div className='flex items-center'>
-                                <Select
+                                {order_dish_item.od_dish_status === 'guest_cancel' ? (
+                                  <Badge variant='destructive'>Khách hủy</Badge>
+                                ) : (
+                                  <Select
+                                    value={order_dish_item.od_dish_status}
+                                    onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
+                                      handleUpdateStatus({
+                                        _id: order_dish_item._id,
+                                        od_dish_status: value,
+                                        od_dish_summary_id: order_summary._id
+                                      })
+                                    }
+                                  >
+                                    <SelectTrigger className='w-[140px]'>
+                                      <SelectValue placeholder='Đang nấu' />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectGroup>
+                                        <SelectLabel>Chọn trạng thái</SelectLabel>
+                                        <SelectItem value='pending'>Chờ xử lý</SelectItem>
+                                        <SelectItem value='processing'>Đang nấu</SelectItem>
+                                        <SelectItem value='delivered'>Đã phục vụ</SelectItem>
+                                        <SelectItem value='refuse'>Từ chối</SelectItem>
+                                      </SelectGroup>
+                                    </SelectContent>
+                                  </Select>
+                                )}
+
+                                {/* <Select
                                   value={order_dish_item.od_dish_status}
                                   onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
                                     handleUpdateStatus({
@@ -553,7 +608,7 @@ export default function ListOrderPage() {
                                       <SelectItem value='refuse'>Từ chối</SelectItem>
                                     </SelectGroup>
                                   </SelectContent>
-                                </Select>
+                                </Select> */}
                               </div>
                               <div className='flex flex-col'>
                                 <span>{formatDateMongo(order_dish_item.createdAt)}</span>
