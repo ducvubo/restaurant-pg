@@ -70,9 +70,8 @@ export function PageArticle<TData, TValue>({ columns, meta, data }: DataTablePro
     router.push(`/dashboard/article/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`)
   }, [pageIndex, pageSize, router])
 
-
   return (
-    <div className='flex flex-col h-[570px]'>
+    <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex justify-end gap-2 items-center py-4'>
         <ListAddArticle />
         <Button variant={'outline'}>

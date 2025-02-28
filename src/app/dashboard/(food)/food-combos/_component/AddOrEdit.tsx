@@ -426,7 +426,7 @@ export default function AddOrEdit({ id, inforFoodCombo }: Props) {
               <FormItem>
                 <FormLabel>Tên combo</FormLabel>
                 <FormControl>
-                  <Input placeholder='Tên món ăn...' {...field} />
+                  <Input placeholder='Tên combo...' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -53,7 +53,6 @@ export const createFood = async (payload: Partial<IFood>) => {
     method: 'POST',
     body: payload
   })
-  console.log('🚀 ~ createFood ~ res:', res)
   return res
 }
 

@@ -56,7 +56,7 @@ export const columns: ColumnDef<IFood>[] = [
     header: () => <div className='font-semibold'>Ảnh</div>,
     cell: ({ row }) => {
       const food = row.original
-      return <Image src={JSON.parse(food.food_image).image_cloud} alt='vuducbo' width={50} height={50} />
+      return <Image src={JSON.parse(food.food_image)[0].image_cloud} alt='vuducbo' width={50} height={50} />
     },
     enableHiding: true
   },

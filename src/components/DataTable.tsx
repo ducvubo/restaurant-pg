@@ -26,11 +26,11 @@ interface DataTableProps<TData, TValue> {
     pageSize: number
     totalPage: number
     totalItem: number
-  },
+  }
   url: string
 }
 
-export function PageTables<TData, TValue>({ columns, meta, data,url }: DataTableProps<TData, TValue>) {
+export function PageTables<TData, TValue>({ columns, meta, data, url }: DataTableProps<TData, TValue>) {
   const router = useRouter()
   const pathname = usePathname().split('/').pop()
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -69,7 +69,7 @@ export function PageTables<TData, TValue>({ columns, meta, data,url }: DataTable
   }, [pageIndex, pageSize, router])
 
   return (
-    <div className='flex flex-col h-[570px]'>
+    <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex items-center py-4'>
         <h1 className='font-semibold text-2xl'>Danh sách món ăn online</h1>
         <DataTableViewOptions table={table} />

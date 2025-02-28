@@ -68,7 +68,7 @@ export function PageGuest<TData, TValue>({ columns, meta, data }: DataTableProps
   }, [pageIndex, pageSize, router])
 
   return (
-    <div className='flex flex-col h-[570px]'>
+    <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex items-center py-4'>
         <DataTableViewOptions table={table} />
       </div>

@@ -46,7 +46,7 @@ async function Component({ searchParams }: PageProps) {
   const data = res.data.result.flat()
 
   return (
-    <ContentLayout title='Danh sách món ăn'>
+    <ContentLayout title='Danh sách combo'>
       <PageFoodCombos data={data} columns={columns} meta={res.data.meta} />
     </ContentLayout>
   )

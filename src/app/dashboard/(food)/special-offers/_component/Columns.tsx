@@ -29,7 +29,11 @@ export const columns: ColumnDef<ISpecialOffer>[] = [
   {
     accessorKey: 'spo_description',
     id: 'Mô tả',
-    header: () => <div className='font-semibold'>Mô tả'</div>,
+    header: () => <div className='font-semibold'>Mô tả</div>,
+    cell: ({ row }) => {
+      const specialOffer = row.original
+      return <div dangerouslySetInnerHTML={{ __html: specialOffer.spo_description as string }} />
+    },
     enableHiding: true
   },
   {

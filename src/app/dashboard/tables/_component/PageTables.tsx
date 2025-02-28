@@ -70,14 +70,17 @@ export function PageTables<TData, TValue>({ columns, meta, data }: DataTableProp
   }, [pageIndex, pageSize, router])
 
   return (
-    <div className='flex flex-col h-[570px]'>
+    <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex justify-end gap-2 items-center py-4'>
-        <Button variant={'outline'}><Link href={'/dashboard/tables/add'}>Thêm</Link></Button>
-        <Button variant={'outline'}><Link href={'/dashboard/tables/recycle'}  >Danh sách đã xóa</Link></Button>
+        <Button variant={'outline'}>
+          <Link href={'/dashboard/tables/add'}>Thêm</Link>
+        </Button>
+        <Button variant={'outline'}>
+          <Link href={'/dashboard/tables/recycle'}>Danh sách đã xóa</Link>
+        </Button>
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>
-       
         <div className='overflow-y-auto h-full'>
           <Table className='min-w-full'>
             <TableHeader>

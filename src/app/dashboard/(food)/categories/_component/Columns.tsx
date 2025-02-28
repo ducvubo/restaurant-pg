@@ -26,16 +26,18 @@ export const columns: ColumnDef<ICategories>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Tên danh mục' />,
     enableHiding: true
   },
-  // {
-  //   accessorKey: 'cat_res_slug',
-  //   id: 'Slug',
-  //   header: () => <div>Slug</div>,
-  //   enableHiding: true
-  // },
   {
     accessorKey: 'cat_res_icon',
     id: 'Icon',
     header: () => <div>Icon</div>,
+    cell: ({ row }) => {
+      const category = row.original
+      return (
+        <span className='font-bold text-7xl'>
+         {category.cat_res_icon}
+        </span>
+      )
+    },
     enableHiding: true
   },
   {

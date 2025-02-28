@@ -30,15 +30,7 @@ const FormSchema = z.object({
 export default function AddOrEdit({ id, inforCategory }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
-  const [file_image, setFile_Image] = useState<File | null>(null)
-  const inputRef_Image = useRef<HTMLInputElement | null>(null)
-  const previousFileImageRef = useRef<Blob | null>(null)
-  const [loading_upload_image, setLoading_upload_image] = useState(false)
-  const [image, setImage] = useState<{ image_cloud: string; image_custom: string }>({
-    image_cloud: '',
-    image_custom: ''
-  })
+  const [selectedEmoji, setSelectedEmoji] = useState<string>(inforCategory?.cat_res_icon || '')
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -58,92 +50,9 @@ export default function AddOrEdit({ id, inforCategory }: Props) {
       if (inforCategory) {
         form.setValue('cat_res_name', inforCategory.cat_res_name)
         form.setValue('cat_res_short_description', inforCategory.cat_res_short_description)
-        if (inforCategory.cat_res_icon) {
-          setImage({
-            image_cloud: inforCategory.cat_res_icon.image_cloud,
-            image_custom: inforCategory.cat_res_icon.image_custom
-          })
-        }
       }
     }
   }, [inforCategory, id])
-
-  const uploadImage = async (formData: FormData, type: string) => {
-    setLoading_upload_image(true)
-    try {
-      const res = await (
-        await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/upload`, {
-          method: 'POST',
-          headers: {
-            folder_type: type
-          },
-          body: formData
-        })
-      ).json()
-
-      if (res.statusCode === 201) {
-        setLoading_upload_image(false)
-
-        toast({
-          title: 'Thành công',
-          description: 'Tải ảnh lên thành công',
-          variant: 'default'
-        })
-        setImage({
-          image_cloud: res.data.image_cloud,
-          image_custom: res.data.image_custom
-        })
-        return res.mataData
-      }
-      if (res.statusCode === 422 || res.statusCode === 400) {
-        setLoading_upload_image(false)
-        setFile_Image(null)
-        setImage({
-          image_cloud: '',
-          image_custom: ''
-        })
-
-        toast({
-          title: 'Thất bại',
-          description: 'Chỉ được tải lên ảnh dưới 5 MB và ảnh phải có định dạng jpg, jpeg, png, webp',
-          variant: 'destructive'
-        })
-      } else {
-        setLoading_upload_image(false)
-
-        toast({
-          title: 'Thất bại',
-          description: 'Lỗi khi tải ảnh lên, vui lòng thử lại sau ít phút',
-          variant: 'default'
-        })
-      }
-    } catch (error) {
-      setLoading_upload_image(false)
-      console.error('Error:', error)
-    }
-  }
-
-  useEffect(() => {
-    const uploadIconCategory = async () => {
-      const formData_icon = new FormData()
-      formData_icon.append('file', file_image as Blob)
-      try {
-        await uploadImage(formData_icon, 'icon_res_category')
-      } catch (error) {
-        console.error('Failed to upload image:', error)
-      }
-    }
-    if (file_image && file_image !== previousFileImageRef.current) {
-      previousFileImageRef.current = file_image
-      uploadIconCategory()
-    }
-    if (!file_image && file_image !== previousFileImageRef.current) {
-      setImage({
-        image_cloud: '',
-        image_custom: ''
-      })
-    }
-  }, [file_image])
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setLoading(true)
@@ -151,7 +60,7 @@ export default function AddOrEdit({ id, inforCategory }: Props) {
     const payload = {
       cat_res_name: data.cat_res_name,
       cat_res_short_description: data.cat_res_short_description,
-      cat_res_icon: image
+      cat_res_icon: selectedEmoji
     }
 
     const res = id === 'add' ? await createCategory(payload) : await updateCategory({ ...payload, _id: id })
@@ -207,87 +116,143 @@ export default function AddOrEdit({ id, inforCategory }: Props) {
     }
   }
 
+  const iconList = [
+    '🍟',
+    '🌭',
+    '🍕',
+    '🥪',
+    '🌮',
+    '🌯',
+    '🥙',
+    '🍝',
+    '🍜',
+    '🍲',
+    '🍛',
+    '🥘',
+    '🍣',
+    '🍤',
+    '🥟',
+    '🍢',
+    '🍥',
+    '🥗',
+    '🍗',
+    '🍖',
+    '🥓',
+    '🥩',
+    '🧁',
+    '🍰',
+    '🎂',
+    '🍩',
+    '🍪',
+    '🍫',
+    '🍬',
+    '🍭',
+    '🍮',
+    '🍯',
+    '🍎',
+    '🍏',
+    '🍐',
+    '🍊',
+    '🍋',
+    '🍌',
+    '🍉',
+    '🍇',
+    '🍓',
+    '🍒',
+    '🥭',
+    '🍍',
+    '🥥',
+    '🥔',
+    '🥕',
+    '🌽',
+    '🥦',
+    '🥒',
+    '🥬',
+    '🥑',
+    '🥤',
+    '☕',
+    '🍵',
+    '🍶',
+    '🍼',
+    '🍺',
+    '🍻',
+    '🥂',
+    '🍷',
+    '🥃',
+    '🍹',
+    '🍸',
+    '🍡',
+    '🍘',
+    '🍙',
+    '🥯',
+    '🧈',
+    '🍳',
+    '🫓',
+    '🫔',
+    '🫕',
+    '🧆',
+    '🫛',
+    '🧄',
+    '🧅',
+    '🫒',
+    '🫚',
+    '🥜',
+    '🫘',
+    '🫙',
+    '🫗',
+    '🧊',
+    '🧃',
+    '🧋',
+    '🧌',
+    '🫖',
+    '🥢',
+    '🍴',
+    '🥄',
+    '🥠',
+    '🍞',
+    '🧇',
+    '🍦',
+    '🥡',
+    '🧉',
+    '🍨',
+    '🥧',
+    '🍧',
+    '🍱',
+    '🧀',
+    '🥮',
+    '🍔',
+    '🥖',
+    '🥐',
+    '🍚',
+    '🍠',
+    '🦪',
+    '🍂',
+    '🍽️',
+    '🫑'
+  ]
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
-        <div>
-          <FormField
-            control={form.control}
-            name='cat_res_icon'
-            render={({ field }) => (
-              <FormItem className='w-20'>
-                <FormLabel>Icon</FormLabel>
-                <FormControl>
-                  <>
-                    {!file_image && !image.image_cloud && (
-                      <label htmlFor='dish_imagae'>
-                        <div className='w-28 h-28 border border-dashed justify-center items-center cursor-pointer flex flex-col rounded-full mt-3'>
-                          <span>
-                            <IoMdCloudUpload />
-                          </span>
-                          <span className='text-sm text-gray-500'>Chọn icon</span>
-                        </div>
-                      </label>
-                    )}
-
-                    <Input
-                      className='hidden'
-                      id='dish_imagae'
-                      disabled={loading_upload_image ? true : false}
-                      type='file'
-                      accept='image/*'
-                      ref={inputRef_Image}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) {
-                          setFile_Image(file)
-                          field.onChange(`${process.env.NEXT_PUBLIC_URL_CLIENT}/` + file?.name) //set thuoc tinh image
-                          // field.onChange(URL.createObjectURL(file))
-                        }
-                      }}
-                    />
-                  </>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {(file_image || image.image_cloud) && (
-            <div>
-              <Image
-                src={file_image ? URL.createObjectURL(file_image) : (image.image_cloud as string)}
-                alt='preview'
-                className='w-28 h-28 object-cover rounded-full my-3'
-                width={128}
-                height={128}
-              />
-              <Button
-                type='button'
-                variant={'destructive'}
-                size={'sm'}
-                onClick={() => {
-                  setFile_Image(null)
-                  form.setValue('cat_res_icon', '')
-                  if (inputRef_Image.current) {
-                    setImage({
-                      image_cloud: '',
-                      image_custom: ''
-                    })
-                    inputRef_Image.current.value = ''
-                  }
-                }}
-                disabled={loading_upload_image}
-              >
-                {loading_upload_image ? (
-                  <>
-                    <ReloadIcon className='mr-2 h-4 w-4 animate-spin' /> Đang tải icon...
-                  </>
-                ) : (
-                  'Xóa hình icon'
-                )}
-              </Button>
+        <div className='flex gap-4'>
+          <div>
+            <FormLabel>Chọn emoji cho danh mục</FormLabel>
+            <div
+              className='grid grid-cols-6 gap-4 overflow-y-auto p-4 bg-gray-100 rounded-lg shadow'
+              style={{ height: '200px', width: '100%', maxWidth: '400px' }}
+            >
+              {iconList.map((emoji, index) => (
+                <span
+                  key={index}
+                  onClick={() => setSelectedEmoji(emoji)}
+                  className='flex items-center cursor-pointer justify-center text-2xl p-2 rounded hover:bg-gray-200 focus:ring-2 focus:ring-blue-400'
+                >
+                  {emoji}
+                </span>
+              ))}
             </div>
-          )}
+          </div>
+          <span className='text-9xl'>{selectedEmoji}</span>
         </div>
 
         <FormField
@@ -317,7 +282,7 @@ export default function AddOrEdit({ id, inforCategory }: Props) {
             </FormItem>
           )}
         />
-        <Button  type='submit'>{id === 'add' ? 'Thêm danh mục mới' : 'Chỉnh sửa'}</Button>
+        <Button type='submit'>{id === 'add' ? 'Thêm danh mục mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>
   )

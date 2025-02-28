@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { z } from 'zod'
 import { FormField, FormItem, FormLabel, FormMessage, Form, FormControl } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
@@ -13,34 +13,45 @@ import { useLoading } from '@/context/LoadingContext'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { useRouter } from 'next/navigation'
 import { ISpecialOffer } from '../special-offer.interface'
+import { Label } from '@/components/ui/label'
+import EditorTiny from '@/components/EditorTiny'
 
 interface Props {
   id: string
   inforSpecialOffer?: ISpecialOffer
 }
 const FormSchema = z.object({
-  spo_title: z.string().nonempty({ message: 'Vui lòng nhập tiêu đề' }),
-  spo_description: z.string().nonempty({ message: 'Vui lòng nhập mô tả' }),
+  spo_title: z.string().nonempty({ message: 'Vui lòng nhập tiêu đề' })
 })
 
 export default function AddOrEdit({ id, inforSpecialOffer }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
+  const refContent = useRef<any>('')
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      spo_title: inforSpecialOffer?.spo_title || '',
-      spo_description: inforSpecialOffer?.spo_description || '',
+      spo_title: inforSpecialOffer?.spo_title || ''
     }
   })
+
+  useEffect(() => {
+    if (id === 'add') {
+      return
+    } else {
+      if (inforSpecialOffer) {
+        refContent.current = inforSpecialOffer.spo_description
+      }
+    }
+  }, [inforSpecialOffer, id])
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setLoading(true)
 
     const payload = {
       spo_title: data.spo_title,
-      spo_description: data.spo_description,
+      spo_description: refContent.current.getContent()
     }
 
     const res = id === 'add' ? await createSpecialOffer(payload) : await updateSpecialOffer({ ...payload, spo_id: id })
@@ -98,7 +109,7 @@ export default function AddOrEdit({ id, inforSpecialOffer }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
         <FormField
           control={form.control}
           name='spo_title'
@@ -112,20 +123,12 @@ export default function AddOrEdit({ id, inforSpecialOffer }: Props) {
             </FormItem>
           )}
         />
-        <FormField
-
-          control={form.control}
-          name='spo_description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Mô tả...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className='flex flex-col gap-2 w-full'>
+          <div className='flex justify-between items-end'>
+            <Label>Giới thiệu</Label>
+          </div>
+          <EditorTiny editorRef={refContent} height='500px' />
+        </div>
 
         <Button type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
       </form>

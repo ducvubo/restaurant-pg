@@ -16,13 +16,7 @@ import { getAmentities, getRestaurantTypes } from '../infor.api'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import EditorTiny from '@/components/EditorTiny'
 
-const frameworksList = [
-  { value: 'react', label: 'React', icon: Turtle },
-  { value: 'angular', label: 'Angular', icon: Cat },
-  { value: 'vue', label: 'Vue', icon: Dog },
-  { value: 'svelte', label: 'Svelte', icon: Rabbit },
-  { value: 'ember', label: 'Ember', icon: Fish }
-]
+
 export default function InforPage() {
   const [restaurant_name, setRestaurant_name] = useState('')
   const [restaurant_phone, setRestaurant_phone] = useState('')

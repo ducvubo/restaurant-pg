@@ -66,11 +66,13 @@ export function PageSpecialOffer<TData, TValue>({ columns, meta, data }: DataTab
   }
 
   React.useEffect(() => {
-    router.push(`/dashboard/special-offers/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`)
+    router.push(
+      `/dashboard/special-offers/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`
+    )
   }, [pageIndex, pageSize, router])
 
   return (
-    <div className='flex flex-col h-[570px]'>
+    <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex justify-end gap-2 items-center py-4'>
         <Button variant={'outline'}>
           <Link href={'/dashboard/special-offers/add'}>Thêm</Link>

@@ -23,7 +23,7 @@ import { IFood } from '../food.interface'
 import { Card, CardContent } from '@/components/ui/card'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { Loader2 } from 'lucide-react'
+import { Loader2, UploadIcon } from 'lucide-react'
 import { FaTrash } from 'react-icons/fa6'
 import { IoAddCircleSharp } from 'react-icons/io5'
 interface Props {
@@ -77,14 +77,15 @@ export default function AddOrEdit({ id, inforFood }: Props) {
   const [categories, setCategories] = useState<ICategories[]>([])
   const refContent = useRef<any>('')
 
-  const [file_image, setFile_Image] = useState<File | null>(null)
-  const inputRef_Image = useRef<HTMLInputElement | null>(null)
-  const previousFileImageRef = useRef<Blob | null>(null)
-  const [loading_upload_image, setLoading_upload_image] = useState(false)
-  const [image, setImage] = useState<{ image_cloud: string; image_custom: string }>({
-    image_cloud: '',
-    image_custom: ''
-  })
+  const [uploadedUrlsImageFood, setUploadedUrlsImageFood] = useState<
+    {
+      image_cloud: string
+      image_custom: string
+    }[]
+  >([])
+  const [isUploadingImageFood, setIsUploadingImageFood] = useState(false)
+  const fileInputImageFoodRef = useRef<HTMLInputElement | null>(null)
+
   const [food_open_time, setFood_open_time] = useState<{ hour: number; minute: number }>({
     hour: 0,
     minute: 0
@@ -142,58 +143,51 @@ export default function AddOrEdit({ id, inforFood }: Props) {
     }
   }
 
-  const uploadImage = async (formData: FormData, type: string) => {
-    setLoading_upload_image(true)
-    try {
-      const res = await (
-        await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/upload`, {
-          method: 'POST',
-          headers: {
-            folder_type: type
-          },
-          body: formData
-        })
-      ).json()
+  const uploadImage = async (file: File, type: string) => {
+    const formData = new FormData()
+    formData.append('file', file)
 
-      if (res.statusCode === 201) {
-        setLoading_upload_image(false)
+    const res: IBackendRes<ImageUrl> = await (
+      await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/upload`, {
+        method: 'POST',
+        headers: {
+          folder_type: type
+        },
+        body: formData
+      })
+    ).json()
 
-        toast({
-          title: 'Thành công',
-          description: 'Tải ảnh lên thành công',
-          variant: 'default'
-        })
-        setImage({
-          image_cloud: res.data.image_cloud,
-          image_custom: res.data.image_custom
-        })
-        return res.mataData
+    return res
+  }
+
+  const handleFileChangeImageFood = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const files = Array.from(event.target.files)
+      setIsUploadingImageFood(true)
+
+      const uploadedImages: {
+        image_cloud: string
+        image_custom: string
+      }[] = []
+      for (const file of files) {
+        try {
+          const url = await uploadImage(file, 'food_restaurant')
+          if (url.statusCode === 201 && url.data?.image_cloud) {
+            uploadedImages.push(url.data)
+          } else {
+            toast({
+              title: 'Thất bại',
+              description: 'Đã có lỗi xảy ra vui lòng thử lại sau ít phút',
+              variant: 'destructive'
+            })
+          }
+        } catch (error) {
+          console.error('Error uploading file:', file.name, error)
+        }
       }
-      if (res.statusCode === 422 || res.statusCode === 400) {
-        setLoading_upload_image(false)
-        setFile_Image(null)
-        setImage({
-          image_cloud: '',
-          image_custom: ''
-        })
 
-        toast({
-          title: 'Thất bại',
-          description: 'Chỉ được tải lên ảnh dưới 5 MB và ảnh phải có định dạng jpg, jpeg, png, webp',
-          variant: 'destructive'
-        })
-      } else {
-        setLoading_upload_image(false)
-
-        toast({
-          title: 'Thất bại',
-          description: 'Lỗi khi tải ảnh lên, vui lòng thử lại sau ít phút',
-          variant: 'default'
-        })
-      }
-    } catch (error) {
-      setLoading_upload_image(false)
-      console.error('Error:', error)
+      setUploadedUrlsImageFood((prev) => [...prev, ...uploadedImages])
+      setIsUploadingImageFood(false)
     }
   }
 
@@ -215,28 +209,6 @@ export default function AddOrEdit({ id, inforFood }: Props) {
   }
 
   useEffect(() => {
-    const uploadIconCategory = async () => {
-      const formData_icon = new FormData()
-      formData_icon.append('file', file_image as Blob)
-      try {
-        await uploadImage(formData_icon, 'icon_res_category')
-      } catch (error) {
-        console.error('Failed to upload image:', error)
-      }
-    }
-    if (file_image && file_image !== previousFileImageRef.current) {
-      previousFileImageRef.current = file_image
-      uploadIconCategory()
-    }
-    if (!file_image && file_image !== previousFileImageRef.current) {
-      setImage({
-        image_cloud: '',
-        image_custom: ''
-      })
-    }
-  }, [file_image])
-
-  useEffect(() => {
     getListCategory()
   }, [])
 
@@ -253,22 +225,11 @@ export default function AddOrEdit({ id, inforFood }: Props) {
       return
     } else {
       if (inforFood) {
-        // form.setValue('food_name', inforFood.food_name)
-        // form.setValue(
-        //   'food_cat_id',
-        //   typeof inforFood.food_cat_id === 'object' && inforFood.food_cat_id !== null ? inforFood.food_cat_id._id : ''
-        // )
-        // form.setValue('food_price', inforFood.food_price)
-        // form.setValue('food_note', inforFood.food_note)
-        // form.setValue('food_sort', inforFood.food_sort)
         if (inforFood.food_description) {
           refContent.current = inforFood.food_description
         }
         if (inforFood.food_image) {
-          setImage({
-            image_cloud: JSON.parse(inforFood.food_image).image_cloud,
-            image_custom: JSON.parse(inforFood.food_image).image_custom
-          })
+          setUploadedUrlsImageFood(JSON.parse(inforFood.food_image))
         }
         if (inforFood.food_open_time) {
           const open_time = inforFood.food_open_time.split(':')
@@ -291,9 +252,6 @@ export default function AddOrEdit({ id, inforFood }: Props) {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data)
 
-    // setLoading(true)
-
-    //kiểm tra giờ mở cửa phải nhỏ hơn giờ đóng cửa
     if (food_open_time.hour > food_close_time.hour) {
       setLoading(false)
       toast({
@@ -317,7 +275,7 @@ export default function AddOrEdit({ id, inforFood }: Props) {
       food_cat_id: data.food_cat_id,
       food_name: data.food_name,
       food_price: data.food_price,
-      food_image: JSON.stringify(image),
+      food_image: JSON.stringify(uploadedUrlsImageFood),
       food_note: data.food_note,
       food_sort: data.food_sort,
       food_description: refContent.current.getContent(),
@@ -382,83 +340,54 @@ export default function AddOrEdit({ id, inforFood }: Props) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
         <div>
-          <FormField
-            control={form.control}
-            name='food_image'
-            render={({ field }) => (
-              <FormItem className='w-20'>
-                <FormLabel>Ảnh món ăn</FormLabel>
-                <FormControl>
-                  <>
-                    {!file_image && !image.image_cloud && (
-                      <label htmlFor='dish_imagae'>
-                        <div className='w-28 h-28 border border-dashed justify-center items-center cursor-pointer flex flex-col mt-3'>
-                          <span>
-                            <IoMdCloudUpload />
-                          </span>
-                          <span className='text-sm text-gray-500'>Chọn ảnh</span>
-                        </div>
-                      </label>
-                    )}
-
-                    <Input
-                      className='hidden'
-                      id='dish_imagae'
-                      disabled={loading_upload_image ? true : false}
-                      type='file'
-                      accept='image/*'
-                      ref={inputRef_Image}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) {
-                          setFile_Image(file)
-                          field.onChange(`${process.env.NEXT_PUBLIC_URL_CLIENT}/` + file?.name) //set thuoc tinh image
-                          // field.onChange(URL.createObjectURL(file))
-                        }
-                      }}
-                    />
-                  </>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {(file_image || image.image_cloud) && (
-            <div>
-              <Image
-                src={file_image ? URL.createObjectURL(file_image) : (image.image_cloud as string)}
-                alt='preview'
-                className='w-28 h-28 object-cover my-3'
-                width={128}
-                height={128}
-              />
-              <Button
-                type='button'
-                variant={'destructive'}
-                size={'sm'}
-                onClick={() => {
-                  setFile_Image(null)
-                  form.setValue('food_image', '')
-                  if (inputRef_Image.current) {
-                    setImage({
-                      image_cloud: '',
-                      image_custom: ''
-                    })
-                    inputRef_Image.current.value = ''
-                  }
-                }}
-                disabled={loading_upload_image}
-              >
-                {loading_upload_image ? (
-                  <>
-                    <ReloadIcon className='mr-2 h-4 w-4 animate-spin' /> Đang tải ảnh...
-                  </>
+          <h1 className='-mb-3'>Ảnh món ăn</h1>
+          <div className='flex gap-2'>
+            <div
+              onClick={() => {
+                if (fileInputImageFoodRef.current) {
+                  fileInputImageFoodRef.current.click()
+                }
+              }}
+              className='mt-4 relative flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 aspect-square rounded-md border-2 border-dashed border-gray-300 transition-colors hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-600 focus-within:outline-2 focus-within:outline-dashed focus-within:outline-gray-500 dark:focus-within:outline-gray-400'
+            >
+              <div className='text-center'>
+                {isUploadingImageFood ? (
+                  <Loader2 className='animate-spin' />
                 ) : (
-                  'Xóa hình hình ảnh'
+                  <UploadIcon className='mx-auto text-gray-400 w-8 h-8' />
                 )}
-              </Button>
+                <Input
+                  ref={fileInputImageFoodRef}
+                  id='uploadImageFood'
+                  type='file'
+                  accept='image/*'
+                  multiple
+                  onChange={handleFileChangeImageFood}
+                  disabled={isUploadingImageFood}
+                  className='sr-only'
+                />
+              </div>
             </div>
-          )}
+            {uploadedUrlsImageFood.length > 0 && (
+              <div className='mt-4'>
+                <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
+                  {uploadedUrlsImageFood.map((url, index) => (
+                    <li
+                      key={index}
+                      className='relative w-full h-24 sm:h-32 md:h-36 aspect-square rounded-md border-2 border-gray-300 transition-colors hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-600'
+                    >
+                      <Image
+                        src={url.image_cloud}
+                        alt={`Uploaded ${index + 1}`}
+                        fill
+                        className='object-cover rounded-md'
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
@@ -820,8 +749,8 @@ export default function AddOrEdit({ id, inforFood }: Props) {
           <EditorTiny editorRef={refContent} height='500px' />
         </div>
 
-        <Button disabled={loading_upload_image || uploadingImages.includes(true)} type='submit'>
-          {loading_upload_image || uploadingImages.includes(true) ? (
+        <Button disabled={isUploadingImageFood || uploadingImages.includes(true)} type='submit'>
+          {isUploadingImageFood || uploadingImages.includes(true) ? (
             <>
               <Loader2 className='mr-2 h-4 w-4 animate-spin' />
               Đang tải...

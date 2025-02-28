@@ -70,7 +70,7 @@ export function PageStockOut<TData, TValue>({ columns, meta, data }: DataTablePr
   }, [pageIndex, pageSize, router])
 
   return (
-    <div className='flex flex-col h-[570px]'>
+    <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex justify-end gap-2 items-center py-4'>
         <Button variant={'outline'}>
           <Link href={'/dashboard/stock-out/add'}>Thêm</Link>
