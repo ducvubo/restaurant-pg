@@ -7,21 +7,26 @@ export interface IBookTable {
   book_tb_phone: string
   book_tb_name: string
   book_tb_date: string
-  book_tb_hour: BookTbHour
+  book_tb_hour: string
   book_tb_number_adults: number
   book_tb_number_children: number
   book_tb_note: string
-  book_tb_status: string
+  book_tb_status:
+    | 'WAITING_GUESR' //Chờ khách hàng xác nhận,
+    | 'GUEST_CANCEL' //Khách hàng hủy
+    | 'EXPRIED_CONFIRM_GUEST' // Hết hạn xác nhận của khách hàng
+    | 'WAITING_RESTAURANT' // Chờ nhà hàng xác nhận
+    | 'RESTAURANT_CANCEL' // Nhà hàng hủy
+    | 'RESTAURANT_CONFIRM' // Nhà hàng xác nhận
+    | 'DONE' // Hoàn thành
+    | 'EXEPTION' // ngoại lệ
+
   book_tb_details: BookTbDetail[]
   book_tb_feedback: string
+  book_tb_star: number
   createdAt: string
   updatedAt: string
   book_tb_token_verify: string
-}
-
-export interface BookTbHour {
-  value: number
-  label: string
 }
 
 export interface BookTbDetail {

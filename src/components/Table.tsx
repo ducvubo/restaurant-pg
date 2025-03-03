@@ -73,7 +73,7 @@ export function TableCompnonent<TData, TValue>({
     }
   }
   return (
-    <div className='flex flex-col -mt-9 gap-2' style={{ height: `${height}px` }}>
+    <div className='flex flex-col gap-2' style={{ height: `${height}px` }}>
       <div className='flex items-center justify-end'>
         <DataTableViewOptions table={table} />
       </div>

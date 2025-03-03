@@ -7,41 +7,74 @@ export const getListBookTable = async ({
   current,
   pageSize,
   toDate,
-  fromDate
+  fromDate,
+  status = '',
+  q = ''
 }: {
   current: number
   pageSize: number
   toDate: Date
   fromDate: Date
+  status: string
+  q: string
 }) => {
   const res: IBackendRes<IModelPaginate<IBookTable>> = await sendRequest({
-    url: `${process.env.URL_SERVER}/book-table/list-book-table-restaurant`,
+    url: `${process.env.URL_SERVER}/book-table/list-order-restaurant`,
     method: 'GET',
     queryParams: {
       current,
       pageSize,
       toDate,
-      fromDate
+      fromDate,
+      status: status,
+      q
     }
   })
   return res
 }
 
-export const updateStatusBookTable = async ({
-  _id,
-  book_tb_status
-}: {
-  _id: string
-  book_tb_status: 'Nhà hàng đã tiếp nhận' | 'Đã hoàn thành' | 'Hủy'
-}) => {
+export const confirmBookTable = async (id: string) => {
   const res: IBackendRes<IBookTable> = await sendRequest({
-    url: `${process.env.URL_SERVER}/book-table/update-status`,
+    url: `${process.env.URL_SERVER}/book-table/restaurant-confirm/${id}`,
+    method: 'PATCH'
+  })
+  return res
+}
+
+export const cancelBookTable = async (id: string) => {
+  const res: IBackendRes<IBookTable> = await sendRequest({
+    url: `${process.env.URL_SERVER}/book-table/restaurant-cancel/${id}`,
+    method: 'PATCH'
+  })
+  return res
+}
+
+export const doneBookTable = async (id: string) => {
+  const res: IBackendRes<IBookTable> = await sendRequest({
+    url: `${process.env.URL_SERVER}/book-table/restaurant-done/${id}`,
+    method: 'PATCH'
+  })
+  return res
+}
+
+export const exceptionBookTable = async (id: string, book_tb_note_res: string) => {
+  const res: IBackendRes<IBookTable> = await sendRequest({
+    url: `${process.env.URL_SERVER}/book-table/exception/${id}`,
     method: 'PATCH',
     body: {
-      _id,
-      book_tb_status
+      book_tb_note_res
     }
   })
+  return res
+}
 
+export const sendFeedbackBookTable = async (id: string, book_tb_feedback_restaurant: string) => {
+  const res: IBackendRes<IBookTable> = await sendRequest({
+    url: `${process.env.URL_SERVER}/book-table/restaurant-feedback/${id}`,
+    method: 'PATCH',
+    body: {
+      book_tb_feedback_restaurant
+    }
+  })
   return res
 }
