@@ -373,7 +373,6 @@ export default function BookTablePage() {
   return (
     <section>
       <div className='flex gap-4 mt-2 flex-wrap'>
-        {/* From Date */}
         <div className='flex gap-2 items-center'>
           <Label className='mt-2'>Từ</Label>
           <Popover>
@@ -405,7 +404,6 @@ export default function BookTablePage() {
           </Popover>
         </div>
 
-        {/* To Date */}
         <div className='flex gap-2 items-center'>
           <Label className='mt-2'>Đến</Label>
           <Popover>
@@ -437,7 +435,6 @@ export default function BookTablePage() {
           </Popover>
         </div>
 
-        {/* Search Query Input */}
         <div className='flex gap-2 items-center'>
           <Label className='mt-2'>Tìm kiếm</Label>
           <Input
@@ -448,7 +445,6 @@ export default function BookTablePage() {
           />
         </div>
 
-        {/* Status Filter */}
         <div className='flex gap-2 items-center'>
           <Label className='mt-2'>Trạng thái</Label>
           <Select value={status} onValueChange={setStatus}>

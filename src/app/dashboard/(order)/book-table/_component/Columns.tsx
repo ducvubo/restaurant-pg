@@ -392,44 +392,46 @@ export const columns: ColumnDef<IBookTable>[] = [
                 </Dialog>
               </>
             )}
-          {bookTable.book_tb_status === 'DONE' && bookTable.book_tb_star !== null && (
-            <>
-              <Button variant={'outline'} onClick={() => setOpenFeedback(true)}>
-                Trả lời
-              </Button>
-              <Dialog open={openFeedBack} onOpenChange={setOpenFeedback}>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Trả lời</DialogTitle>
-                    <DialogDescription>Vui lòng nhập phản hồi</DialogDescription>
-                  </DialogHeader>
-                  <div className='grid gap-4 py-4'>
-                    <div className='grid gap-2'>
-                      <Label htmlFor='feedback'>Phàn hồi</Label>
-                      <Input
-                        id='feedback'
-                        value={book_tb_feedback_restaurant}
-                        onChange={(e) => setBookTbFeedbackRestaurant(e.target.value)}
-                        placeholder='Nhập phản hồi...'
-                      />
+          {bookTable.book_tb_status === 'DONE' &&
+            bookTable.book_tb_star !== null &&
+            bookTable.book_tb_feedback_restaurant === '' && (
+              <>
+                <Button variant={'outline'} onClick={() => setOpenFeedback(true)}>
+                  Trả lời
+                </Button>
+                <Dialog open={openFeedBack} onOpenChange={setOpenFeedback}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Trả lời</DialogTitle>
+                      <DialogDescription>Vui lòng nhập phản hồi</DialogDescription>
+                    </DialogHeader>
+                    <div className='grid gap-4 py-4'>
+                      <div className='grid gap-2'>
+                        <Label htmlFor='feedback'>Phàn hồi</Label>
+                        <Input
+                          id='feedback'
+                          value={book_tb_feedback_restaurant}
+                          onChange={(e) => setBookTbFeedbackRestaurant(e.target.value)}
+                          placeholder='Nhập phản hồi...'
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      onClick={() => {
-                        repFeedbackBookTable(book_tb_feedback_restaurant)
-                        setOpenFeedback(false)
-                        setBookTbFeedbackRestaurant('')
-                      }}
-                      disabled={!book_tb_feedback_restaurant.trim()}
-                    >
-                      Xác nhận
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </>
-          )}
+                    <DialogFooter>
+                      <Button
+                        onClick={() => {
+                          repFeedbackBookTable(book_tb_feedback_restaurant)
+                          setOpenFeedback(false)
+                          setBookTbFeedbackRestaurant('')
+                        }}
+                        disabled={!book_tb_feedback_restaurant.trim()}
+                      >
+                        Xác nhận
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
         </div>
       )
     },

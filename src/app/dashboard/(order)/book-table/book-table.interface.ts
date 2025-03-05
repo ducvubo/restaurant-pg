@@ -23,6 +23,7 @@ export interface IBookTable {
 
   book_tb_details: BookTbDetail[]
   book_tb_feedback: string
+  book_tb_feedback_restaurant: string
   book_tb_star: number
   createdAt: string
   updatedAt: string
