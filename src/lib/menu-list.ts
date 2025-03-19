@@ -69,6 +69,19 @@ export function getMenuListRestaurant(pathname: string): Group[] {
       groupLabel: 'Quản lý',
       menus: [
         {
+          active: pathname.includes('/dashboard/ticket-guest'),
+          href: '/dashboard/ticket-guest',
+          icon: TicketCheck,
+          label: 'Quản lý hỏi đáp',
+          submenus: [
+            {
+              active: pathname === '/dashboard/ticket-guest',
+              href: '/dashboard/ticket-guest',
+              label: 'Danh sách hỏi đáp'
+            }
+          ]
+        },
+        {
           href: 'dashboard/employees',
           label: 'Quản lý nhân viên',
           active: pathname.includes('/employees'),
@@ -165,7 +178,7 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               href: '/dashboard/category-blog',
               label: 'Danh mục blog',
               active: pathname === '/dashboard/category-blog'
-            },{
+            }, {
               href: '/dashboard/article',
               label: 'Bài viết',
               active: pathname === '/dashboard/article'

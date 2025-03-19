@@ -31,7 +31,7 @@ interface DataTableProps<TData, TValue> {
     totalPage: number
     totalItem: number
   }
-  height: number
+  height?: string
 }
 
 export function TableCompnonent<TData, TValue>({
@@ -73,7 +73,7 @@ export function TableCompnonent<TData, TValue>({
     }
   }
   return (
-    <div className='flex flex-col gap-2' style={{ height: 'calc(100vh - 9rem)' }}>
+    <div className='flex flex-col gap-2' style={{ height: `calc(100vh - ${height ? height : '9rem'})` }}>
       <div className='flex items-center justify-end'>
         <DataTableViewOptions table={table} />
       </div>

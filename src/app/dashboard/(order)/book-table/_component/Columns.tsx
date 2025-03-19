@@ -39,6 +39,8 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { MoreHorizontal } from 'lucide-react'
 
 const getTextStatus = (status: string) => {
   switch (status) {
@@ -163,9 +165,10 @@ export const columns: ColumnDef<IBookTable>[] = [
       const handleUpdateStatus = async (status: 'cancel' | 'confirm' | 'done') => {
         setLoading(true)
         let res: IBackendRes<IBookTable> = { statusCode: 400, message: 'Đã có lỗi xảy ra, vui lòng thử lại sau' }
-        if (status === 'cancel') await cancelBookTable(bookTable._id)
+        if (status === 'cancel') res = await cancelBookTable(bookTable._id)
         if (status === 'confirm') res = await confirmBookTable(bookTable._id)
         if (status === 'done') res = await doneBookTable(bookTable._id)
+        console.log("🚀 ~ handleUpdateStatus ~ res:", res)
         if (res.statusCode === 200) {
           setLoading(false)
           toast({
@@ -341,7 +344,8 @@ export const columns: ColumnDef<IBookTable>[] = [
 
       return (
         <div className='flex gap-2'>
-          {bookTable.book_tb_status === 'WAITING_RESTAURANT' && (
+
+          {/* {bookTable.book_tb_status === 'WAITING_RESTAURANT' && (
             <Button onClick={() => handleUpdateStatus('confirm')} variant={'outline'}>
               Nhận đơn
             </Button>
@@ -431,7 +435,113 @@ export const columns: ColumnDef<IBookTable>[] = [
                   </DialogContent>
                 </Dialog>
               </>
-            )}
+            )} */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <MoreHorizontal className='h-4 w-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+              <DropdownMenuSeparator />
+              {/* <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem> */}
+              {bookTable.book_tb_status === 'WAITING_RESTAURANT' && (
+                <DropdownMenuItem onClick={() => handleUpdateStatus('confirm')}>
+                  Nhận đơn
+                </DropdownMenuItem>
+              )}
+              {bookTable.book_tb_status === 'WAITING_RESTAURANT' && (
+                <DropdownMenuItem onClick={() => handleUpdateStatus('cancel')}>
+                  Hủy đơn
+                </DropdownMenuItem>
+              )}
+              {bookTable.book_tb_status === 'RESTAURANT_CONFIRM' && (
+                <DropdownMenuItem onClick={() => handleUpdateStatus('done')}>Hoàn thành</DropdownMenuItem>
+              )}
+              {bookTable.book_tb_status !== 'DONE' &&
+                bookTable.book_tb_status !== 'EXEPTION' &&
+                bookTable.book_tb_star === null && (
+                  <>
+                    <DropdownMenuItem onClick={() => setOpen(true)}>Ngoại lệ</DropdownMenuItem>
+                    <Dialog open={open} onOpenChange={setOpen}>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Ghi chú ngoại lệ</DialogTitle>
+                          <DialogDescription>Vui lòng nhập lý do cho trạng thái ngoại lệ</DialogDescription>
+                        </DialogHeader>
+                        <div className='grid gap-4 py-4'>
+                          <div className='grid gap-2'>
+                            <Label htmlFor='note'>Ghi chú</Label>
+                            <Input
+                              id='note'
+                              value={note}
+                              onChange={(e) => setNote(e.target.value)}
+                              placeholder='Nhập ghi chú...'
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              handleExceptionBookTable(note)
+                              setOpen(false)
+                              setNote('') // Reset note after submission
+                            }}
+                            disabled={!note.trim()}
+                          >
+                            Xác nhận
+                          </DropdownMenuItem>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
+              {bookTable.book_tb_status === 'DONE' &&
+                bookTable.book_tb_star !== null &&
+                bookTable.book_tb_feedback_restaurant === '' && (
+                  <>
+                    <DropdownMenuItem onClick={() => setOpenFeedback(true)}>
+                      Trả lời
+                    </DropdownMenuItem>
+                    <Dialog open={openFeedBack} onOpenChange={setOpenFeedback}>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Trả lời</DialogTitle>
+                          <DialogDescription>Vui lòng nhập phản hồi</DialogDescription>
+                        </DialogHeader>
+                        <div className='grid gap-4 py-4'>
+                          <div className='grid gap-2'>
+                            <Label htmlFor='feedback'>Phàn hồi</Label>
+                            <Input
+                              id='feedback'
+                              value={book_tb_feedback_restaurant}
+                              onChange={(e) => setBookTbFeedbackRestaurant(e.target.value)}
+                              placeholder='Nhập phản hồi...'
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              repFeedbackBookTable(book_tb_feedback_restaurant)
+                              setOpenFeedback(false)
+                              setBookTbFeedbackRestaurant('')
+                            }}
+                            disabled={!book_tb_feedback_restaurant.trim()}
+                          >
+                            Xác nhận
+                          </DropdownMenuItem>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
+
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )
     },
