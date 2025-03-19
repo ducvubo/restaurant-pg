@@ -18,10 +18,10 @@ export default function PageDetailTicket() {
   const params = useParams()
   const [ticket, setTicket] = useState<ITicketGuestRestaurant>()
   const [ticketReply, setTicketReply] = useState<ITicketGuestRestaurantReplice[]>()
-  console.log('🚀 ~ PageDetailTicket ~ ticketReply:', ticketReply)
   const [isReplying, setIsReplying] = useState(false)
   const [replyAttachmentLinks, setReplyAttachmentLinks] = useState<string[]>([])
   const [isUploading, setIsUploading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false) // New loading state for submission
   const refContent = useRef<any>('')
 
   const getTicket = async () => {
@@ -137,41 +137,52 @@ export default function PageDetailTicket() {
   }
 
   const handleReplySubmit = async () => {
-    const res: IBackendRes<ITicketGuestRestaurantReplice> = await createTicketReplice({
-      tkgr_id: params.slug as string,
-      tkgr_rp_content: refContent.current.getContent(),
-      tkgr_rp_attachment: JSON.stringify(replyAttachmentLinks)
-    })
+    setIsSubmitting(true) // Start loading
+    try {
+      const res: IBackendRes<ITicketGuestRestaurantReplice> = await createTicketReplice({
+        tkgr_id: params.slug as string,
+        tkgr_rp_content: refContent.current.getContent(),
+        tkgr_rp_attachment: JSON.stringify(replyAttachmentLinks)
+      })
 
-    if (res.statusCode === 201) {
-      getTicketReply()
-      refContent.current = ' '
-      setReplyAttachmentLinks([])
-      setIsReplying(false)
-
-      toast({
-        title: 'Thành công',
-        description: 'Đã gửi phản hồi thành công'
-      })
-    } else if (res.code === -10) {
-      toast({
-        title: 'Thông báo',
-        description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
-        variant: 'destructive'
-      })
-      await deleteCookiesAndRedirect()
-    } else if (res.code === -11) {
-      toast({
-        title: 'Thông báo',
-        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
-        variant: 'destructive'
-      })
-    } else {
+      if (res.statusCode === 201) {
+        await getTicketReply()
+        refContent.current.setContent('') // Clear editor content
+        setReplyAttachmentLinks([])
+        setIsReplying(false)
+        toast({
+          title: 'Thành công',
+          description: 'Đã gửi phản hồi thành công'
+        })
+      } else if (res.code === -10) {
+        toast({
+          title: 'Thông báo',
+          description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+          variant: 'destructive'
+        })
+        await deleteCookiesAndRedirect()
+      } else if (res.code === -11) {
+        toast({
+          title: 'Thông báo',
+          description:
+            'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+          variant: 'destructive'
+        })
+      } else {
+        toast({
+          title: 'Thất bại',
+          description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+          variant: 'destructive'
+        })
+      }
+    } catch (error) {
       toast({
         title: 'Thất bại',
         description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
         variant: 'destructive'
       })
+    } finally {
+      setIsSubmitting(false) // Stop loading
     }
   }
 
@@ -349,11 +360,39 @@ export default function PageDetailTicket() {
                   Hủy
                 </Button>
                 <Button
-                  disabled={ticket?.tkgr_status === 'resolved' || ticket?.tkgr_status === 'close' || isUploading}
+                  disabled={
+                    ticket?.tkgr_status === 'resolved' || ticket?.tkgr_status === 'close' || isUploading || isSubmitting
+                  }
                   size='sm'
                   onClick={handleReplySubmit}
                 >
-                  Gửi
+                  {isSubmitting ? (
+                    <span className='flex items-center gap-2'>
+                      <svg
+                        className='animate-spin h-5 w-5 text-white'
+                        xmlns='http://www.w3.org/2000/svg'
+                        fill='none'
+                        viewBox='0 0 24 24'
+                      >
+                        <circle
+                          className='opacity-25'
+                          cx='12'
+                          cy='12'
+                          r='10'
+                          stroke='currentColor'
+                          strokeWidth='4'
+                        ></circle>
+                        <path
+                          className='opacity-75'
+                          fill='currentColor'
+                          d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                        ></path>
+                      </svg>
+                      Đang gửi...
+                    </span>
+                  ) : (
+                    'Gửi'
+                  )}
                 </Button>
               </div>
             </div>
