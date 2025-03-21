@@ -222,6 +222,19 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               active: pathname === '/dashboard/stock-out'
             }
           ]
+        },
+        {
+          active: pathname.includes('/dashboard/connect'),
+          href: '/dashboard/connect',
+          icon: Component,
+          label: 'Kết nối',
+          submenus: [
+            {
+              active: pathname === '/dashboard/connect',
+              href: '/dashboard/connect',
+              label: 'Kết nối'
+            }
+          ]
         }
       ]
     }
