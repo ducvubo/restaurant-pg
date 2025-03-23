@@ -72,12 +72,17 @@ export function getMenuListRestaurant(pathname: string): Group[] {
           active: pathname.includes('/dashboard/ticket-guest'),
           href: '/dashboard/ticket-guest',
           icon: TicketCheck,
-          label: 'Quản lý hỏi đáp',
+          label: 'Quản lý hỗ trợ',
           submenus: [
             {
               active: pathname === '/dashboard/ticket-guest',
               href: '/dashboard/ticket-guest',
               label: 'Danh sách hỏi đáp'
+            },
+            {
+              active: pathname === '/dashboard/connect',
+              href: '/dashboard/connect',
+              label: 'Tin nhắn khách hàng'
             }
           ]
         },
@@ -223,19 +228,6 @@ export function getMenuListRestaurant(pathname: string): Group[] {
             }
           ]
         },
-        {
-          active: pathname.includes('/dashboard/connect'),
-          href: '/dashboard/connect',
-          icon: Component,
-          label: 'Kết nối',
-          submenus: [
-            {
-              active: pathname === '/dashboard/connect',
-              href: '/dashboard/connect',
-              label: 'Kết nối'
-            }
-          ]
-        }
       ]
     }
   ]

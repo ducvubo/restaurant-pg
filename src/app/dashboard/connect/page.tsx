@@ -4,7 +4,7 @@ import PageConnect from './_component/PageConnect'
 
 export default function page() {
   return (
-    <ContentLayout title="Connect">
+    <ContentLayout title="Tin nhắn với khách hàng">
       <PageConnect />
     </ContentLayout>
   )

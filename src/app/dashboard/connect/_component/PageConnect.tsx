@@ -17,7 +17,7 @@ import { useParams } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { DocumentData } from "firebase/firestore";
+import { DocumentData, where } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/redux/store";
 
@@ -62,20 +62,18 @@ const RestaurantDashboard = () => {
     }
 
     const fetchCustomers = () => {
-      const chatsRef = collection(db, "chats");
+      const chatsRef = query(
+        collection(db, "chats"),
+        where("restaurantId", "==", id)
+      );
       const unsubscribeChats = onSnapshot(
         chatsRef,
         (chatRoomsSnapshot: QuerySnapshot<DocumentData>) => {
           const allChatRooms = chatRoomsSnapshot.docs.map((doc) => doc.id);
-          const relatedChatRooms = allChatRooms.filter((chatRoomId: string) =>
-            chatRoomId.startsWith(`${id}_`)
-          );
-
-          // Hủy các listener cũ
           unsubscribesRef.current.forEach((unsubscribe) => unsubscribe());
           unsubscribesRef.current = [];
 
-          if (relatedChatRooms.length === 0) {
+          if (allChatRooms.length === 0) {
             setError("Chưa có khách hàng nào nhắn tin.");
             setCustomers([]);
             customersRef.current = [];
@@ -85,7 +83,7 @@ const RestaurantDashboard = () => {
 
           const customerMap = new Map<string, Customer>();
 
-          relatedChatRooms.forEach((chatRoomId: string) => {
+          allChatRooms.forEach((chatRoomId: string) => {
             const customerId = chatRoomId.replace(`${id}_`, "");
             customerMap.set(customerId, {
               customerId,
@@ -97,7 +95,7 @@ const RestaurantDashboard = () => {
             });
           });
 
-          const unsubscribesMessages = relatedChatRooms.map((chatRoomId: string) => {
+          const unsubscribesMessages = allChatRooms.map((chatRoomId: string) => {
             const customerId = chatRoomId.replace(`${id}_`, "");
             const messagesRef = collection(db, "chats", chatRoomId, "messages");
             const q = query(messagesRef, orderBy("timestamp", "asc"));

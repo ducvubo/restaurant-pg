@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import {
   getFirestore, collection, addDoc, query, orderBy, onSnapshot, getDocs, getDoc, doc, setDoc, writeBatch, DocumentData,
+  where,
   QuerySnapshot
 } from "firebase/firestore";
 
@@ -18,7 +19,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db: any = getFirestore(app);
 
 // Chỉ khởi tạo Analytics trên client-side
 if (typeof window !== "undefined") {
@@ -29,5 +30,6 @@ if (typeof window !== "undefined") {
 
 export {
   db, collection, addDoc, query, orderBy, onSnapshot, getDocs, getDoc, doc, setDoc, writeBatch,
-  QuerySnapshot
+  QuerySnapshot,
+  where,
 };
