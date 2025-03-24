@@ -51,7 +51,7 @@ export default function AddArticleVideo({ inforArticle, id }: Props) {
   const router = useRouter()
   const [title, setTitle] = useState(inforArticle?.atlTitle || '')
   const [listCategories, setListCategories] = useState<ICategory[]>([])
-  const [category, setCategory] = useState<string>(inforArticle?.category.catId || '')
+  const [category, setCategory] = useState<string>(inforArticle?.catId || '')
   const [slug, setSlug] = useState<string>(inforArticle?.atlSlug || '')
   const [description, setDescription] = useState(inforArticle?.atlDescription || '')
   const [notes, setNotes] = useState<string[]>(inforArticle?.listArticleNote || [''])
@@ -71,9 +71,9 @@ export default function AddArticleVideo({ inforArticle, id }: Props) {
     inforArticle?.atlImage
       ? JSON.parse(inforArticle.atlImage)
       : {
-          image_cloud: '',
-          image_custom: ''
-        }
+        image_cloud: '',
+        image_custom: ''
+      }
   )
   const [isUploadingImage, setIsUploadingImage] = useState(false)
   const fileInputImageRef = useRef<HTMLInputElement | null>(null)

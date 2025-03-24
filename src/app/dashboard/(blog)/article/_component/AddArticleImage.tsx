@@ -50,7 +50,7 @@ export default function AddArticleImage({ inforArticle, id }: Props) {
   const router = useRouter()
   const [title, setTitle] = useState(inforArticle?.atlTitle || '')
   const [listCategories, setListCategories] = useState<ICategory[]>([])
-  const [category, setCategory] = useState<string>(inforArticle?.category.catId || '')
+  const [category, setCategory] = useState<string>(inforArticle?.catId || '')
   const [slug, setSlug] = useState<string>(inforArticle?.atlSlug || '')
   const [description, setDescription] = useState(inforArticle?.atlDescription || '')
   const [notes, setNotes] = useState<string[]>(inforArticle?.listArticleNote || [''])
