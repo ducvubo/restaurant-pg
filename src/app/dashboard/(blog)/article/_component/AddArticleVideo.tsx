@@ -94,8 +94,9 @@ export default function AddArticleVideo({ inforArticle, id }: Props) {
         : ''
       : ''
   )
+
   const [descriptionVideo, setDescriptionVideo] = useState<string>(
-    JSON.parse(inforArticle?.atlContent).description || ''
+    inforArticle?.atlContent ? JSON.parse(inforArticle.atlContent).description : ''
   )
 
   const handleAddNote = () => {
