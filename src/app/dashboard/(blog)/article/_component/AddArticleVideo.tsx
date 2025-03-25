@@ -238,7 +238,7 @@ export default function AddArticleVideo({ inforArticle, id }: Props) {
     formData.append('file', file)
 
     const res: IBackendRes<ImageUrl> = await (
-      await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/upload/article`, {
+      await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/upload`, {
         method: 'POST',
         headers: {
           type: 'image'
@@ -251,12 +251,13 @@ export default function AddArticleVideo({ inforArticle, id }: Props) {
   }
 
   const uploadVideo = async (file: File) => {
-    setLoading(true)
+    // setLoading(true)
     const formData = new FormData()
-    formData.append('file', file)
+    // formData.append('file', file)
+    formData.append('upload', file)
 
     const res: IBackendRes<string> = await (
-      await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/upload/article`, {
+      await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/file`, {
         method: 'POST',
         headers: {
           type: 'video'
@@ -315,7 +316,7 @@ export default function AddArticleVideo({ inforArticle, id }: Props) {
       const res: IBackendRes<string> = await uploadVideo(files[0])
       if (res.statusCode === 201 && res.data) {
         setIsUploadingVideo(false)
-        setUploadedVideo(res.data)
+        setUploadedVideo(res.data.link)
       } else {
         setIsUploadingVideo(false)
         toast({

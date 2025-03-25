@@ -9,6 +9,7 @@ export const POST = async (req: any) => {
     const folder_type = header.get('folder_type') || ''
     const formData = await req.formData()
     const file = formData.get('upload')
+    console.log("🚀 ~ POST ~ file:", file)
     if (!file) {
       return NextResponse.json({ error: 'No files received.' }, { status: 400 })
     }
@@ -26,7 +27,9 @@ export const POST = async (req: any) => {
       },
       body: formDataToSend
     })
+    console.log("🚀 ~ POST ~ response:", response)
     const result = await response.json()
+    console.log("🚀 ~ POST ~ result:", result)
     return new Response(JSON.stringify(result), {
       status: result.statusCode
     })

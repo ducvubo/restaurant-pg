@@ -309,7 +309,7 @@ export default function AddArticleImage({ inforArticle, id }: Props) {
     formData.append('file', file)
 
     const res: IBackendRes<ImageUrl> = await (
-      await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/upload/article`, {
+      await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/upload`, {
         method: 'POST',
         headers: {
           type: 'image'
