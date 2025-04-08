@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
-import { z } from 'zod'
+import { any, z } from 'zod'
 import { FormField, FormItem, FormLabel, FormMessage, Form, FormControl } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -39,6 +39,10 @@ import { InputNoBoder } from '@/components/CustomInputNoBoder'
 import { IoMdCloudUpload } from 'react-icons/io'
 import Image from 'next/image'
 import { Loader2, TrashIcon } from 'lucide-react'
+import { createIngredient, findAllUnits } from '../../ingredients/ingredient.api'
+import { createSupplier } from '../../suppliers/supplier.api'
+import { createUnit } from '../../units/unit.api'
+import { createCatIngredient } from '../../cat-ingredients/cat-ingredient.api'
 
 interface Props {
   id: string
@@ -74,6 +78,10 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
     image_cloud: '',
     image_custom: ''
   })
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
+  const [listUnits, setListUnits] = useState<any[]>([])
+  const [listCatIngredients, setListCatIngredients] = useState<any[]>([])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -89,10 +97,18 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
     }
   })
 
+  const findAllUnitsCom = async () => {
+    const res = await findAllUnits();
+    if (res.statusCode === 200 && res.data) {
+      setListUnits(res.data);
+    }
+  }
+
   useEffect(() => {
     findAllSuppliers()
     findAllEmployees()
     findAllIngredient()
+    findAllUnitsCom()
   }, [])
 
   useEffect(() => {
@@ -105,7 +121,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
           inforStockIn.items.forEach((item) => {
             const ingredient = listIngredients.find((ingredient) => ingredient.igd_id === item.igd_id)
             if (ingredient) {
-              ;(item.igd_name = ingredient.igd_name),
+              ; (item.igd_name = ingredient.igd_name),
                 (item.unt_name = typeof ingredient.unt_id !== 'string' ? ingredient.unt_id?.unt_name || '' : '')
             }
           })
@@ -412,8 +428,282 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
     }
   }
 
+  const createSupplierCom = async (name: string) => {
+    const payload = {
+      spli_name: name,
+      spli_email: 'nhaphoadon@gmail.com',
+      spli_phone: '0987654321',
+      spli_address: 'Dữ liệu được nhập tự động từ file PDF',
+      spli_description: 'Dữ liệu được nhập tự động từ file PDF',
+      spli_type: 'supplier'
+    } as any;
+    // const res = await fetch('http://localhost:11000/api/v1/suppliers', {
+    //   method: 'POST',
+    //   headers: {
+    //     'accept': 'application/json',
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify(payload)
+    // });
+    const res = await createSupplier(payload)
+    if (res.statusCode === 201 && res.data) {
+      setListSuppliers((prev: any) => [...prev, res.data]);
+      return res.data.spli_id;
+    }
+  }
+
+  // Hàm thêm mới unit
+  const createUnitCom = async (name: string) => {
+    const payload = {
+      unt_name: name,
+      unt_symbol: name.slice(0, 2).toLowerCase(), // Tạm lấy 2 ký tự đầu làm symbol
+      unt_description: 'Dữ liệu được nhập tự động từ file PDF'
+    };
+    const res = await createUnit(payload)
+    if (res.statusCode === 201 && res.data) {
+      setListUnits(prev => [...prev, res.data]);
+      return res.data.unt_id;
+    }
+  }
+
+  const createCatIngredientCom = async () => {
+    const payload = {
+      cat_igd_name: "Danh mục từ nhập pdf",
+      cat_igd_description: "Danh mục tự động tạo từ dữ liệu nhập PDF"
+    };
+    const res = await createCatIngredient(payload)
+    if (res.statusCode === 201 && res.data) {
+      setListCatIngredients(prev => [...prev, res.data]);
+      return res.data.cat_igd_id;
+    }
+    return null;
+  }
+
+  const createIngredientCom = async (name: string, unitId: string, code: string) => {
+    let catIgdId = '';
+    const existingCat = listCatIngredients.find(cat =>
+      cat.cat_igd_name.toLowerCase() === "danh mục từ nhập pdf"
+    );
+
+    if (existingCat) {
+      catIgdId = existingCat.cat_igd_id;
+    } else {
+      catIgdId = await createCatIngredientCom() as string;
+      if (!catIgdId) {
+        toast({
+          title: 'Cảnh báo',
+          description: 'Không thể tạo danh mục nguyên liệu, sẽ dùng ID mặc định',
+          variant: 'destructive'
+        });
+        catIgdId = 'e10673a0-dd00-443e-9fbc-e27b14eb7519'; // Dùng ID mặc định nếu tạo thất bại
+      }
+    }
+
+    const payload = {
+      cat_igd_id: catIgdId,
+      unt_id: unitId,
+      igd_name: name,
+      igd_description: 'Dữ liệu được nhập tự động từ file PDF',
+      igd_image: 'Dữ liệu được nhập tự động từ file PDF'
+    };
+    const res = await createIngredient(payload);
+    console.log("🚀 ~ createIngredientCom ~ res:", res);
+    if (res.statusCode === 201 && res.data) {
+      setListIngredients((prev: any) => [...prev, res.data]);
+      return res.data.igd_id;
+    }
+    return null;
+  }
+
+  // Hàm thêm mới ingredient
+  // const createIngredientCom = async (name: string, unitId: string, code: string) => {
+  //   const payload = {
+  //     cat_igd_id: 'e10673a0-dd00-443e-9fbc-e27b14eb7519', // Gán cứng cat_igd_id
+  //     unt_id: unitId,
+  //     igd_name: name,
+  //     igd_description: 'Dữ liệu được nhập tự động từ file PDF',
+  //     igd_image: 'Dữ liệu được nhập tự động từ file PDF'
+  //   };
+  //   const res = await createIngredient(payload)
+  //   console.log("🚀 ~ createIngredientCom ~ data:", res)
+  //   if (res.statusCode === 201 && res.data) {
+  //     setListIngredients((prev: any) => [...prev, res.data]);
+  //     return res.data.igd_id;
+  //   }
+  // }
+
+  const handleUploadPdf = async () => {
+    if (!pdfFile) {
+      toast({
+        title: 'Thông báo',
+        description: 'Vui lòng chọn file PDF trước khi tải lên',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    setIsUploadingPdf(true)
+    const formData = new FormData()
+    formData.append('file', pdfFile)
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_ORDER}/stock-in/import-pdf`, {
+        method: 'POST',
+        headers: {
+          'accept': '*/*',
+        },
+        body: formData,
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log("🚀 ~ handleUploadPdf ~ result:", result)
+        toast({
+          title: 'Thành công',
+          description: 'Tải file PDF và trích xuất dữ liệu thành công',
+          variant: 'default'
+        })
+
+        const pdfData = result.data
+
+        // Xử lý supplier
+        let spliId = '';
+        const supplier = listSuppliers.find((s: any) =>
+          s.spli_name.toLowerCase().includes(pdfData.spli_id.toLowerCase())
+        );
+        if (supplier) {
+          spliId = supplier.spli_id;
+        } else {
+          spliId = await createSupplierCom(pdfData.spli_id) as string;
+          console.log("🚀 ~ handleUploadPdf ~ spliId:", spliId)
+          if (!spliId) {
+            toast({
+              title: 'Cảnh báo',
+              description: 'Không thể tạo nhà cung cấp mới, vui lòng kiểm tra',
+              variant: 'destructive'
+            });
+          } else {
+            form.setValue('spli_id', spliId)
+          }
+        }
+
+        // Xử lý receiver
+        let receiverId = '';
+        const receiver = listEmployees.find(e =>
+          e.epl_name.toLowerCase().includes(pdfData.stki_receiver.toLowerCase())
+        );
+        receiverId = receiver ? receiver._id : '';
+
+        // Điền dữ liệu cơ bản vào form
+        form.setValue('spli_id', spliId)
+        form.setValue('stki_code', pdfData.stki_code || '');
+        form.setValue('spli_id', spliId || '');
+        form.setValue('stki_delivery_name', pdfData.stki_delivery_name || '');
+        form.setValue('stki_delivery_phone', pdfData.stki_delivery_phone || '');
+        form.setValue('stki_receiver', receiverId || '');
+        form.setValue('stki_date', pdfData.stki_date ? new Date(pdfData.stki_date) : new Date());
+        form.setValue('stki_note', pdfData.stki_note || '');
+        form.setValue('stki_payment_method', pdfData.stki_payment_method || 'cash');
+
+        // Xử lý stock_in_items
+        if (pdfData.stock_in_items && pdfData.stock_in_items.length > 0) {
+          const mappedItems = await Promise.all(pdfData.stock_in_items.map(async (item: any) => {
+            // Xử lý unit
+            let untId = '';
+            const unit = listUnits.find(u =>
+              u.unt_name.toLowerCase().includes(item.stki_item_unit.toLowerCase())
+            );
+            if (unit) {
+              untId = unit.unt_id;
+            } else if (item.stki_item_unit) {
+              untId = await createUnitCom(item.stki_item_unit) as string;
+              if (!untId) {
+                toast({
+                  title: 'Cảnh báo',
+                  description: `Không thể tạo đơn vị tính "${item.stki_item_unit}", vui lòng kiểm tra`,
+                  variant: 'destructive'
+                });
+              }
+            }
+
+            // Xử lý ingredient
+            let igdId = '';
+            const ingredient = listIngredients.find(i =>
+              i.igd_name.toLowerCase().includes(item.stki_item_name.toLowerCase()) ||
+              i.igd_id.toLowerCase() === item.stki_item_code.toLowerCase()
+            );
+            if (ingredient) {
+              igdId = ingredient.igd_id;
+            } else {
+              igdId = await createIngredientCom(item.stki_item_name, untId, item.stki_item_code) as string;
+              if (!igdId) {
+                toast({
+                  title: 'Cảnh báo',
+                  description: `Không thể tạo nguyên liệu "${item.stki_item_name}", vui lòng kiểm tra`,
+                  variant: 'destructive'
+                });
+              }
+            }
+
+            return {
+              igd_id: igdId || item.stki_item_code,
+              igd_name: item.stki_item_name,
+              unt_name: item.stki_item_unit,
+              stki_item_quantity_real: parseFloat(item.stki_item_quantity_real) || 0,
+              stki_item_quantity: parseFloat(item.stki_item_quantity_real) || 0,
+              stki_item_price: parseFloat(item.stki_item_price) || 0,
+              stki_item_total: parseFloat(item.stki_item_total) || 0,
+              stki_item_note: item.stki_item_note || ''
+            };
+          }));
+          setStockInItems(mappedItems);
+        }
+
+        setPdfFile(null);
+      } else {
+        throw new Error('Upload failed')
+      }
+    } catch (error) {
+      toast({
+        title: 'Thất bại',
+        description: 'Có lỗi xảy ra khi tải file PDF, vui lòng thử lại',
+        variant: 'destructive'
+      })
+    } finally {
+      setIsUploadingPdf(false)
+    }
+  }
+
   return (
     <Form {...form}>
+      <div className="space-y-4 p-4 border rounded-md">
+        <h3 className="text-lg font-semibold">Tải lên file PDF</h3>
+        <div className="flex items-center gap-2">
+          <Input
+            type="file"
+            accept=".pdf"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) setPdfFile(file);
+            }}
+            disabled={isUploadingPdf}
+          />
+          <Button
+            type="button"
+            onClick={handleUploadPdf}
+            disabled={!pdfFile || isUploadingPdf}
+          >
+            {isUploadingPdf ? (
+              <>
+                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                Đang tải
+              </>
+            ) : (
+              'Tải lên'
+            )}
+          </Button>
+        </div>
+      </div>
       <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
         <ResizablePanelGroup direction='horizontal'>
           <ResizablePanel defaultSize={75} className='p-4'>

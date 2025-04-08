@@ -30,7 +30,6 @@ export const getListBookTable = async ({
       q
     }
   })
-  console.log("🚀 ~ res:", res)
   return res
 }
 

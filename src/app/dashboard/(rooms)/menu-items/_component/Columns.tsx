@@ -15,85 +15,72 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import DeleteOrRestore from './DeleteOrRestore'
-import { updateStatus } from '../ingredient.api'
+import { updateStatus } from '../menu-items.api'
 import { MoreHorizontal } from 'lucide-react'
-import { IIngredient } from '../ingredient.interface'
+import { IMenuItems } from '../menu-items.interface'
 import Image from 'next/image'
 
-export const columns: ColumnDef<IIngredient>[] = [
+export const columns: ColumnDef<IMenuItems>[] = [
   {
-    accessorKey: 'igd_name',
-    id: 'Tên nguyên liệu',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Tên nguyên liệu' />,
-    enableHiding: true
-  },
-  {
-    accessorKey: 'cat_igd_id',
-    id: 'Danh mục',
-    header: () => <div className='font-semibold'>Danh mục</div>,
-    cell: ({ row }) => {
-      const ingredient = row.original
-      if (typeof ingredient.cat_igd_id === 'object') {
-        return ingredient.cat_igd_id.cat_igd_name
-      } else {
-        return ''
-      }
-    }
-  },
-  {
-    accessorKey: 'unt_id',
-    id: 'Đơn vị đo',
-    header: () => <div className='font-semibold'>Đơn vị đo</div>,
-    cell: ({ row }) => {
-      const ingredient = row.original
-      if (typeof ingredient.unt_id === 'object') {
-        return ingredient.unt_id.unt_name
-      } else {
-        return ''
-      }
-    }
-  },
-  {
-    accessorKey: 'igd_image',
+    accessorKey: 'mitems_image',
     id: 'Ảnh',
     header: () => <div className='font-semibold'>Ảnh</div>,
     cell: ({ row }) => {
-      const ingredient = row.original;
-      try {
-        const parsedImage = JSON.parse(ingredient.igd_image);
-        if (parsedImage && parsedImage.image_cloud) {
-          return <Image
-            src={parsedImage.image_cloud}
-            alt='vuducbo'
-            width={50}
-            height={50}
-          />;
-        }
-        return null; // Không hiển thị gì nếu không có image_cloud
-      } catch (error) {
-        return null; // Không hiển thị gì nếu parse thất bại
-      }
+      const menuItems = row.original
+      return <Image src={JSON.parse(menuItems.mitems_image).image_cloud} alt='vuducbo' width={50} height={50} />
     },
     enableHiding: true
   },
   {
-    accessorKey: 'igd_description',
-    id: 'Mô tả',
-    header: () => <div className='font-semibold'>Mô tả</div>,
+    accessorKey: 'mitems_name',
+    id: 'Tên thực đơn',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Tên thực đơn' />,
     enableHiding: true
   },
   {
-    accessorKey: 'igd_status',
+    accessorKey: 'mitems_image',
+    id: 'Danh mục',
+    header: () => <div className='font-semibold'>Danh mục</div>,
+    cell: ({ row }) => {
+      const menuItems = row.original
+      return typeof menuItems.category === 'object' && menuItems.category !== null
+        ? menuItems.category.mcat_name
+        : 'Chưa có danh mục'
+    },
+    enableHiding: true
+  },
+
+  {
+    accessorKey: 'mitems_price',
+    id: 'Giá thực đơn',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Giá thực đơn' />,
+    enableHiding: true
+  },
+  {
+    accessorKey: 'mitems_note',
+    id: 'Ghi chú',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Ghi chú' />,
+    enableHiding: true
+  },
+  {
+    accessorKey: 'mitems_description',
+    id: 'Mô tả',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Mô tả' />,
+    enableHiding: true
+  },
+
+  {
+    accessorKey: 'mitems_status',
     id: 'Trạng thái',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
       const router = useRouter()
-      const ingredient = row.original
+      const menuItems = row.original
       const handleUpdateStatus = async () => {
         const res = await updateStatus({
-          igd_id: ingredient.igd_id ? ingredient.igd_id : '',
-          igd_status: ingredient.igd_status === 'enable' ? 'disable' : 'enable'
+          mitems_id: menuItems.mitems_id ? menuItems.mitems_id : '',
+          mitems_status: menuItems.mitems_status === 'enable' ? 'disable' : 'enable'
         })
         if (res.statusCode === 200) {
           toast({
@@ -140,7 +127,7 @@ export const columns: ColumnDef<IIngredient>[] = [
           })
         }
       }
-      return ingredient.igd_status === 'enable' ? (
+      return menuItems.mitems_status === 'enable' ? (
         <Button variant={'outline'} onClick={handleUpdateStatus}>
           Hoạt động
         </Button>
@@ -156,10 +143,10 @@ export const columns: ColumnDef<IIngredient>[] = [
     accessorKey: 'Actions',
     id: 'Actions',
     cell: ({ row }) => {
-      const ingredient = row.original
+      const menuItems = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
-        return <DeleteOrRestore inforIngredient={ingredient} path={pathname} />
+        return <DeleteOrRestore inforMenuItems={menuItems} path={pathname} />
       }
       return (
         <DropdownMenu>
@@ -173,11 +160,11 @@ export const columns: ColumnDef<IIngredient>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/ingredients/${ingredient.igd_id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/menu-items/${menuItems.mitems_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>
-              <DeleteOrRestore inforIngredient={ingredient} path='delete' />
+              <DeleteOrRestore inforMenuItems={menuItems} path='delete' />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

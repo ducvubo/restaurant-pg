@@ -71,10 +71,26 @@ export default function AddOrEdit({ id, inforIngredient }: Props) {
     } else {
       if (inforIngredient) {
         if (inforIngredient.igd_image) {
-          setImage({
-            image_cloud: JSON.parse(inforIngredient.igd_image).image_cloud,
-            image_custom: JSON.parse(inforIngredient.igd_image).image_custom
-          })
+          try {
+            const parsedImage = JSON.parse(inforIngredient.igd_image);
+            if (parsedImage && parsedImage.image_cloud && parsedImage.image_custom) {
+              setImage({
+                image_cloud: parsedImage.image_cloud,
+                image_custom: parsedImage.image_custom
+              });
+            } else {
+              setImage({
+                image_cloud: "",
+                image_custom: ""
+              });
+            }
+          } catch (error) {
+            setImage({
+              image_cloud: "",
+              image_custom: ""
+            });
+            console.error('Error parsing igd_image:', error);
+          }
         }
       }
     }

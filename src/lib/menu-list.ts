@@ -86,6 +86,34 @@ export function getMenuListRestaurant(pathname: string): Group[] {
             }
           ]
         },
+        // {
+        //   active: pathname.includes('/dashboard/rooms'),
+        //   href: '/dashboard/rooms',
+        //   icon: Album,
+        //   label: 'Quản lý phòng/sảnh',
+        //   submenus: [
+        //     {
+        //       active: pathname === '/dashboard/rooms',
+        //       href: '/dashboard/rooms',
+        //       label: 'Quản lý phòng/sảnh'
+        //     },
+        //     {
+        //       active: pathname === '/dashboard/amenities',
+        //       href: '/dashboard/amenities',
+        //       label: 'Quản lý dịch vụ'
+        //     },
+        //     {
+        //       active: pathname === '/dashboard/menu-category',
+        //       href: '/dashboard/menu-category',
+        //       label: 'Quản lý danh mục thực đơn'
+        //     },
+        //     {
+        //       active: pathname === '/dashboard/menu-items',
+        //       href: '/dashboard/menu-items',
+        //       label: 'Quản lý thực đơn'
+        //     }
+        //   ]
+        // },
         {
           href: 'dashboard/employees',
           label: 'Quản lý nhân viên',
@@ -183,7 +211,8 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               href: '/dashboard/category-blog',
               label: 'Danh mục blog',
               active: pathname === '/dashboard/category-blog'
-            }, {
+            },
+            {
               href: '/dashboard/article',
               label: 'Bài viết',
               active: pathname === '/dashboard/article'
@@ -227,7 +256,7 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               active: pathname === '/dashboard/stock-out'
             }
           ]
-        },
+        }
       ]
     }
   ]
