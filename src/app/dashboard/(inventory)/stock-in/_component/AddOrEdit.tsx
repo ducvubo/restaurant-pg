@@ -547,7 +547,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
     formData.append('file', pdfFile)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_ORDER}/stock-in/import-pdf`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_INVENTORY}/stock-in/import-pdf`, {
         method: 'POST',
         headers: {
           'accept': '*/*',
