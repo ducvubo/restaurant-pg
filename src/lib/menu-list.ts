@@ -60,7 +60,12 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               href: '/dashboard/book-table',
               label: 'Danh sách đặt bàn',
               active: pathname === '/dashboard/book-table'
-            }
+            },
+            {
+              href: '/dashboard/order-food',
+              label: 'Danh sách đặt món ăn',
+              active: pathname === '/dashboard/order-food'
+            },
           ]
         }
       ]

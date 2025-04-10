@@ -36,7 +36,7 @@ export function Pagination({ meta, defaultRow, pageIndex, pageSize, setPageIndex
               <SelectValue placeholder={pageSize} />
             </SelectTrigger>
             <SelectContent side='top'>
-              {[defaultRow ? defaultRow : null, 10, 20, 30, 40, 50].map((size) => (
+              {[defaultRow ? defaultRow : null, 5, 20, 30, 40, 50].map((size) => (
                 <SelectItem key={size} value={`${size}`}>
                   {size}
                 </SelectItem>
