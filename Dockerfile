@@ -18,7 +18,8 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
-COPY .env ./.env
+COPY .env.production ./.env.production
+COPY .env.development ./.env.development
 COPY next.config.mjs ./next.config.mjs
 # COPY --from=builder /app/.env ./.env  # Thêm dòng này để copy .env
 
