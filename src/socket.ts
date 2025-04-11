@@ -4,7 +4,7 @@ let socket: Socket | null = null
 
 export const connectSocket = (token: string, type: string, refresh_token = '') => {
   if (socket) {
-    socket.disconnect() // Nếu socket đã tồn tại, ngắt kết nối cũ trước
+    socket.disconnect()
   }
 
   socket = io(process.env.NEXT_PUBLIC_URLAPI_ENDPOINT, {

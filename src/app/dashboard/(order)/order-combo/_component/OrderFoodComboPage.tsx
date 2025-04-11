@@ -15,8 +15,6 @@ import { debounce } from 'lodash'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { Input } from '@/components/ui/input'
-import { IOrderFood } from '../order-food.interface'
-import { getListOrderFood, restaurantCancelOrderFood, restaurantConfirmOrderFood, restaurantConfirmShipping, restaurantDeliveredOrderFood, restaurantFeedbackOrderFood, restaurantUpdateViewFeedbackOrderFood } from '../order-food.api'
 import {
   Card,
   CardContent,
@@ -89,29 +87,33 @@ const getStatusVariant = (status: string): 'default' | 'destructive' | 'secondar
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea'
 import { Pagination } from '@/components/Pagination'
+import { IOrderFoodCombo } from '../order-food.interface'
+import { getListOrderFoodCombo, restaurantCancelOrderFoodCombo, restaurantConfirmOrderFoodCombo, restaurantConfirmShipping, restaurantDeliveredOrderFoodCombo, restaurantFeedbackOrderFoodCombo, restaurantUpdateViewFeedbackOrderFoodCombo } from '../order-food.api'
 
-const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order, refresh }) => {
+const OrderCard: React.FC<{ order: IOrderFoodCombo; refresh: () => void }> = ({ order, refresh }) => {
   const [feedback, setFeedback] = useState<string>('');
   const [isFeedbackViewActive, setIsFeedbackViewActive] = useState<boolean>(
-    order.od_feed_view === 'active'
+    order.od_cb_feed_view === 'active'
   );
-
-  const totalPrice = order.orderItems.reduce((total, item) => {
-    const options = item.foodSnap.fsnp_options
-      ? JSON.parse(item.foodSnap.fsnp_options)
-      : [];
-    const optionTotal = options.reduce((sum: number, opt: any) => sum + opt.fopt_price, 0);
-    const itemPrice = (item.foodSnap.fsnp_price + optionTotal) * item.od_it_quantity;
-    return total + itemPrice;
-  }, 0) + (order.od_price_shipping || 0);
-
-  const statusLabel = getTextStatus(order.od_status);
-  const statusVariant = getStatusVariant(order.od_status);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
+
+
+  let totalComboPrice = 0;
+  for (const item of order.orderItems) {
+    const quantity = item.od_cb_it_quantity || 0;
+    const price = item.foodComboSnap?.fcb_snp_price || 0;
+    totalComboPrice += quantity * price;
+  }
+  const shippingPrice = order.od_cb_price_shipping || 0;
+  const totalPrice = totalComboPrice + shippingPrice;
+
+  const statusLabel = getTextStatus(order.od_cb_status);
+  const statusVariant = getStatusVariant(order.od_cb_status);
+
   // Handle Confirm Order
   const handleConfirmOrder = async () => {
-    const res = await restaurantConfirmOrderFood(order.od_id);
+    const res = await restaurantConfirmOrderFoodCombo(order.od_cb_id);
     if (res.statusCode === 200) {
       toast({
         title: 'Thành công',
@@ -130,7 +132,7 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
 
   // Handle Confirm Shipping
   const handleConfirmShipping = async () => {
-    const res = await restaurantConfirmShipping(order.od_id);
+    const res = await restaurantConfirmShipping(order.od_cb_id);
     if (res.statusCode === 200) {
       toast({
         title: 'Thành công',
@@ -149,7 +151,7 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
 
   // Handle Delivered Order
   const handleDeliveredOrder = async () => {
-    const res = await restaurantDeliveredOrderFood(order.od_id);
+    const res = await restaurantDeliveredOrderFoodCombo(order.od_cb_id);
     if (res.statusCode === 200) {
       toast({
         title: 'Thành công',
@@ -178,7 +180,7 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
       return;
     }
 
-    const res = await restaurantCancelOrderFood(order.od_id, cancelReason);
+    const res = await restaurantCancelOrderFoodCombo(order.od_cb_id, cancelReason);
     if (res.statusCode === 200) {
       toast({
         title: 'Thành công',
@@ -196,7 +198,6 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
       });
     }
   };
-
   // Handle Submit Feedback
   const handleSubmitFeedback = async () => {
     if (!feedback.trim()) {
@@ -208,7 +209,7 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
       return;
     }
 
-    const res = await restaurantFeedbackOrderFood(order.od_id, feedback);
+    const res = await restaurantFeedbackOrderFoodCombo(order.od_cb_id, feedback);
     if (res.statusCode === 200) {
       toast({
         title: 'Thành công',
@@ -228,7 +229,7 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
 
   const handleToggleFeedbackView = async () => {
     const newViewStatus = isFeedbackViewActive ? 'disable' : 'active';
-    const res = await restaurantUpdateViewFeedbackOrderFood(order.od_id, newViewStatus);
+    const res = await restaurantUpdateViewFeedbackOrderFoodCombo(order.od_cb_id, newViewStatus);
     if (res.statusCode === 200) {
       toast({
         title: 'Thành công',
@@ -253,9 +254,9 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
           <div className="w-2/3 flex flex-col">
             <div className="flex gap-2 items-center">
               <CardTitle>
-                {order.od_user_name} - {order.od_user_phone || 'Không có'}
+                {order.od_cb_user_name} - {order.od_cb_user_phone || 'Không có'}
               </CardTitle>
-              <CardDescription>({formatVietnameseDate(new Date(order.od_created_at))})</CardDescription>
+              <CardDescription>({formatVietnameseDate(new Date(order.od_cb_created_at))})</CardDescription>
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-sm italic text-muted-foreground">
@@ -266,11 +267,11 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
               </span>
             </div>
             <span className="text-sm italic text-muted-foreground">
-              Địa chỉ: {order.od_user_address}, P.{order.od_user_ward}, Q.{order.od_user_district}, T.
-              {order.od_user_province}
+              Địa chỉ: {order.od_cb_user_address}, P.{order.od_cb_user_ward}, Q.{order.od_cb_user_district}, T.
+              {order.od_cb_user_province}
             </span>
             <span className="text-sm italic text-muted-foreground">
-              Feedback: {order.od_feed_star} ⭐ - {order.od_feed_content || 'Không có'}
+              Feedback: {order.od_cb_feed_star} ⭐ - {order.od_cb_feed_content || 'Không có'}
             </span>
           </div>
           <div className="w-1/3">
@@ -279,40 +280,40 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
               <Badge variant={statusVariant}>{statusLabel}</Badge>
             </div>
             <span className='text-sm italic text-muted-foreground'>
-              Phản hồi: {order.od_feed_reply || 'Chưa có phản hồi'}
+              Phản hồi: {order.od_cb_feed_reply || 'Chưa có phản hồi'}
             </span>
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
               {
-                order.od_status === 'waiting_confirm_restaurant' && (
+                order.od_cb_status === 'waiting_confirm_restaurant' && (
                   <Button variant="outline" size="sm" onClick={handleConfirmOrder}>
                     Xác nhận đơn hàng
                   </Button>
                 )
               }
               {
-                order.od_status === 'waiting_shipping' && (
+                order.od_cb_status === 'waiting_shipping' && (
                   <Button variant="outline" size="sm" onClick={handleConfirmShipping}>
                     Xác nhận giao hàng
                   </Button>
                 )
               }
               {
-                order.od_status === 'shipping' && (
+                order.od_cb_status === 'shipping' && (
                   <Button variant="outline" size="sm" onClick={handleDeliveredOrder}>
                     Xác nhận đã giao hàng
                   </Button>
                 )
               }
               {/* {
-                order.od_status === 'waiting_confirm_restaurant' || order.od_status === 'waiting_shipping' ? (
+                order.od_cb_status === 'waiting_confirm_restaurant' || order.od_cb_status === 'waiting_shipping' ? (
                   <Button variant="outline" size="sm" onClick={handleCancelOrder}>
                     Hủy đơn hàng
                   </Button>
                 ) : null
               } */}
-              {(order.od_status === 'waiting_confirm_restaurant' || order.od_status === 'waiting_shipping') && (
+              {(order.od_cb_status === 'waiting_confirm_restaurant' || order.od_cb_status === 'waiting_shipping') && (
                 <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
                   <DialogTrigger asChild>
                     <Button
@@ -357,14 +358,14 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
           </div>
         </div>
 
-        {(order.od_status === 'complaint' || order.od_status === 'complaint_done') || (order.od_feed_content && order.od_feed_star) && (
+        {(order.od_cb_status === 'complaint' || order.od_cb_status === 'complaint_done') || (order.od_cb_feed_content && order.od_cb_feed_star) && (
           <div className="mt-4">
             {
-              !order.od_feed_reply &&
+              !order.od_cb_feed_reply &&
               <Label className="font-semibold">Phản hồi feedback</Label>
             }
             {
-              !order.od_feed_reply &&
+              !order.od_cb_feed_reply &&
               <Textarea
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
@@ -373,7 +374,7 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
               />}
             <div className="flex gap-2 mt-2">
               {
-                !order.od_feed_reply &&
+                !order.od_cb_feed_reply &&
                 <Button size="sm" onClick={handleSubmitFeedback}>
                   Gửi phản hồi
                 </Button>
@@ -400,19 +401,13 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
               {order.orderItems.length > 0 ? (
                 <div className="space-y-3 overflow-y-auto">
                   {order.orderItems.map((item, index) => {
-                    const options = item.foodSnap.fsnp_options
-                      ? JSON.parse(item.foodSnap.fsnp_options)
-                      : [];
-                    const optionTotal = options.reduce((sum: number, opt: any) => sum + opt.fopt_price, 0);
-                    const itemTotal = (item.foodSnap.fsnp_price + optionTotal) * item.od_it_quantity;
-
                     return (
-                      <div key={item.od_it_id} className="flex items-center gap-2 sm:gap-3">
-                        <Avatar className="h-20 w-20 !rounded-md">
+                      <div key={item.od_cb_it_id} className="flex items-center gap-2 sm:gap-3">
+                        <Avatar className="h-12 w-12 !rounded-md">
                           <AvatarImage
                             src={
-                              item.foodSnap.fsnp_image
-                                ? JSON.parse(item.foodSnap.fsnp_image)[0]?.image_cloud
+                              item.foodComboSnap.fcb_snp_image
+                                ? JSON.parse(item.foodComboSnap.fcb_snp_image)?.image_cloud
                                 : '/placeholder-image.jpg'
                             }
                             alt="Food item"
@@ -421,35 +416,21 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
                         </Avatar>
                         <div className="flex-1">
                           <p className="font-medium text-sm sm:text-base">
-                            {item.foodSnap.fsnp_name} (
+                            {item.foodComboSnap.fcb_snp_name} (
                             {new Intl.NumberFormat('vi-VN', {
                               style: 'currency',
                               currency: 'VND',
-                            }).format(itemTotal)}
+                            }).format(item.foodComboSnap.fcb_snp_price * item.od_cb_it_quantity)}
                             )
                           </p>
                           <p className="text-xs sm:text-sm text-muted-foreground">
-                            Giá:{' '}
+                            Giá:
                             {new Intl.NumberFormat('vi-VN', {
                               style: 'currency',
                               currency: 'VND',
-                            }).format(item.foodSnap.fsnp_price)}{' '}
-                            x {item.od_it_quantity}
+                            }).format(item.foodComboSnap.fcb_snp_price)}{' '}
+                            x {item.od_cb_it_quantity}
                           </p>
-                          {options.length > 0 && (
-                            <div className="text-xs sm:text-sm text-muted-foreground">
-                              {options.map((opt: any, optIndex: number) => (
-                                <p key={optIndex}>
-                                  {opt.fopt_name}: {opt.fopt_attribute} (+
-                                  {new Intl.NumberFormat('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND',
-                                  }).format(opt.fopt_price)}
-                                  )
-                                </p>
-                              ))}
-                            </div>
-                          )}
                         </div>
                       </div>
                     );
@@ -466,7 +447,7 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
   );
 };
 
-export default function OrderFoodPage() {
+export default function OrderFoodComboPage() {
   const today = new Date();
   const defaultToDate = new Date(today.setHours(0, 0, 0, 0));
   const defaultFromDate = new Date(defaultToDate);
@@ -489,8 +470,7 @@ export default function OrderFoodPage() {
     totalItem: 0,
   });
   const searchParam = useSearchParams().get('a');
-  const [listOrderFood, setListOrderFood] = useState<IOrderFood[]>([]);
-
+  const [listOrderFoodCombo, setListOrderFoodCombo] = useState<IOrderFoodCombo[]>([]);
 
   const handleSelectFromDate = (date: Date | undefined) => {
     if (date) {
@@ -513,7 +493,7 @@ export default function OrderFoodPage() {
   };
 
   const findListBookTable = async () => {
-    const res: IBackendRes<IModelPaginate<IOrderFood>> = await getListOrderFood({
+    const res: IBackendRes<IModelPaginate<IOrderFoodCombo>> = await getListOrderFoodCombo({
       current: pageIndex,
       pageSize: pageSize,
       toDate: toDate,
@@ -522,10 +502,10 @@ export default function OrderFoodPage() {
       q: query,
     });
     if (res.statusCode === 200 && res.data && res.data.result) {
-      setListOrderFood(res.data.result);
+      setListOrderFoodCombo(res.data.result);
       setMeta(res.data.meta);
     } else if (res.code === -10) {
-      setListOrderFood([]);
+      setListOrderFoodCombo([]);
       toast({
         title: 'Thông báo',
         description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
@@ -533,14 +513,14 @@ export default function OrderFoodPage() {
       });
       await deleteCookiesAndRedirect();
     } else if (res.code === -11) {
-      setListOrderFood([]);
+      setListOrderFoodCombo([]);
       toast({
         title: 'Thông báo',
         description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
         variant: 'destructive',
       });
     } else {
-      setListOrderFood([]);
+      setListOrderFoodCombo([]);
       toast({
         title: 'Thất bại',
         description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
@@ -670,9 +650,9 @@ export default function OrderFoodPage() {
       </div>
 
       <div className="mt-6">
-        {listOrderFood.length > 0 ? (
-          listOrderFood.map((order) => (
-            <OrderCard key={order.od_id} order={order} refresh={findListBookTable} />
+        {listOrderFoodCombo.length > 0 ? (
+          listOrderFoodCombo.map((order) => (
+            <OrderCard key={order.od_cb_id} order={order} refresh={findListBookTable} />
           ))
         ) : (
           <p className="text-center text-gray-500">Không có đơn hàng nào để hiển thị.</p>

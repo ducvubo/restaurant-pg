@@ -66,12 +66,12 @@ export const restaurantDeliveredOrderFood = async (od_id: string) => {
   return res
 }
 
-export const restaurantCancelOrderFood = async (od_id: string) => {
+export const restaurantCancelOrderFood = async (od_id: string, od_reason_cancel: string) => {
   const res: IBackendRes<IOrderFood> = await sendRequest({
     url: `${process.env.URL_SERVER_ORDER}/order-food/restaurant-cancel-order-food`,
     method: 'PATCH',
     body: {
-      od_id
+      od_id, od_reason_cancel
     }
   })
   return res
