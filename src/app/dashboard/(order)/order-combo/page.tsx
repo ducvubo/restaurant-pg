@@ -5,7 +5,7 @@ import { ContentLayout } from '@/components/admin-panel/content-layout'
 export default function PageBookTable() {
   return (
     <div>
-      <ContentLayout title='Danh sách đặt bàn'>
+      <ContentLayout title='Danh sách đặt combo'>
         <OrderFoodComboPage />
       </ContentLayout>
     </div>

@@ -7,7 +7,7 @@ import Link from 'next/link'
 export default function PageBookTable() {
   return (
     <div>
-      <ContentLayout title='Danh sách đặt bàn'>
+      <ContentLayout title='Danh sách đặt món ăn'>
         <BookTablePage />
       </ContentLayout>
     </div>
