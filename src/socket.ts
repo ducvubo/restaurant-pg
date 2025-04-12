@@ -14,7 +14,6 @@ export const connectSocket = (token: string, type: string, refresh_token = '') =
       type: type
     }
   })
-
   socket.on('connect', () => {
     console.log('Connected to socket:', socket?.id)
   })

@@ -9,6 +9,7 @@ import { getCookie } from '@/app/actions/action'
 import { connectSocket } from '@/socket'
 import { toast } from '@/hooks/use-toast'
 import { switchStatusOrderVi } from '@/app/utils'
+import { addNotification, INotification } from '../notification.slice'
 
 export default function RefreshToken() {
   const dispatch = useDispatch()
@@ -20,6 +21,10 @@ export default function RefreshToken() {
 
   const runAppEmployee = (inforEmployee: any) => {
     dispatch(startAppEmployee(inforEmployee))
+  }
+
+  const runAddNotification = (notification: INotification) => {
+    dispatch(addNotification(notification))
   }
 
   useEffect(() => {
@@ -70,6 +75,11 @@ export default function RefreshToken() {
         socket.on('guest-cancel-order', () => {
           const currentPath = window.location.pathname
           router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
+        })
+
+        socket.on('notification_account', (data: INotification) => {
+          console.log("🚀 ~ socket.on ~ notification_account:", data)
+          runAddNotification(data)
         })
       }
 
