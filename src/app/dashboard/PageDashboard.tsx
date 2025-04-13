@@ -416,7 +416,7 @@ export default function PageDashboard() {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                   }}
-                  formatter={(value) => formatCurrency(value)}
+                  formatter={(value: number) => formatCurrency(value)}
                 />
                 <Line
                   type="monotone"
@@ -450,7 +450,7 @@ export default function PageDashboard() {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                   }}
-                  formatter={(value) => formatCurrency(value)}
+                  formatter={(value: number) => formatCurrency(value)}
                 />
                 <Bar dataKey="revenue" fill="url(#gradient-dishes)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -477,7 +477,7 @@ export default function PageDashboard() {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                   }}
-                  formatter={(value) => formatCurrency(value)}
+                  formatter={(value: number) => formatCurrency(value)}
                 />
                 <Line
                   type="monotone"
@@ -511,7 +511,7 @@ export default function PageDashboard() {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                   }}
-                  formatter={(value) => formatCurrency(value)}
+                  formatter={(value: number) => formatCurrency(value)}
                 />
                 <Bar dataKey="revenue" fill="url(#gradient-foods)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -538,7 +538,7 @@ export default function PageDashboard() {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                   }}
-                  formatter={(value) => formatCurrency(value)}
+                  formatter={(value: number) => formatCurrency(value)}
                 />
                 <Line
                   type="monotone"
@@ -572,7 +572,7 @@ export default function PageDashboard() {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                   }}
-                  formatter={(value) => formatCurrency(value)}
+                  formatter={(value: number) => formatCurrency(value)}
                 />
                 <Bar dataKey="revenue" fill="url(#gradient-combos)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -610,7 +610,7 @@ export default function PageDashboard() {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                   }}
-                  formatter={(value) => `${value} đơn`}
+                  formatter={(value: number) => `${value} đơn`}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -654,7 +654,7 @@ export default function PageDashboard() {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                   }}
-                  formatter={(value) => `${value} khách`}
+                  formatter={(value: number) => `${value} khách`}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -694,7 +694,7 @@ export default function PageDashboard() {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                   }}
-                  formatter={(value) => `${value} bàn`}
+                  formatter={(value: number) => `${value} bàn`}
                 />
                 <Line
                   type="monotone"
