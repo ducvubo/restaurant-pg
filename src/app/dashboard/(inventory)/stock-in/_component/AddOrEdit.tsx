@@ -581,7 +581,6 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
           spliId = supplier.spli_id;
         } else {
           spliId = await createSupplierCom(pdfData.spli_id) as string;
-          console.log("🚀 ~ handleUploadPdf ~ spliId:", spliId)
           if (!spliId) {
             toast({
               title: 'Cảnh báo',
@@ -655,10 +654,9 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
               igd_id: igdId || item.stki_item_code,
               igd_name: item.stki_item_name,
               unt_name: item.stki_item_unit,
-              stki_item_quantity_real: parseFloat(item.stki_item_quantity_real) || 0,
-              stki_item_quantity: parseFloat(item.stki_item_quantity_real) || 0,
+              stki_item_quantity_real: parseFloat(item.stki_item_quantity_real.replace(/,/g, '')) || 0,
+              stki_item_quantity: parseFloat(item.stki_item_quantity_real.replace(/,/g, '')) || 0,
               stki_item_price: parseFloat(item.stki_item_price) || 0,
-              stki_item_total: parseFloat(item.stki_item_total) || 0,
               stki_item_note: item.stki_item_note || ''
             };
           }));
