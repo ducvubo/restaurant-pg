@@ -656,7 +656,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
               unt_name: item.stki_item_unit,
               stki_item_quantity_real: parseFloat(item.stki_item_quantity_real.replace(/,/g, '')) || 0,
               stki_item_quantity: parseFloat(item.stki_item_quantity_real.replace(/,/g, '')) || 0,
-              stki_item_price: parseFloat(item.stki_item_price) || 0,
+              stki_item_price: parseFloat(item.stki_item_price.replace(/,/g, '')) || 0,
               stki_item_note: item.stki_item_note || ''
             };
           }));
