@@ -54,6 +54,7 @@ export function PageIngredient<TData, TValue>({ columns, meta, data }: DataTable
       columnVisibility
     }
   })
+    console.log("🚀 ~ data:", data)
 
   const [pageIndex, setPageIndex] = React.useState(meta.current)
   const [pageSize, setPageSize] = React.useState(meta.pageSize)

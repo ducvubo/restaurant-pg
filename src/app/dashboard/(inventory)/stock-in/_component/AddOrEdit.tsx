@@ -39,10 +39,10 @@ import { InputNoBoder } from '@/components/CustomInputNoBoder'
 import { IoMdCloudUpload } from 'react-icons/io'
 import Image from 'next/image'
 import { Loader2, TrashIcon } from 'lucide-react'
-import { createIngredient, findAllUnits } from '../../ingredients/ingredient.api'
+import { createIngredient, findAllCategories, findAllUnits } from '../../ingredients/ingredient.api'
 import { createSupplier } from '../../suppliers/supplier.api'
 import { createUnit } from '../../units/unit.api'
-import { createCatIngredient } from '../../cat-ingredients/cat-ingredient.api'
+import { createCatIngredient, getAllCatIngredients } from '../../cat-ingredients/cat-ingredient.api'
 
 interface Props {
   id: string
@@ -82,6 +82,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   const [listUnits, setListUnits] = useState<any[]>([])
   const [listCatIngredients, setListCatIngredients] = useState<any[]>([])
+  console.log("🚀 ~ AddOrEdit ~ listCatIngredients:", listCatIngredients)
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -109,6 +110,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
     findAllEmployees()
     findAllIngredient()
     findAllUnitsCom()
+    getListCatIngredients()
   }, [])
 
   useEffect(() => {
@@ -479,10 +481,31 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
     return null;
   }
 
+  const getListCatIngredients = async () => {
+    const res = await findAllCategories()
+    if (res.statusCode === 200 && res.data) {
+      setListCatIngredients(res.data);
+    } else if (res.code === -10) {
+      toast({
+        title: 'Thông báo',
+        description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+        variant: 'destructive'
+      })
+      await deleteCookiesAndRedirect()
+    } else if (res.code === -11) {
+      toast({
+        title: 'Thông báo',
+        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+        variant: 'destructive'
+      })
+    }
+
+  }
+
   const createIngredientCom = async (name: string, unitId: string, code: string) => {
     let catIgdId = '';
     const existingCat = listCatIngredients.find(cat =>
-      cat.cat_igd_name.toLowerCase() === "danh mục từ nhập pdf"
+      cat.cat_igd_name === "Danh mục từ nhập pdf"
     );
 
     if (existingCat) {
@@ -514,23 +537,6 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
     }
     return null;
   }
-
-  // Hàm thêm mới ingredient
-  // const createIngredientCom = async (name: string, unitId: string, code: string) => {
-  //   const payload = {
-  //     cat_igd_id: 'e10673a0-dd00-443e-9fbc-e27b14eb7519', // Gán cứng cat_igd_id
-  //     unt_id: unitId,
-  //     igd_name: name,
-  //     igd_description: 'Dữ liệu được nhập tự động từ file PDF',
-  //     igd_image: 'Dữ liệu được nhập tự động từ file PDF'
-  //   };
-  //   const res = await createIngredient(payload)
-  //   console.log("🚀 ~ createIngredientCom ~ data:", res)
-  //   if (res.statusCode === 201 && res.data) {
-  //     setListIngredients((prev: any) => [...prev, res.data]);
-  //     return res.data.igd_id;
-  //   }
-  // }
 
   const handleUploadPdf = async () => {
     if (!pdfFile) {

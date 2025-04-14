@@ -10,5 +10,7 @@ export interface IIngredient {
   igd_name: string
   igd_image: string
   igd_description?: string
-  igd_status?: 'enable' | 'disable'
+  igd_status?: 'enable' | 'disable',
+  totalStockOutQuantity?: number
+  totalStockInQuantity?: number
 }

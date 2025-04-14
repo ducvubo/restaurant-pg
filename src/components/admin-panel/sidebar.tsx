@@ -37,7 +37,7 @@ export function Sidebar({ inforEmployee, inforRestaurant }: Props) {
           variant='link'
           asChild
         >
-          <Link href='/dashboard/infor' className='flex items-center gap-2'>
+          <Link href='/dashboard' className='flex items-center gap-2'>
             {/* <PanelsTopLeft className='w-6 h-6 mr-1' /> */}
             <Avatar>
               <AvatarImage

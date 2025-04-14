@@ -13,7 +13,6 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from 'recharts';
 import { Badge } from '@/components/ui/badge';
@@ -44,43 +43,29 @@ import {
   getComboRevenueTrends,
   getTopCombos,
   getRecentComboOrders,
+  getTotalStockValue,
+  getStockInTrends,
+  getStockOutTrends,
+  getLowStockIngredients,
+  getTopIngredients,
+  getRecentStockTransactions,
+  getStockByCategory,
 } from './dashboard.api';
 
-// Static sample data
+// Constants
+const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFCE56', '#36A2EB'];
 const blogPerformance = [
   { title: 'Top món ăn mùa hè', views: 1200, likes: 150 },
   { title: 'Cách làm phở ngon', views: 800, likes: 90 },
   { title: 'Chuyện nhà hàng', views: 600, likes: 70 },
 ];
 
-const inventoryData = [
-  { item: 'Thịt bò', stock: 50, unit: 'kg' },
-  { item: 'Gạo', stock: 200, unit: 'kg' },
-  { item: 'Rau xanh', stock: 30, unit: 'kg' },
-  { item: 'Nước mắm', stock: 20, unit: 'lít' },
-];
-
+// Utility function
 const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(value);
-
-const COLORS = [
-  '#FF6B6B',
-  '#4ECDC4',
-  '#45B7D1',
-  '#96CEB4',
-  '#FFCE56',
-  '#36A2EB',
-  '#FF6384',
-  '#4BC0C0',
-  '#9966FF',
-  '#C9CB3F',
-  '#FF9F40',
-];
+  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 
 export default function PageDashboard() {
+  // State declarations (unchanged for brevity)
   const [totalReservations, setTotalReservations] = useState<number>(0);
   const [reservationTrends, setReservationTrends] = useState<
     { date: string; reservations: number }[]
@@ -121,139 +106,152 @@ export default function PageDashboard() {
   const [recentOrdersCombo, setRecentOrdersCombo] = useState<
     { id: string; customer: string; total: number; status: string }[]
   >([]);
+  const [totalStockValue, setTotalStockValue] = useState<number>(0);
+  const [stockInTrends, setStockInTrends] = useState<
+    { date: string; quantity: number; value: number }[]
+  >([]);
+  const [stockOutTrends, setStockOutTrends] = useState<
+    { date: string; quantity: number; value: number }[]
+  >([]);
+  const [lowStockIngredients, setLowStockIngredients] = useState<
+    { igd_name: string; stock: number; unit: string }[]
+  >([]);
+  const [topIngredients, setTopIngredients] = useState<
+    { igd_name: string; quantity: number; value: number }[]
+  >([]);
+  const [recentStockTransactions, setRecentStockTransactions] = useState<
+    { id: string; code: string; ingredient: string; quantity: number; date: string; type: 'in' | 'out' }[]
+  >([]);
+  const [stockByCategory, setStockByCategory] = useState<
+    { category: string; stock: number; value: number }[]
+  >([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const restaurantId = '123'; // TODO: Replace with dynamic restaurant ID
+  const restaurantId = '123';
   const queryParams = {
     restaurantId,
     startDate: '2024-01-01',
-    endDate: '2026-04-07',
+    endDate: '2026-04-12',
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-
-        // Booking APIs
+        // Fetch data (unchanged for brevity, same API calls)
         const totalRes = await getTotalReservations(queryParams);
         if (totalRes.statusCode === 200 && totalRes.data) {
           setTotalReservations(totalRes.data.totalReservations);
-        } else {
         }
-
         const trendsRes = await getReservationTrends(queryParams);
         if (trendsRes.statusCode === 200 && trendsRes.data) {
           setReservationTrends(trendsRes.data);
-        } else {
         }
-
         const customerRes = await getCustomerDistribution(queryParams);
         if (customerRes.statusCode === 200 && customerRes.data) {
           setCustomerData([
             { type: 'Khách mới', value: customerRes.data.newCustomers },
             { type: 'Khách quen', value: customerRes.data.returningCustomers },
           ]);
-        } else {
         }
-
-        // Dish APIs
         const totalRevenueDishRes = await getTotalRevenue(queryParams);
         if (totalRevenueDishRes.statusCode === 200 && totalRevenueDishRes.data) {
           setTotalRevenueDish(totalRevenueDishRes.data.totalRevenue);
-        } else {
         }
-
         const revenueTrendsDishRes = await getRevenueTrends(queryParams);
         if (revenueTrendsDishRes.statusCode === 200 && revenueTrendsDishRes.data) {
           setRevenueTrendsDish(revenueTrendsDishRes.data);
-        } else {
         }
-
         const topDishesRes = await getTopDishes(queryParams);
         if (topDishesRes.statusCode === 200 && topDishesRes.data) {
           setTopDishes(topDishesRes.data);
-        } else {
         }
-
         const recentOrdersDishRes = await getRecentOrders(queryParams);
         if (recentOrdersDishRes.statusCode === 200 && recentOrdersDishRes.data) {
           setRecentOrdersDish(recentOrdersDishRes.data);
-        } else {
         }
-
-        // Food APIs
         const totalRevenueFoodRes = await getTotalRevenueFood(queryParams);
         if (totalRevenueFoodRes.statusCode === 200 && totalRevenueFoodRes.data) {
           setTotalRevenueFood(totalRevenueFoodRes.data.totalRevenue);
-        } else {
         }
-
         const revenueTrendsFoodRes = await getRevenueTrendsFood(queryParams);
         if (revenueTrendsFoodRes.statusCode === 200 && revenueTrendsFoodRes.data) {
           setRevenueTrendsFood(revenueTrendsFoodRes.data);
-        } else {
         }
-
         const topFoodsRes = await getTopFoods(queryParams);
         if (topFoodsRes.statusCode === 200 && topFoodsRes.data) {
           setTopFoods(topFoodsRes.data);
-        } else {
         }
-
         const recentOrdersFoodRes = await getRecentOrdersFood(queryParams);
         if (recentOrdersFoodRes.statusCode === 200 && recentOrdersFoodRes.data) {
           setRecentOrdersFood(recentOrdersFoodRes.data);
-        } else {
         }
-
         const statusDistributionRes = await getOrderStatusDistributionFood(queryParams);
         if (statusDistributionRes.statusCode === 200 && statusDistributionRes.data) {
           setOrderStatusDistribution(statusDistributionRes.data);
-        } else {
         }
-
-        // Combo APIs
         const totalRevenueComboRes = await getTotalComboRevenue(queryParams);
         if (totalRevenueComboRes.statusCode === 200 && totalRevenueComboRes.data) {
           setTotalRevenueCombo(totalRevenueComboRes.data.totalComboRevenue);
-        } else {
         }
-
         const revenueTrendsComboRes = await getComboRevenueTrends(queryParams);
         if (revenueTrendsComboRes.statusCode === 200 && revenueTrendsComboRes.data) {
           setRevenueTrendsCombo(revenueTrendsComboRes.data);
-        } else {
         }
-
         const topCombosRes = await getTopCombos(queryParams);
         if (topCombosRes.statusCode === 200 && topCombosRes.data) {
           setTopCombos(topCombosRes.data);
-        } else {
         }
-
         const recentOrdersComboRes = await getRecentComboOrders(queryParams);
         if (recentOrdersComboRes.statusCode === 200 && recentOrdersComboRes.data) {
           setRecentOrdersCombo(recentOrdersComboRes.data);
-        } else {
         }
-
+        const totalStockRes = await getTotalStockValue(queryParams);
+        if (totalStockRes.statusCode === 200 && totalStockRes.data) {
+          setTotalStockValue(totalStockRes.data.totalStockValue);
+        }
+        const stockInTrendsRes = await getStockInTrends(queryParams);
+        if (stockInTrendsRes.statusCode === 200 && stockInTrendsRes.data) {
+          setStockInTrends(stockInTrendsRes.data);
+        }
+        const stockOutTrendsRes = await getStockOutTrends(queryParams);
+        if (stockOutTrendsRes.statusCode === 200 && stockOutTrendsRes.data) {
+          setStockOutTrends(stockOutTrendsRes.data);
+        }
+        const lowStockRes = await getLowStockIngredients({
+          ...queryParams,
+          threshold: 10,
+        });
+        if (lowStockRes.statusCode === 200 && lowStockRes.data) {
+          setLowStockIngredients(lowStockRes.data);
+        }
+        const topIngredientsRes = await getTopIngredients(queryParams);
+        if (topIngredientsRes.statusCode === 200 && topIngredientsRes.data) {
+          setTopIngredients(topIngredientsRes.data);
+        }
+        const recentStockRes = await getRecentStockTransactions(queryParams);
+        if (recentStockRes.statusCode === 200 && recentStockRes.data) {
+          setRecentStockTransactions(recentStockRes.data);
+        }
+        const stockByCategoryRes = await getStockByCategory(queryParams);
+        if (stockByCategoryRes.statusCode === 200 && stockByCategoryRes.data) {
+          setStockByCategory(stockByCategoryRes.data);
+        }
         setError(null);
       } catch (err: any) {
-        setError(err.message || 'An error occurred while fetching data');
+        setError(err.message || 'Đã xảy ra lỗi khi tải dữ liệu');
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-lg text-gray-600">Đang tải dữ liệu...</p>
+        <p className="text-base text-gray-600">Đang tải...</p>
       </div>
     );
   }
@@ -261,334 +259,426 @@ export default function PageDashboard() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-lg text-red-600">Lỗi: {error}</p>
+        <p className="text-base text-red-600">Lỗi: {error}</p>
       </div>
     );
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen">
-      {/* Gradient for hover effect */}
-      <svg className="absolute w-0 h-0">
-        <defs>
-          <linearGradient id="gradient-revenue-dish" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#4F46E5', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#7C3AED', stopOpacity: 1 }} />
-          </linearGradient>
-          <linearGradient id="gradient-dishes" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#10B981', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#34D399', stopOpacity: 1 }} />
-          </linearGradient>
-          <linearGradient id="gradient-revenue-food" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#8B5CF6', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#D946EF', stopOpacity: 1 }} />
-          </linearGradient>
-          <linearGradient id="gradient-foods" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#F59E0B', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#FBBF24', stopOpacity: 1 }} />
-          </linearGradient>
-          <linearGradient id="gradient-revenue-combo" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#EC4899', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#F472B6', stopOpacity: 1 }} />
-          </linearGradient>
-          <linearGradient id="gradient-combos" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#EF4444', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#F87171', stopOpacity: 1 }} />
-          </linearGradient>
-          <linearGradient id="gradient-blog" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#F97316', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#EF4444', stopOpacity: 1 }} />
-          </linearGradient>
-          <linearGradient id="gradient-reservations" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#14B8A6', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#22D3EE', stopOpacity: 1 }} />
-          </linearGradient>
-          <linearGradient id="gradient-status" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#FF6B6B', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#FF9F40', stopOpacity: 1 }} />
-          </linearGradient>
-        </defs>
-      </svg>
-
+    <div className="p-4 space-y-4 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="text-center sm:text-left">
-        <h1 className="text-3xl sm:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-          Dashboard Quản Lý Nhà Hàng
-        </h1>
-        <p className="mt-2 text-sm sm:text-base text-gray-600">
-          Tổng quan hoạt động kinh doanh món ăn, món ăn online và combo
+        <h1 className="text-2xl font-bold text-indigo-600">Dashboard Nhà Hàng</h1>
+        <p className="mt-1 text-sm text-gray-600">
+          Tổng quan kinh doanh, đặt bàn, kho hàng
         </p>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {[
           {
-            title: 'Doanh Thu Món Ăn',
+            title: 'Doanh Thu Món',
             value: formatCurrency(totalRevenueDish),
             change: '+20%',
             icon: Utensils,
-            color: 'from-green-400 to-emerald-600',
+            color: 'text-green-600',
           },
           {
             title: 'Doanh Thu Online',
             value: formatCurrency(totalRevenueFood),
             change: '+18%',
             icon: ShoppingCart,
-            color: 'from-yellow-400 to-amber-600',
+            color: 'text-yellow-600',
           },
           {
             title: 'Doanh Thu Combo',
             value: formatCurrency(totalRevenueCombo),
             change: '+15%',
             icon: Pizza,
-            color: 'from-red-400 to-pink-600',
+            color: 'text-red-600',
           },
           {
-            title: 'Số Khách Hàng',
+            title: 'Khách Hàng',
             value: customerData.reduce((sum, item) => sum + item.value, 0).toString(),
             change: '+15%',
             icon: Users,
-            color: 'from-blue-400 to-indigo-600',
+            color: 'text-blue-600',
           },
           {
             title: 'Đặt Bàn',
             value: totalReservations.toString(),
             change: '+12%',
             icon: Table,
-            color: 'from-teal-400 to-cyan-600',
+            color: 'text-teal-600',
+          },
+          {
+            title: 'Tồn Kho',
+            value: formatCurrency(totalStockValue),
+            change: 'Cập nhật',
+            icon: Package,
+            color: 'text-gray-600',
           },
           {
             title: 'Lượt Xem Blog',
             value: '2600',
             change: '+25%',
             icon: BookOpen,
-            color: 'from-purple-400 to-violet-600',
-          },
-          {
-            title: 'Tồn Kho',
-            value: '4 mặt hàng',
-            change: 'Cần bổ sung: 1',
-            icon: Package,
-            color: 'from-red-400 to-pink-600',
+            color: 'text-purple-600',
           },
         ].map((metric) => (
-          <Card
-            key={metric.title}
-            className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow"
-          >
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-semibold text-gray-700">
+          <Card key={metric.title} className="bg-white shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-1">
+              <CardTitle className="text-sm font-medium text-gray-700">
                 {metric.title}
               </CardTitle>
-              <metric.icon className="h-5 w-5 text-gray-500" />
+              <metric.icon className="h-4 w-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div
-                className={`text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r ${metric.color}`}
-              >
+              <div className={`text-xl font-semibold ${metric.color}`}>
                 {metric.value}
               </div>
-              <p className="text-xs text-gray-500 mt-1">{metric.change}</p>
+              <p className="text-xs text-gray-500">{metric.change}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Charts */}
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 !p-0">
-        {/* Dish Revenue Chart */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
+      {/* Charts Section */}
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+        {/* Dish Revenue */}
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-indigo-700">
-              Doanh Thu Món Ăn Theo Ngày
+            <CardTitle className="text-base font-medium text-indigo-600">
+              Doanh Thu Món
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={200}>
               <LineChart data={revenueTrendsDish}>
-                <XAxis dataKey="date" stroke="#6B7280" />
-                <YAxis tickFormatter={(value) => formatCurrency(value)} stroke="#6B7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #C7D2FE',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                  formatter={(value: number) => formatCurrency(value)}
+                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
+                <YAxis
+                  tickFormatter={(value) => formatCurrency(value)}
+                  stroke="#6B7280"
+                  fontSize={12}
                 />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Line
                   type="monotone"
                   dataKey="revenue"
-                  stroke="url(#gradient-revenue-dish)"
-                  strokeWidth={3}
-                  dot={{ r: 5, fill: 'url(#gradient-revenue-dish)' }}
-                  activeDot={{ r: 8, fill: 'url(#gradient-revenue-dish)' }}
+                  stroke="#4F46E5"
+                  strokeWidth={2}
+                  dot={false}
                 />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Top Dishes Chart */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
+        {/* Top Dishes */}
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-green-700">
-              Top Món Ăn Được Yêu Thích
+            <CardTitle className="text-base font-medium text-green-600">
+              Top Món Ăn
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={topDishes}>
-                <XAxis dataKey="name" stroke="#6B7280" />
-                <YAxis tickFormatter={(value) => formatCurrency(value)} stroke="#6B7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #6EE7B7',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                  formatter={(value: number) => formatCurrency(value)}
+                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
+                <YAxis
+                  tickFormatter={(value) => formatCurrency(value)}
+                  stroke="#6B7280"
+                  fontSize={12}
                 />
-                <Bar dataKey="revenue" fill="url(#gradient-dishes)" radius={[4, 4, 0, 0]} />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                <Bar dataKey="revenue" fill="#10B981" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Food Revenue Chart */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
+        {/* Food Revenue */}
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-purple-700">
-              Doanh Thu Món Ăn Online Theo Ngày
+            <CardTitle className="text-base font-medium text-purple-600">
+              Doanh Thu Online
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={200}>
               <LineChart data={revenueTrendsFood}>
-                <XAxis dataKey="date" stroke="#6B7280" />
-                <YAxis tickFormatter={(value) => formatCurrency(value)} stroke="#6B7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #C4B5FD',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                  formatter={(value: number) => formatCurrency(value)}
+                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
+                <YAxis
+                  tickFormatter={(value) => formatCurrency(value)}
+                  stroke="#6B7280"
+                  fontSize={12}
                 />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Line
                   type="monotone"
                   dataKey="revenue"
-                  stroke="url(#gradient-revenue-food)"
-                  strokeWidth={3}
-                  dot={{ r: 5, fill: 'url(#gradient-revenue-food)' }}
-                  activeDot={{ r: 8, fill: 'url(#gradient-revenue-food)' }}
+                  stroke="#8B5CF6"
+                  strokeWidth={2}
+                  dot={false}
                 />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Top Foods Chart */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
+        {/* Top Foods */}
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-amber-700">
-              Top Món Ăn Online Được Yêu Thích
+            <CardTitle className="text-base font-medium text-amber-600">
+              Top Món Online
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={topFoods}>
-                <XAxis dataKey="name" stroke="#6B7280" />
-                <YAxis tickFormatter={(value) => formatCurrency(value)} stroke="#6B7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #FBBF24',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                  formatter={(value: number) => formatCurrency(value)}
+                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
+                <YAxis
+                  tickFormatter={(value) => formatCurrency(value)}
+                  stroke="#6B7280"
+                  fontSize={12}
                 />
-                <Bar dataKey="revenue" fill="url(#gradient-foods)" radius={[4, 4, 0, 0]} />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                <Bar dataKey="revenue" fill="#F59E0B" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Combo Revenue Chart */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
+        {/* Combo Revenue */}
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-pink-700">
-              Doanh Thu Combo Online Theo Ngày
+            <CardTitle className="text-base font-medium text-pink-600">
+              Doanh Thu Combo
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={200}>
               <LineChart data={revenueTrendsCombo}>
-                <XAxis dataKey="date" stroke="#6B7280" />
-                <YAxis tickFormatter={(value) => formatCurrency(value)} stroke="#6B7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #F9A8D4',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                  formatter={(value: number) => formatCurrency(value)}
+                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
+                <YAxis
+                  tickFormatter={(value) => formatCurrency(value)}
+                  stroke="#6B7280"
+                  fontSize={12}
                 />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Line
                   type="monotone"
                   dataKey="revenue"
-                  stroke="url(#gradient-revenue-combo)"
-                  strokeWidth={3}
-                  dot={{ r: 5, fill: 'url(#gradient-revenue-combo)' }}
-                  activeDot={{ r: 8, fill: 'url(#gradient-revenue-combo)' }}
+                  stroke="#EC4899"
+                  strokeWidth={2}
+                  dot={false}
                 />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Top Combos Chart */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
+        {/* Top Combos */}
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-red-700">
-              Top Combo Online Được Yêu Thích
+            <CardTitle className="text-base font-medium text-red-600">
+              Top Combo
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={topCombos}>
-                <XAxis dataKey="name" stroke="#6B7280" />
-                <YAxis tickFormatter={(value) => formatCurrency(value)} stroke="#6B7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #FCA5A5',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                  formatter={(value: number) => formatCurrency(value)}
+                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
+                <YAxis
+                  tickFormatter={(value) => formatCurrency(value)}
+                  stroke="#6B7280"
+                  fontSize={12}
                 />
-                <Bar dataKey="revenue" fill="url(#gradient-combos)" radius={[4, 4, 0, 0]} />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                <Bar dataKey="revenue" fill="#EF4444" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Stock In Trends */}
+        <Card className="bg-white shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-green-600">
+              Nhập Kho
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={stockInTrends}>
+                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
+                <Line
+                  type="monotone"
+                  dataKey="quantity"
+                  stroke="#10B981"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Stock Out Trends */}
+        <Card className="bg-white shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-red-600">
+              Xuất Kho
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={stockOutTrends}>
+                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
+                <Line
+                  type="monotone"
+                  dataKey="quantity"
+                  stroke="#EF4444"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Low Stock Ingredients */}
+        <Card className="bg-white shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-yellow-600">
+              Nguyên Liệu Sắp Hết
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {lowStockIngredients.length ? (
+                lowStockIngredients.map((item) => (
+                  <div
+                    key={item.igd_name}
+                    className="flex justify-between border-b py-1 text-sm"
+                  >
+                    <span>{item.igd_name}</span>
+                    <Badge variant="outline">
+                      {item.stock} {item.unit}
+                    </Badge>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">Không có nguyên liệu sắp hết.</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Top Ingredients */}
+        <Card className="bg-white shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-blue-600">
+              Nguyên Liệu Phổ Biến
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={topIngredients}>
+                <XAxis dataKey="igd_name" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
+                <Bar dataKey="quantity" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Recent Stock Transactions */}
+        <Card className="bg-white shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-gray-600">
+              Giao Dịch Kho
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {recentStockTransactions.length ? (
+                recentStockTransactions.map((transaction) => (
+                  <div
+                    key={transaction.id}
+                    className="flex justify-between border-b py-1 text-sm"
+                  >
+                    <div>
+                      <p>{transaction.ingredient}</p>
+                      <p className="text-xs text-gray-500">{transaction.code}</p>
+                    </div>
+                    <div className="text-right">
+                      <p>{transaction.quantity} đơn vị</p>
+                      <Badge
+                        variant={transaction.type === 'in' ? 'default' : 'destructive'}
+                      >
+                        {transaction.type === 'in' ? 'Nhập' : 'Xuất'}
+                      </Badge>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">Không có giao dịch.</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Stock by Category */}
+        <Card className="bg-white shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-purple-600">
+              Tồn Kho Theo Loại
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={stockByCategory}
+                  dataKey="stock"
+                  nameKey="category"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                >
+                  {stockByCategory.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-2 flex flex-wrap gap-2 justify-center">
+              {stockByCategory.map((entry) => (
+                <Badge key={entry.category} variant="outline">
+                  {entry.category}: {entry.stock}
+                </Badge>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
         {/* Order Status Distribution */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-orange-700">
-              Phân Bố Trạng Thái Đơn Online
+            <CardTitle className="text-base font-medium text-orange-600">
+              Trạng Thái Đơn Online
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie
                   data={orderStatusDistribution}
@@ -596,27 +686,18 @@ export default function PageDashboard() {
                   nameKey="type"
                   cx="50%"
                   cy="50%"
-                  outerRadius={100}
-                  label={({ name, value }) => `${name}: ${value}`}
+                  outerRadius={80}
                 >
-                  {orderStatusDistribution.map((entry, index) => (
+                  {orderStatusDistribution.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #FDBA74',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                  formatter={(value: number) => `${value} đơn`}
-                />
+                <Tooltip formatter={(value: number) => `${value} đơn`} />
               </PieChart>
             </ResponsiveContainer>
-            <div className="mt-4 flex flex-wrap justify-center gap-2 sm:gap-4">
+            <div className="mt-2 flex flex-wrap gap-2 justify-center">
               {orderStatusDistribution.map((entry) => (
-                <Badge key={entry.type} className="bg-orange-100 text-orange-800">
+                <Badge key={entry.type} variant="outline">
                   {entry.type}: {entry.value}
                 </Badge>
               ))}
@@ -625,14 +706,14 @@ export default function PageDashboard() {
         </Card>
 
         {/* Customer Distribution */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-cyan-700">
-              Phân Loại Khách Hàng
+            <CardTitle className="text-base font-medium text-cyan-600">
+              Loại Khách Hàng
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie
                   data={customerData}
@@ -640,34 +721,18 @@ export default function PageDashboard() {
                   nameKey="type"
                   cx="50%"
                   cy="50%"
-                  outerRadius={100}
-                  label={({ name, value }) => `${name}: ${value} khách`}
+                  outerRadius={80}
                 >
-                  {customerData.map((entry, index) => (
+                  {customerData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #A5F3FC',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                  formatter={(value: number) => `${value} khách`}
-                />
+                <Tooltip formatter={(value: number) => `${value} khách`} />
               </PieChart>
             </ResponsiveContainer>
-            <div className="mt-4 flex flex-wrap justify-center gap-2 sm:gap-4">
+            <div className="mt-2 flex flex-wrap gap-2 justify-center">
               {customerData.map((entry) => (
-                <Badge
-                  key={entry.type}
-                  className={
-                    entry.type === 'Khách mới'
-                      ? 'bg-cyan-100 text-cyan-800'
-                      : 'bg-indigo-100 text-indigo-800'
-                  }
-                >
+                <Badge key={entry.type} variant="outline">
                   {entry.type}: {entry.value}
                 </Badge>
               ))}
@@ -676,33 +741,24 @@ export default function PageDashboard() {
         </Card>
 
         {/* Reservation Trends */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-teal-700">
-              Xu Hướng Đặt Bàn
+            <CardTitle className="text-base font-medium text-teal-600">
+              Đặt Bàn
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={200}>
               <LineChart data={reservationTrends}>
-                <XAxis dataKey="date" stroke="#6B7280" />
-                <YAxis stroke="#6B7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #5EEAD4',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                  formatter={(value: number) => `${value} bàn`}
-                />
+                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip formatter={(value: number) => `${value} bàn`} />
                 <Line
                   type="monotone"
                   dataKey="reservations"
-                  stroke="url(#gradient-reservations)"
-                  strokeWidth={3}
-                  dot={{ r: 5, fill: 'url(#gradient-reservations)' }}
-                  activeDot={{ r: 8, fill: 'url(#gradient-reservations)' }}
+                  stroke="#14B8A6"
+                  strokeWidth={2}
+                  dot={false}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -710,224 +766,162 @@ export default function PageDashboard() {
         </Card>
 
         {/* Recent Dish Orders */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg !p-0">
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-700">
-              Đơn Hàng Món Ăn Gần Đây
+            <CardTitle className="text-base font-medium text-gray-600">
+              Đơn Món Gần Đây
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {recentOrdersDish.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-2 gap-2"
-                >
-                  <div>
-                    {/* <p className="font-medium text-gray-800">{order.id.slice(0, 8)}</p> */}
-                    <p className="text-sm text-gray-500">{order.customer}</p>
+            <div className="space-y-2">
+              {recentOrdersDish.length ? (
+                recentOrdersDish.map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex justify-between border-b py-1 text-sm"
+                  >
+                    <span>{order.customer}</span>
+                    <div className="text-right">
+                      <p>{formatCurrency(order.total)}</p>
+                      <Badge
+                        variant={
+                          order.status === 'Hoàn thành'
+                            ? 'default'
+                            : order.status === 'Từ chối'
+                              ? 'destructive'
+                              : 'secondary'
+                        }
+                      >
+                        {order.status}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="text-left sm:text-right">
-                    <p className="font-medium text-gray-800">
-                      {formatCurrency(order.total)}
-                    </p>
-                    <Badge
-                      className={
-                        order.status === 'Hoàn thành'
-                          ? 'bg-green-100 text-green-800'
-                          : order.status === 'Từ chối'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                      }
-                    >
-                      {order.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">Không có đơn hàng.</p>
+              )}
             </div>
           </CardContent>
         </Card>
 
         {/* Recent Food Orders */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg !p-0">
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-700">
-              Đơn Hàng Món Ăn Online Gần Đây
+            <CardTitle className="text-base font-medium text-gray-600">
+              Đơn Online Gần Đây
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {recentOrdersFood.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-2 gap-2"
-                >
-                  <div>
-                    {/* <p className="font-medium text-gray-800">{order.id.slice(0, 8)}</p> */}
-                    <p className="text-sm text-gray-500">{order.customer}</p>
+            <div className="space-y-2">
+              {recentOrdersFood.length ? (
+                recentOrdersFood.map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex justify-between border-b py-1 text-sm"
+                  >
+                    <span>{order.customer}</span>
+                    <div className="text-right">
+                      <p>{formatCurrency(order.total)}</p>
+                      <Badge
+                        variant={
+                          order.status === 'Hoàn thành'
+                            ? 'default'
+                            : order.status.includes('hủy')
+                              ? 'destructive'
+                              : 'secondary'
+                        }
+                      >
+                        {order.status}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="text-left sm:text-right">
-                    <p className="font-medium text-gray-800">
-                      {formatCurrency(order.total)}
-                    </p>
-                    <Badge
-                      className={
-                        order.status === 'Hoàn thành'
-                          ? 'bg-green-100 text-green-800'
-                          : order.status.includes('hủy')
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                      }
-                    >
-                      {order.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">Không có đơn hàng.</p>
+              )}
             </div>
           </CardContent>
         </Card>
 
         {/* Recent Combo Orders */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg !p-0">
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-700">
-              Đơn Hàng Combo Online Gần Đây
+            <CardTitle className="text-base font-medium text-gray-600">
+              Đơn Combo Gần Đây
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {recentOrdersCombo.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-2 gap-2"
-                >
-                  <div>
-                    {/* <p className="font-medium text-gray-800">{order.id.slice(0, 8)}</p> */}
-                    <p className="text-sm text-gray-500">{order.customer}</p>
-                  </div>
-                  <div className="text-left sm:text-right">
-                    <p className="font-medium text-gray-800">
-                      {formatCurrency(order.total)}
-                    </p>
-                    <Badge
-                      className={
-                        order.status === 'Hoàn thành'
-                          ? 'bg-green-100 text-green-800'
-                          : order.status.includes('hủy')
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                      }
-                    >
-                      {order.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Inventory Status */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-red-700">
-              Trạng Thái Kho Hàng
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={inventoryData.map((item) => ({
-                    name: item.item,
-                    value: item.stock,
-                  }))}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label={({ name, value }) => `${name}: ${value}`}
-                >
-                  {inventoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #FCA5A5',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-4 space-y-2">
-              {inventoryData.map((item) => (
-                <div key={item.item} className="flex justify-between items-center">
-                  <span className="text-sm font-medium">{item.item}</span>
-                  <Badge
-                    className={
-                      item.stock < 50
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-green-100 text-green-800'
-                    }
+            <div className="space-y-2">
+              {recentOrdersCombo.length ? (
+                recentOrdersCombo.map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex justify-between border-b py-1 text-sm"
                   >
-                    {item.stock} {item.unit}
-                  </Badge>
-                </div>
-              ))}
+                    <span>{order.customer}</span>
+                    <div className="text-right">
+                      <p>{formatCurrency(order.total)}</p>
+                      <Badge
+                        variant={
+                          order.status === 'Hoàn thành'
+                            ? 'default'
+                            : order.status.includes('hủy')
+                              ? 'destructive'
+                              : 'secondary'
+                        }
+                      >
+                        {order.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">Không có đơn hàng.</p>
+              )}
             </div>
           </CardContent>
         </Card>
 
         {/* Blog Performance */}
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
+        <Card className="bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-orange-700">
-              Hiệu Suất Bài Viết Blog
+            <CardTitle className="text-base font-medium text-orange-600">
+              Hiệu Suất Blog
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={200}>
               <LineChart data={blogPerformance}>
-                <XAxis dataKey="title" stroke="#6B7280" />
-                <YAxis stroke="#6B7280" />
+                <XAxis dataKey="title" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #FDBA74',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
+                  formatter={(value: number, name: string) => [
+                    value,
+                    name === 'views' ? 'Lượt xem' : 'Lượt thích',
+                  ]}
                 />
                 <Line
                   type="monotone"
                   dataKey="views"
-                  stroke="url(#gradient-blog)"
-                  strokeWidth={3}
-                  dot={{ r: 5, fill: 'url(#gradient-blog)' }}
-                  activeDot={{ r: 8, fill: 'url(#gradient-blog)' }}
+                  stroke="#F97316"
+                  strokeWidth={2}
+                  dot={false}
                 />
                 <Line
                   type="monotone"
                   dataKey="likes"
                   stroke="#EF4444"
-                  strokeWidth={3}
-                  dot={{ r: 5, fill: '#EF4444' }}
-                  activeDot={{ r: 8, fill: '#EF4444' }}
+                  strokeWidth={2}
+                  dot={false}
                 />
               </LineChart>
             </ResponsiveContainer>
-            <div className="mt-4 flex flex-wrap justify-center gap-2 sm:gap-4">
-              <Badge className="bg-orange-100 text-orange-800">
-                Tổng lượt xem: 2600
+            <div className="mt-2 flex gap-2 justify-center">
+              <Badge variant="outline">
+                Xem: {blogPerformance.reduce((sum, item) => sum + item.views, 0)}
               </Badge>
-              <Badge className="bg-red-100 text-red-800">
-                Tổng lượt thích: 310
+              <Badge variant="outline">
+                Thích: {blogPerformance.reduce((sum, item) => sum + item.likes, 0)}
               </Badge>
             </div>
           </CardContent>

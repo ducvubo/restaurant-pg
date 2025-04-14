@@ -19,6 +19,7 @@ import { updateStatus } from '../ingredient.api'
 import { MoreHorizontal } from 'lucide-react'
 import { IIngredient } from '../ingredient.interface'
 import Image from 'next/image'
+import { Badge } from '@/components/ui/badge'
 
 export const columns: ColumnDef<IIngredient>[] = [
   {
@@ -41,13 +42,58 @@ export const columns: ColumnDef<IIngredient>[] = [
     }
   },
   {
-    accessorKey: 'unt_id',
-    id: 'Đơn vị đo',
-    header: () => <div className='font-semibold'>Đơn vị đo</div>,
+    accessorKey: 'totalStockInQuantity',
+    id: 'Nhập kho',
+    header: () => <div className='font-semibold'>Nhập kho</div>,
     cell: ({ row }) => {
       const ingredient = row.original
-      if (typeof ingredient.unt_id === 'object') {
-        return ingredient.unt_id.unt_name
+      if (typeof ingredient.totalStockInQuantity === 'number' && typeof ingredient.unt_id === 'object') {
+        return `${ingredient.totalStockInQuantity} ${ingredient.unt_id?.unt_name}`
+      } else {
+        return ''
+      }
+    }
+  },
+  {
+    accessorKey: 'totalStockOutQuantity',
+    id: 'Đã sử dụng',
+    header: () => <div className='font-semibold'>Đã sử dụng</div>,
+    cell: ({ row }) => {
+      const ingredient = row.original
+      if (typeof ingredient.totalStockOutQuantity === 'number' && typeof ingredient.unt_id === 'object') {
+        return `${ingredient.totalStockOutQuantity} ${ingredient.unt_id?.unt_name}`
+      } else {
+        return ''
+      }
+    }
+  },
+  {
+    accessorKey: 'totalStockInQuantity',
+    id: 'Tồn kho hiện tại',
+    header: () => <div className='font-semibold'>Tồn kho hiện tại</div>,
+    cell: ({ row }) => {
+      const ingredient = row.original
+      if (
+        typeof ingredient.totalStockInQuantity === 'number' &&
+        typeof ingredient.totalStockOutQuantity === 'number' &&
+        typeof ingredient.unt_id === 'object'
+      ) {
+        const currentStock = ingredient.totalStockInQuantity - ingredient.totalStockOutQuantity
+        let variant: 'secondary' | 'default' | 'destructive' = 'secondary'
+
+        if (currentStock < 0) {
+          variant = 'destructive'
+        } else if (currentStock < 10) {
+          variant = 'default'
+        } else {
+          variant = 'secondary'
+        }
+
+        return (
+          <Badge variant={variant}>
+            {currentStock} {ingredient.unt_id?.unt_name}
+          </Badge>
+        )
       } else {
         return ''
       }
@@ -69,9 +115,9 @@ export const columns: ColumnDef<IIngredient>[] = [
             height={50}
           />;
         }
-        return null; // Không hiển thị gì nếu không có image_cloud
+        return null;
       } catch (error) {
-        return null; // Không hiển thị gì nếu parse thất bại
+        return null;
       }
     },
     enableHiding: true

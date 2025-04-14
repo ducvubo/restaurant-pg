@@ -64,7 +64,6 @@ export const getTotalRevenue = async (data: IGetStatsDto) => {
     method: 'GET',
     queryParams: data,
   });
-  console.log("🚀 ~ getTotalRevenue ~ res:", res)
   return res;
 };
 
@@ -179,6 +178,73 @@ export const getTopCombos = async (data: IGetStatsDto) => {
 export const getRecentComboOrders = async (data: IGetStatsDto) => {
   const res: IBackendRes<any> = await sendRequest({
     url: `${process.env.URL_SERVER_ORDER}/order-food-combo/recent-orders`,
+    method: 'GET',
+    queryParams: data,
+  });
+  return res;
+};
+
+
+
+
+export const getTotalStockValue = async (data: IGetStatsDto) => {
+  const res: IBackendRes<{ totalStockValue: number }> = await sendRequest({
+    url: `${process.env.URL_SERVER_INVENTORY}/ingredients/total-stock-value`,
+    method: 'GET',
+    queryParams: data,
+  });
+  return res;
+};
+
+export const getStockInTrends = async (data: IGetStatsDto) => {
+  const res: IBackendRes<{ date: string; quantity: number; value: number }[]> = await sendRequest({
+    url: `${process.env.URL_SERVER_INVENTORY}/ingredients/stock-in-trends`,
+    method: 'GET',
+    queryParams: data,
+  });
+  return res;
+};
+
+export const getStockOutTrends = async (data: IGetStatsDto) => {
+  const res: IBackendRes<{ date: string; quantity: number; value: number }[]> = await sendRequest({
+    url: `${process.env.URL_SERVER_INVENTORY}/ingredients/stock-out-trends`,
+    method: 'GET',
+    queryParams: data,
+  });
+  return res;
+};
+
+export const getLowStockIngredients = async (data: IGetStatsDto & { threshold?: number }) => {
+  const res: IBackendRes<{ igd_name: string; stock: number; unit: string }[]> = await sendRequest({
+    url: `${process.env.URL_SERVER_INVENTORY}/ingredients/low-stock`,
+    method: 'GET',
+    queryParams: {...data, },
+  });
+  console.log("🚀 ~ getLowStockIngredients ~ res:", res)
+  return res;
+};
+
+export const getTopIngredients = async (data: IGetStatsDto) => {
+  const res: IBackendRes<{ igd_name: string; quantity: number; value: number }[]> = await sendRequest({
+    url: `${process.env.URL_SERVER_INVENTORY}/ingredients/top-ingredients`,
+    method: 'GET',
+    queryParams: data,
+  });
+  return res;
+};
+
+export const getRecentStockTransactions = async (data: IGetStatsDto) => {
+  const res: IBackendRes<{ id: string; code: string; ingredient: string; quantity: number; date: string; type: 'in' | 'out' }[]> = await sendRequest({
+    url: `${process.env.URL_SERVER_INVENTORY}/ingredients/recent-transactions`,
+    method: 'GET',
+    queryParams: data,
+  });
+  return res;
+};
+
+export const getStockByCategory = async (data: IGetStatsDto) => {
+  const res: IBackendRes<{ category: string; stock: number; value: number }[]> = await sendRequest({
+    url: `${process.env.URL_SERVER_INVENTORY}/ingredients/stock-by-category`,
     method: 'GET',
     queryParams: data,
   });

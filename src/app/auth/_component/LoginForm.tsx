@@ -101,7 +101,7 @@ export function LoginForm() {
           description: 'Đăng nhập thành công'
         })
         // router.push('/dashboard/order/dish')
-        router.push(localStorage.getItem('currentUrl') || '/dashboard/order/dish')
+        router.push(localStorage.getItem('currentUrl') || '/dashboard')
       } else if (res?.code === -5) {
         setLoading(false)
         if (Array.isArray(res.message)) {

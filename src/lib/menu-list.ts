@@ -72,7 +72,8 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               active: pathname === '/dashboard/order-combo'
             },
           ]
-        }
+        },
+        //thống kê
       ]
     },
     {
