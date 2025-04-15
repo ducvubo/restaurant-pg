@@ -83,3 +83,14 @@ export const updateStatus = async ({ _id, dish_status }: { _id: string; dish_sta
   })
   return res
 }
+
+export const getAllDishRestaurant = async () => {
+  const res: IBackendRes<IDish[]> = await sendRequest({
+    url: `${process.env.URL_SERVER}/dishes/all-dish`,
+    method: 'GET',
+    nextOption: {
+      cache: 'no-store'
+    }
+  })
+  return res
+}
