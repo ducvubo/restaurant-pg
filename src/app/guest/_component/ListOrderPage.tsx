@@ -57,7 +57,7 @@ export default function ListOrderPage() {
 
           let finalPrice = originalPrice
 
-          if (sale.sale_type === 'fixed') {
+          if (sale && sale.sale_type && sale.sale_type === 'fixed') {
             finalPrice -= sale.sale_value
           }
 
