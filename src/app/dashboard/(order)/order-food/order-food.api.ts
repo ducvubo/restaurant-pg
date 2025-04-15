@@ -66,6 +66,17 @@ export const restaurantDeliveredOrderFood = async (od_id: string) => {
   return res
 }
 
+export const restaurantCustomerUnreachableOrderFood = async (od_id: string) => {
+  const res: IBackendRes<IOrderFood> = await sendRequest({
+    url: `${process.env.URL_SERVER_ORDER}/order-food/restaurant-customer-unreachable-order-food`,
+    method: 'PATCH',
+    body: {
+      od_id,
+    }
+  })
+  return res
+}
+
 export const restaurantCancelOrderFood = async (od_id: string, od_reason_cancel: string) => {
   const res: IBackendRes<IOrderFood> = await sendRequest({
     url: `${process.env.URL_SERVER_ORDER}/order-food/restaurant-cancel-order-food`,

@@ -16,7 +16,7 @@ import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { Input } from '@/components/ui/input'
 import { IOrderFood } from '../order-food.interface'
-import { getListOrderFood, restaurantCancelOrderFood, restaurantConfirmOrderFood, restaurantConfirmShipping, restaurantDeliveredOrderFood, restaurantFeedbackOrderFood, restaurantUpdateViewFeedbackOrderFood } from '../order-food.api'
+import { getListOrderFood, restaurantCancelOrderFood, restaurantConfirmOrderFood, restaurantConfirmShipping, restaurantCustomerUnreachableOrderFood, restaurantDeliveredOrderFood, restaurantFeedbackOrderFood, restaurantUpdateViewFeedbackOrderFood } from '../order-food.api'
 import {
   Card,
   CardContent,
@@ -55,6 +55,7 @@ const getTextStatus = (status: string) => {
     waiting_shipping: 'Chờ giao hàng',
     shipping: 'Đang giao hàng',
     delivered_customer: 'Đã giao hàng đến khách hàng',
+    customer_unreachable: 'Không liên lạc được với khách hàng',
     received_customer: 'Khách hàng đã nhận hàng',
     cancel_customer: 'Khách hàng đã hủy đơn hàng',
     cancel_restaurant: 'Nhà hàng đã hủy đơn hàng',
@@ -70,6 +71,7 @@ const getStatusVariant = (status: string): 'default' | 'destructive' | 'secondar
     case 'over_time_customer':
     case 'cancel_customer':
     case 'cancel_restaurant':
+    case 'customer_unreachable':
     case 'complaint':
       return 'destructive';
     case 'delivered_customer':
@@ -162,6 +164,25 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
       toast({
         title: 'Thất bại',
         description: res.message || 'Không thể xác nhận giao hàng.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Handle Customer Unreachable
+  const handleCustomerUnreachable = async () => {
+    const res = await restaurantCustomerUnreachableOrderFood(order.od_id);
+    if (res.statusCode === 200) {
+      toast({
+        title: 'Thành công',
+        description: 'Đã ghi nhận khách hàng không thể liên lạc.',
+        variant: 'default',
+      });
+      refresh();
+    } else {
+      toast({
+        title: 'Thất bại',
+        description: res.message || 'Không thể ghi nhận trạng thái khách hàng không liên lạc.',
         variant: 'destructive',
       });
     }
@@ -300,9 +321,15 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
               }
               {
                 order.od_status === 'shipping' && (
-                  <Button variant="outline" size="sm" onClick={handleDeliveredOrder}>
-                    Xác nhận đã giao hàng
-                  </Button>
+                  <>
+                    <Button variant="outline" size="sm" onClick={handleDeliveredOrder}>
+                      Xác nhận đã giao hàng
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleCustomerUnreachable}>
+                      Không liên lạc được với khách hàng
+                    </Button>
+                  </>
+
                 )
               }
               {/* {

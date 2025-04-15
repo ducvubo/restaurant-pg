@@ -1,6 +1,6 @@
 'use server'
 import { sendRequest } from '@/lib/api'
-import { IOrderFoodCombo } from './order-food.interface'
+import { IOrderFoodCombo } from './order-food-combo.interface'
 
 export const getListOrderFoodCombo = async ({
   current,
@@ -57,6 +57,18 @@ export const restaurantConfirmShipping = async (od_cb_id: string) => {
 export const restaurantDeliveredOrderFoodCombo = async (od_cb_id: string) => {
   const res: IBackendRes<IOrderFoodCombo> = await sendRequest({
     url: `${process.env.URL_SERVER_ORDER}/order-food-combo/restaurant-delivered-order-food-combo`,
+    method: 'PATCH',
+    body: {
+      od_cb_id
+    }
+  })
+  return res
+}
+
+//restaurantCustomerUnreachableOrderFoodCombo
+export const restaurantCustomerUnreachableOrderFoodCombo = async (od_cb_id: string) => {
+  const res: IBackendRes<IOrderFoodCombo> = await sendRequest({
+    url: `${process.env.URL_SERVER_ORDER}/order-food-combo/restaurant-customer-unreachable-order-food-combo`,
     method: 'PATCH',
     body: {
       od_cb_id
