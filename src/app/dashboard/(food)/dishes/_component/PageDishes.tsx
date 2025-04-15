@@ -97,7 +97,7 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
     formData.append('image', file);
 
     try {
-      const response = await fetch('http://localhost:5001/api/v1/dishes/import-menu-image', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URLAPI_ENDPOINT}/api/v1/dishes/import-menu-image`, {
         method: 'POST',
         body: formData,
         headers: {
