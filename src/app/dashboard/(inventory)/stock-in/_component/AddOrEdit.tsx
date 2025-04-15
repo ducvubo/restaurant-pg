@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { any, z } from 'zod'
 import { FormField, FormItem, FormLabel, FormMessage, Form, FormControl } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
@@ -42,12 +42,14 @@ import { Loader2, TrashIcon } from 'lucide-react'
 import { createIngredient, findAllCategories, findAllUnits } from '../../ingredients/ingredient.api'
 import { createSupplier } from '../../suppliers/supplier.api'
 import { createUnit } from '../../units/unit.api'
-import { createCatIngredient, getAllCatIngredients } from '../../cat-ingredients/cat-ingredient.api'
+import { createCatIngredient } from '../../cat-ingredients/cat-ingredient.api'
+import slugify from 'slugify'
 
 interface Props {
   id: string
   inforStockIn?: IStockIn
 }
+
 const FormSchema = z.object({
   stki_code: z.string().nonempty({ message: 'Vui lòng nhập tên' }),
   spli_id: z.string().nonempty({ message: 'Vui lòng chọn nhà cung cấp' }),
@@ -78,11 +80,28 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
     image_cloud: '',
     image_custom: ''
   })
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false)
   const [listUnits, setListUnits] = useState<any[]>([])
   const [listCatIngredients, setListCatIngredients] = useState<any[]>([])
-  console.log("🚀 ~ AddOrEdit ~ listCatIngredients:", listCatIngredients)
+
+  // Sử dụng useRef để lưu trữ danh sách tạm thời
+  const catIngredientsRef = useRef<any[]>([])
+  const unitsRef = useRef<any[]>([])
+  // Biến để theo dõi trạng thái đang tạo danh mục hoặc đơn vị
+  const creatingCatRef = useRef<string | null>(null)
+  const creatingUnitRef = useRef<string | null>(null)
+
+  // Đồng bộ ref với state
+  useEffect(() => {
+    catIngredientsRef.current = listCatIngredients
+    console.log('Đồng bộ catIngredientsRef:', catIngredientsRef.current)
+  }, [listCatIngredients])
+
+  useEffect(() => {
+    unitsRef.current = listUnits
+    console.log('Đồng bộ unitsRef:', unitsRef.current)
+  }, [listUnits])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -99,9 +118,33 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
   })
 
   const findAllUnitsCom = async () => {
-    const res = await findAllUnits();
+    const res = await findAllUnits()
     if (res.statusCode === 200 && res.data) {
-      setListUnits(res.data);
+      setListUnits(res.data)
+      unitsRef.current = res.data
+      console.log('findAllUnitsCom:', res.data)
+    }
+  }
+
+  const getListCatIngredients = async () => {
+    const res = await findAllCategories()
+    if (res.statusCode === 200 && res.data) {
+      setListCatIngredients(res.data)
+      catIngredientsRef.current = res.data
+      console.log('getListCatIngredients:', res.data)
+    } else if (res.code === -10) {
+      toast({
+        title: 'Thông báo',
+        description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+        variant: 'destructive'
+      })
+      await deleteCookiesAndRedirect()
+    } else if (res.code === -11) {
+      toast({
+        title: 'Thông báo',
+        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+        variant: 'destructive'
+      })
     }
   }
 
@@ -119,12 +162,11 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
     } else {
       if (inforStockIn) {
         if (inforStockIn.items) {
-          //tìm tên nguyên liệu và đơn vị đo cho từng item
           inforStockIn.items.forEach((item) => {
             const ingredient = listIngredients.find((ingredient) => ingredient.igd_id === item.igd_id)
             if (ingredient) {
-              ; (item.igd_name = ingredient.igd_name),
-                (item.unt_name = typeof ingredient.unt_id !== 'string' ? ingredient.unt_id?.unt_name || '' : '')
+              item.igd_name = ingredient.igd_name
+              item.unt_name = typeof ingredient.unt_id !== 'string' ? ingredient.unt_id?.unt_name || '' : ''
             }
           })
           setStockInItems(inforStockIn.items)
@@ -173,17 +215,8 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
         variant: 'destructive'
       })
       await deleteCookiesAndRedirect()
-    } else if (res.code === -10) {
-      setLoading(false)
-      toast({
-        title: 'Thông báo',
-        description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
-        variant: 'destructive'
-      })
-      await deleteCookiesAndRedirect()
     } else if (res.code === -11) {
       setLoading(false)
-
       toast({
         title: 'Thông báo',
         description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
@@ -229,8 +262,10 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
   }
 
   const findAllIngredient = async () => {
+    setLoading(true)
     const res: IBackendRes<IIngredient[]> = await findIngredientName()
     if (res.statusCode === 200 && res.data) {
+      setLoading(false)
       setListIngredients(res.data)
     } else if (res.code === -10) {
       setLoading(false)
@@ -272,7 +307,6 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
 
       if (res.statusCode === 201) {
         setLoading_upload_image(false)
-
         toast({
           title: 'Thành công',
           description: 'Tải ảnh lên thành công',
@@ -291,7 +325,6 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
           image_cloud: '',
           image_custom: ''
         })
-
         toast({
           title: 'Thất bại',
           description: 'Chỉ được tải lên ảnh dưới 5 MB và ảnh phải có định dạng jpg, jpeg, png, webp',
@@ -438,88 +471,109 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
       spli_address: 'Dữ liệu được nhập tự động từ file PDF',
       spli_description: 'Dữ liệu được nhập tự động từ file PDF',
       spli_type: 'supplier'
-    } as any;
-    // const res = await fetch('http://localhost:11000/api/v1/suppliers', {
-    //   method: 'POST',
-    //   headers: {
-    //     'accept': 'application/json',
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify(payload)
-    // });
+    } as any
     const res = await createSupplier(payload)
     if (res.statusCode === 201 && res.data) {
-      setListSuppliers((prev: any) => [...prev, res.data]);
-      return res.data.spli_id;
+      setListSuppliers((prev: any) => [...prev, res.data])
+      return res.data.spli_id
     }
   }
 
-  // Hàm thêm mới unit
+  const normalizeString = (str: string) => str.trim().toLowerCase().normalize('NFC')
+
   const createUnitCom = async (name: string) => {
-    const payload = {
-      unt_name: name,
-      unt_symbol: name.slice(0, 2).toLowerCase(), // Tạm lấy 2 ký tự đầu làm symbol
-      unt_description: 'Dữ liệu được nhập tự động từ file PDF'
-    };
-    const res = await createUnit(payload)
-    if (res.statusCode === 201 && res.data) {
-      setListUnits(prev => [...prev, res.data]);
-      return res.data.unt_id;
-    }
-  }
+    const normalizedName = normalizeString(name)
+    console.log('createUnitCom:', normalizedName)
 
-  const createCatIngredientCom = async () => {
-    const payload = {
-      cat_igd_name: "Danh mục từ nhập pdf",
-      cat_igd_description: "Danh mục tự động tạo từ dữ liệu nhập PDF"
-    };
-    const res = await createCatIngredient(payload)
-    if (res.statusCode === 201 && res.data) {
-      setListCatIngredients(prev => [...prev, res.data]);
-      return res.data.cat_igd_id;
-    }
-    return null;
-  }
-
-  const getListCatIngredients = async () => {
-    const res = await findAllCategories()
-    if (res.statusCode === 200 && res.data) {
-      setListCatIngredients(res.data);
-    } else if (res.code === -10) {
-      toast({
-        title: 'Thông báo',
-        description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
-        variant: 'destructive'
-      })
-      await deleteCookiesAndRedirect()
-    } else if (res.code === -11) {
-      toast({
-        title: 'Thông báo',
-        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
-        variant: 'destructive'
-      })
+    // Kiểm tra xem đơn vị đang được tạo chưa
+    if (creatingUnitRef.current === normalizedName) {
+      console.log('Đơn vị đang được tạo, chờ:', normalizedName)
+      return null
     }
 
+    // Kiểm tra trong unitsRef
+    const existingUnit = unitsRef.current.find((unit) => normalizeString(unit.unt_name) === normalizedName)
+    if (existingUnit) {
+      console.log('Đơn vị đã tồn tại:', existingUnit)
+      return existingUnit.unt_id
+    }
+
+    // Đánh dấu đang tạo đơn vị
+    creatingUnitRef.current = normalizedName
+
+    try {
+      const payload = {
+        unt_name: name,
+        unt_symbol: slugify(normalizedName, {
+          replacement: '-',
+          lower: true,
+          strict: true,
+          locale: 'vi',
+          trim: true
+        }),
+        unt_description: 'Dữ liệu được nhập tự động từ file PDF'
+      }
+      const res = await createUnit(payload)
+      if (res.statusCode === 201 && res.data) {
+        setListUnits((prev) => {
+          const newList = [...prev, res.data]
+          unitsRef.current = newList
+          console.log('Đã tạo đơn vị mới:', res.data, 'new unitsRef:', newList)
+          return newList
+        })
+        return res.data.unt_id
+      }
+    } finally {
+      // Xóa trạng thái đang tạo
+      creatingUnitRef.current = null
+    }
+    return null
   }
 
   const createIngredientCom = async (name: string, unitId: string, code: string) => {
-    let catIgdId = '';
-    const existingCat = listCatIngredients.find(cat =>
-      cat.cat_igd_name === "Danh mục từ nhập pdf"
-    );
+    let catIgdId = ''
+    const catName = 'Danh mục từ nhập PDF'
+    const normalizedCatName = normalizeString(catName)
+    console.log('createIngredientCom, kiểm tra danh mục:', normalizedCatName)
 
+    // Kiểm tra xem danh mục đang được tạo chưa
+    if (creatingCatRef.current === normalizedCatName) {
+      console.log('Danh mục đang được tạo, chờ:', normalizedCatName)
+      return null
+    }
+
+    // Kiểm tra trong catIngredientsRef
+    const existingCat = catIngredientsRef.current.find((cat) => normalizeString(cat.cat_igd_name) === normalizedCatName)
     if (existingCat) {
-      catIgdId = existingCat.cat_igd_id;
+      catIgdId = existingCat.cat_igd_id
+      console.log('Danh mục đã tồn tại:', existingCat)
     } else {
-      catIgdId = await createCatIngredientCom() as string;
-      if (!catIgdId) {
-        toast({
-          title: 'Cảnh báo',
-          description: 'Không thể tạo danh mục nguyên liệu, sẽ dùng ID mặc định',
-          variant: 'destructive'
-        });
-        catIgdId = 'e10673a0-dd00-443e-9fbc-e27b14eb7519'; // Dùng ID mặc định nếu tạo thất bại
+      // Đánh dấu đang tạo danh mục
+      creatingCatRef.current = normalizedCatName
+
+      try {
+        const resCat = await createCatIngredient({
+          cat_igd_name: catName,
+          cat_igd_description: 'Danh mục tự động tạo từ dữ liệu nhập PDF'
+        })
+        if (resCat.statusCode === 201 && resCat.data) {
+          catIgdId = resCat.data.cat_igd_id
+          setListCatIngredients((prev) => {
+            const newList = [...prev, resCat.data]
+            catIngredientsRef.current = newList
+            console.log('Đã tạo danh mục mới:', resCat.data, 'new catIngredientsRef:', newList)
+            return newList
+          })
+        }
+      } finally {
+        // Xóa trạng thái đang tạo
+        creatingCatRef.current = null
       }
+    }
+
+    if (!catIgdId) {
+      console.log('Không có catIgdId, bỏ qua tạo nguyên liệu')
+      return null
     }
 
     const payload = {
@@ -527,15 +581,18 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
       unt_id: unitId,
       igd_name: name,
       igd_description: 'Dữ liệu được nhập tự động từ file PDF',
-      igd_image: 'Dữ liệu được nhập tự động từ file PDF'
-    };
-    const res = await createIngredient(payload);
-    console.log("🚀 ~ createIngredientCom ~ res:", res);
-    if (res.statusCode === 201 && res.data) {
-      setListIngredients((prev: any) => [...prev, res.data]);
-      return res.data.igd_id;
+      igd_image: JSON.stringify({
+        image_cloud: '/api/view-image?bucket=default&file=z6421112010455_6b4f24e676211cf8fd442b7e472a343f.png',
+        image_custom: '/api/view-image?bucket=default&file=z6421112010455_6b4f24e676211cf8fd442b7e472a343f.png'
+      })
     }
-    return null;
+    const res = await createIngredient(payload)
+    if (res.statusCode === 201 && res.data) {
+      setListIngredients((prev: any) => [...prev, res.data])
+      console.log('Đã tạo nguyên liệu:', res.data)
+      return res.data.igd_id
+    }
+    return null
   }
 
   const handleUploadPdf = async () => {
@@ -556,14 +613,14 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
       const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_INVENTORY}/stock-in/import-pdf`, {
         method: 'POST',
         headers: {
-          'accept': '*/*',
+          accept: '*/*'
         },
-        body: formData,
+        body: formData
       })
 
       if (response.ok) {
         const result = await response.json()
-        console.log("🚀 ~ handleUploadPdf ~ result:", result)
+        console.log('PDF response:', result)
         toast({
           title: 'Thành công',
           description: 'Tải file PDF và trích xuất dữ liệu thành công',
@@ -572,85 +629,85 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
 
         const pdfData = result.data
 
-        // Xử lý supplier
-        let spliId = '';
+        let spliId = ''
         const supplier = listSuppliers.find((s: any) =>
-          s.spli_name.toLowerCase().includes(pdfData.spli_id.toLowerCase())
-        );
+          normalizeString(s.spli_name).includes(normalizeString(pdfData.spli_id))
+        )
         if (supplier) {
-          spliId = supplier.spli_id;
+          spliId = supplier.spli_id
         } else {
-          spliId = await createSupplierCom(pdfData.spli_id) as string;
+          spliId = (await createSupplierCom(pdfData.spli_id)) as string
           if (!spliId) {
             toast({
               title: 'Cảnh báo',
               description: 'Không thể tạo nhà cung cấp mới, vui lòng kiểm tra',
               variant: 'destructive'
-            });
+            })
           } else {
             form.setValue('spli_id', spliId)
           }
         }
 
-        // Xử lý receiver
-        let receiverId = '';
-        const receiver = listEmployees.find(e =>
-          e.epl_name.toLowerCase().includes(pdfData.stki_receiver.toLowerCase())
-        );
-        receiverId = receiver ? receiver._id : '';
+        let receiverId = ''
+        const receiver = listEmployees.find((e) =>
+          normalizeString(e.epl_name).includes(normalizeString(pdfData.stki_receiver))
+        )
+        receiverId = receiver ? receiver._id : ''
 
         // Điền dữ liệu cơ bản vào form
-        form.setValue('spli_id', spliId)
-        form.setValue('stki_code', pdfData.stki_code || '');
-        form.setValue('spli_id', spliId || '');
-        form.setValue('stki_delivery_name', pdfData.stki_delivery_name || '');
-        form.setValue('stki_delivery_phone', pdfData.stki_delivery_phone || '');
-        form.setValue('stki_receiver', receiverId || '');
-        form.setValue('stki_date', pdfData.stki_date ? new Date(pdfData.stki_date) : new Date());
-        form.setValue('stki_note', pdfData.stki_note || '');
-        form.setValue('stki_payment_method', pdfData.stki_payment_method || 'cash');
+        form.setValue('stki_code', pdfData.stki_code || '')
+        form.setValue('spli_id', spliId || '')
+        form.setValue('stki_delivery_name', pdfData.stki_delivery_name || '')
+        form.setValue('stki_delivery_phone', pdfData.stki_delivery_phone || '')
+        form.setValue('stki_receiver', receiverId || '')
+        form.setValue('stki_date', pdfData.stki_date ? new Date(pdfData.stki_date) : new Date())
+        form.setValue('stki_note', pdfData.stki_note || '')
+        form.setValue('stki_payment_method', pdfData.stki_payment_method || 'cash')
 
-        // Xử lý stock_in_items
         if (pdfData.stock_in_items && pdfData.stock_in_items.length > 0) {
-          const mappedItems = await Promise.all(pdfData.stock_in_items.map(async (item: any) => {
-            // Xử lý unit
-            let untId = '';
-            const unit = listUnits.find(u =>
-              u.unt_name.toLowerCase().includes(item.stki_item_unit.toLowerCase())
-            );
+          const mappedItems = []
+          for (const item of pdfData.stock_in_items) {
+            let untId = ''
+            const normalizedUnit = normalizeString(item.stki_item_unit)
+            const unit = unitsRef.current.find((u) => normalizeString(u.unt_name) === normalizedUnit)
             if (unit) {
-              untId = unit.unt_id;
+              untId = unit.unt_id
+              console.log('Tìm thấy đơn vị:', unit)
             } else if (item.stki_item_unit) {
-              untId = await createUnitCom(item.stki_item_unit) as string;
+              untId = (await createUnitCom(item.stki_item_unit)) as string
               if (!untId) {
                 toast({
                   title: 'Cảnh báo',
                   description: `Không thể tạo đơn vị tính "${item.stki_item_unit}", vui lòng kiểm tra`,
                   variant: 'destructive'
-                });
+                })
+                continue
               }
             }
 
-            // Xử lý ingredient
-            let igdId = '';
-            const ingredient = listIngredients.find(i =>
-              i.igd_name.toLowerCase().includes(item.stki_item_name.toLowerCase()) ||
-              i.igd_id.toLowerCase() === item.stki_item_code.toLowerCase()
-            );
+            let igdId = ''
+            const normalizedIngredient = normalizeString(item.stki_item_name)
+            const ingredient = listIngredients.find(
+              (i) =>
+                normalizeString(i.igd_name).includes(normalizedIngredient) ||
+                normalizeString(i.igd_id) === normalizeString(item.stki_item_code)
+            )
             if (ingredient) {
-              igdId = ingredient.igd_id;
+              igdId = ingredient.igd_id
+              console.log('Tìm thấy nguyên liệu:', ingredient)
             } else {
-              igdId = await createIngredientCom(item.stki_item_name, untId, item.stki_item_code) as string;
+              igdId = (await createIngredientCom(item.stki_item_name, untId, item.stki_item_code)) as string
               if (!igdId) {
                 toast({
                   title: 'Cảnh báo',
                   description: `Không thể tạo nguyên liệu "${item.stki_item_name}", vui lòng kiểm tra`,
                   variant: 'destructive'
-                });
+                })
+                continue
               }
             }
 
-            return {
+            mappedItems.push({
               igd_id: igdId || item.stki_item_code,
               igd_name: item.stki_item_name,
               unt_name: item.stki_item_unit,
@@ -658,16 +715,17 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
               stki_item_quantity: parseFloat(item.stki_item_quantity_real.replace(/,/g, '')) || 0,
               stki_item_price: parseFloat(item.stki_item_price.replace(/,/g, '')) || 0,
               stki_item_note: item.stki_item_note || ''
-            };
-          }));
-          setStockInItems(mappedItems);
+            })
+          }
+          setStockInItems(mappedItems)
         }
 
-        setPdfFile(null);
+        setPdfFile(null)
       } else {
         throw new Error('Upload failed')
       }
     } catch (error) {
+      console.error('Lỗi upload PDF:', error)
       toast({
         title: 'Thất bại',
         description: 'Có lỗi xảy ra khi tải file PDF, vui lòng thử lại',
@@ -687,16 +745,12 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
             type="file"
             accept=".pdf"
             onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) setPdfFile(file);
+              const file = e.target.files?.[0]
+              if (file) setPdfFile(file)
             }}
             disabled={isUploadingPdf}
           />
-          <Button
-            type="button"
-            onClick={handleUploadPdf}
-            disabled={!pdfFile || isUploadingPdf}
-          >
+          <Button type="button" onClick={handleUploadPdf} disabled={!pdfFile || isUploadingPdf}>
             {isUploadingPdf ? (
               <>
                 <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
@@ -708,9 +762,9 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
           </Button>
         </div>
       </div>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
-        <ResizablePanelGroup direction='horizontal'>
-          <ResizablePanel defaultSize={75} className='p-4'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel defaultSize={75} className="p-4">
             <Select
               value={selectedIngredient?.igd_id}
               onValueChange={(e) => {
@@ -725,14 +779,12 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
                   stki_item_quantity_real: 0,
                   stki_item_price: 0
                 })
-                // const listIngredientsClone = listIngredients.filter((item) => item.igd_id !== e)
-                // setListIngredients(listIngredientsClone)
                 setStockInItems(stockInItemsClone)
                 setSelectedIngredient(null)
               }}
             >
-              <SelectTrigger className='w-full'>
-                <SelectValue placeholder='Chọn nguyên liệu...' />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Chọn nguyên liệu..." />
               </SelectTrigger>
               <SelectContent>
                 {listIngredients
@@ -760,10 +812,10 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
               <TableBody>
                 {stockInItems.map((stockInItem, index) => (
                   <TableRow key={index}>
-                    <TableCell className='w-2/5'>
-                      <div className='flex gap-2'>
+                    <TableCell className="w-2/5">
+                      <div className="flex gap-2">
                         <span
-                          className='cursor-pointer text-red-500'
+                          className="cursor-pointer text-red-500"
                           onClick={() => {
                             const updatedItems = [...stockInItems]
                             updatedItems.splice(index, 1)
@@ -779,7 +831,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
                     <TableCell>
                       <InputNoBoder
                         value={stockInItem.stki_item_quantity}
-                        type='number'
+                        type="number"
                         onChange={(e) => {
                           if (!e.target.value || Number(e.target.value) < 0) return
                           const updatedItems = [...stockInItems]
@@ -791,7 +843,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
                     <TableCell>
                       <InputNoBoder
                         value={stockInItem.stki_item_quantity_real}
-                        type='number'
+                        type="number"
                         onChange={(e) => {
                           if (!e.target.value || Number(e.target.value) < 0) return
                           const updatedItems = [...stockInItems]
@@ -803,7 +855,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
                     <TableCell>
                       <InputNoBoder
                         value={stockInItem.stki_item_price}
-                        type='number'
+                        type="number"
                         onChange={(e) => {
                           if (!e.target.value || Number(e.target.value) < 0) return
                           const updatedItems = [...stockInItems]
@@ -821,45 +873,45 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
               <TableFooter>
                 <TableRow>
                   <TableCell colSpan={5}>Tổng tiền: </TableCell>
-                  <TableCell className='font-bold'>{calculateTotal(stockInItems).toLocaleString()}đ</TableCell>
+                  <TableCell className="font-bold">{calculateTotal(stockInItems).toLocaleString()}đ</TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
           </ResizablePanel>
           <ResizableHandle />
-          <ResizablePanel defaultSize={25} className='p-4'>
+          <ResizablePanel defaultSize={25} className="p-4">
             <div>
               <FormField
                 control={form.control}
-                name='stki_image'
+                name="stki_image"
                 render={({ field }) => (
-                  <FormItem className='w-full'>
+                  <FormItem className="w-full">
                     <FormLabel>Ảnh hóa đơn</FormLabel>
                     <FormControl>
                       <>
                         {!file_image && !image.image_cloud && (
-                          <label htmlFor='dish_imagae'>
-                            <div className='w-28 h-28 border border-dashed justify-center items-center cursor-pointer flex flex-col mt-3'>
+                          <label htmlFor="dish_imagae">
+                            <div className="w-28 h-28 border border-dashed justify-center items-center cursor-pointer flex flex-col mt-3">
                               <span>
                                 <IoMdCloudUpload />
                               </span>
-                              <span className='text-sm text-gray-500'>Chọn ảnh</span>
+                              <span className="text-sm text-gray-500">Chọn ảnh</span>
                             </div>
                           </label>
                         )}
 
                         <Input
-                          className='hidden'
-                          id='dish_imagae'
+                          className="hidden"
+                          id="dish_imagae"
                           disabled={loading_upload_image ? true : false}
-                          type='file'
-                          accept='image/*'
+                          type="file"
+                          accept="image/*"
                           ref={inputRef_Image}
                           onChange={(e) => {
                             const file = e.target.files?.[0]
                             if (file) {
                               setFile_Image(file)
-                              field.onChange(`${process.env.NEXT_PUBLIC_URL_CLIENT}/` + file?.name) //set thuoc tinh image
+                              field.onChange(`${process.env.NEXT_PUBLIC_URL_CLIENT}/` + file?.name)
                             }
                           }}
                         />
@@ -873,13 +925,13 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
                 <div>
                   <Image
                     src={file_image ? URL.createObjectURL(file_image) : (image.image_cloud as string)}
-                    alt='preview'
-                    className='w-28 h-28 object-cover my-3'
+                    alt="preview"
+                    className="w-28 h-28 object-cover my-3"
                     width={128}
                     height={128}
                   />
                   <Button
-                    type='button'
+                    type="button"
                     variant={'destructive'}
                     size={'sm'}
                     onClick={() => {
@@ -897,7 +949,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
                   >
                     {loading_upload_image ? (
                       <>
-                        <ReloadIcon className='mr-2 h-4 w-4 animate-spin' /> Đang tải ảnh...
+                        <ReloadIcon className="mr-2 h-4 w-4 animate-spin" /> Đang tải ảnh...
                       </>
                     ) : (
                       'Xóa hình hình ảnh'
@@ -908,14 +960,14 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
             </div>
             <FormField
               control={form.control}
-              name='spli_id'
+              name="spli_id"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nhà cung cấp</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder='Chọn nhà cung cấp...' />
+                        <SelectValue placeholder="Chọn nhà cung cấp..." />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -932,12 +984,12 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
             />
             <FormField
               control={form.control}
-              name='stki_code'
+              name="stki_code"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Mã phiếu nhập</FormLabel>
                   <FormControl>
-                    <Input placeholder='Mã phiếu nhập...' {...field} />
+                    <Input placeholder="Mã phiếu nhập..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -945,12 +997,12 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
             />
             <FormField
               control={form.control}
-              name='stki_delivery_name'
+              name="stki_delivery_name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Người giao hàng</FormLabel>
                   <FormControl>
-                    <Input placeholder='Người giao hàng...' {...field} />
+                    <Input placeholder="Người giao hàng..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -958,12 +1010,12 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
             />
             <FormField
               control={form.control}
-              name='stki_delivery_phone'
+              name="stki_delivery_phone"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Số điện thoại người giao hàng</FormLabel>
                   <FormControl>
-                    <Input placeholder='Số điện thoại người giao hàng...' {...field} />
+                    <Input placeholder="Số điện thoại người giao hàng..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -971,14 +1023,14 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
             />
             <FormField
               control={form.control}
-              name='stki_receiver'
+              name="stki_receiver"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Người nhận</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder='Chọn người nhận...' />
+                        <SelectValue placeholder="Chọn người nhận..." />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -995,12 +1047,12 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
             />
             <FormField
               control={form.control}
-              name='stki_note'
+              name="stki_note"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nhập ghi chú</FormLabel>
                   <FormControl>
-                    <Input placeholder='Nhập ghi chú...' {...field} />
+                    <Input placeholder="Nhập ghi chú..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -1008,20 +1060,20 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
             />
             <FormField
               control={form.control}
-              name='stki_payment_method'
+              name="stki_payment_method"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Phương thức thanh toán</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder='Chọn phương thức thanh toán...' />
+                        <SelectValue placeholder="Chọn phương thức thanh toán..." />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value='cash'>Tiền mặt</SelectItem>
-                      <SelectItem value='transfer'>Chuyển khoản</SelectItem>
-                      <SelectItem value='credit_card'>Thẻ tín dụng</SelectItem>
+                      <SelectItem value="cash">Tiền mặt</SelectItem>
+                      <SelectItem value="transfer">Chuyển khoản</SelectItem>
+                      <SelectItem value="credit_card">Thẻ tín dụng</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -1030,9 +1082,9 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
             />
             <FormField
               control={form.control}
-              name='stki_date'
+              name="stki_date"
               render={({ field }) => (
-                <FormItem className='flex flex-col mt-2'>
+                <FormItem className="flex flex-col mt-2">
                   <FormLabel>Ngày nhập</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -1042,13 +1094,13 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
                           className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
                         >
                           {field.value ? format(field.value, 'dd/MM/yyyy') : <span>Chọn ngày nhập</span>}
-                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className='w-auto p-0' align='start'>
+                    <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
-                        mode='single'
+                        mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
                         disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
@@ -1060,11 +1112,11 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
                 </FormItem>
               )}
             />
-            <div className='flex justify-center mt-3'>
-              <Button disabled={loading_upload_image} type='submit'>
+            <div className="flex justify-center mt-3">
+              <Button disabled={loading_upload_image} type="submit">
                 {loading_upload_image ? (
                   <>
-                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Đang tải...
                   </>
                 ) : id === 'add' ? (

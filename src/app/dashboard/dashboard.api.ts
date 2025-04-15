@@ -218,9 +218,8 @@ export const getLowStockIngredients = async (data: IGetStatsDto & { threshold?: 
   const res: IBackendRes<{ igd_name: string; stock: number; unit: string }[]> = await sendRequest({
     url: `${process.env.URL_SERVER_INVENTORY}/ingredients/low-stock`,
     method: 'GET',
-    queryParams: {...data, },
+    queryParams: { ...data, },
   });
-  console.log("🚀 ~ getLowStockIngredients ~ res:", res)
   return res;
 };
 

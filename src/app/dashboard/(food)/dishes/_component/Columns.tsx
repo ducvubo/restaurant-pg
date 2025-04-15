@@ -44,7 +44,7 @@ export const columns: ColumnDef<IDish>[] = [
           alt='vuducbo'
           width={100}
           height={100}
-          className='w-auto h-auto object-cover'
+          className='w-14 h-14 object-cover'
         />
       )
     },
@@ -110,21 +110,21 @@ export const columns: ColumnDef<IDish>[] = [
     header: () => <div>Ghi chú</div>,
     enableHiding: true
   },
-  {
-    accessorKey: 'dish_description',
-    id: 'Mô tả',
-    header: () => <div>Mô tả</div>,
-    cell: ({ row }) => {
-      const dish = row.original
-      const sanitizedHTML = DOMPurify.sanitize(dish.dish_description)
-      return (
-        <ScrollArea className='h-[200px] w-[200px] rounded-md border p-4'>
-          <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
-        </ScrollArea>
-      )
-    },
-    enableHiding: true
-  },
+  // {
+  //   accessorKey: 'dish_description',
+  //   id: 'Mô tả',
+  //   header: () => <div>Mô tả</div>,
+  //   cell: ({ row }) => {
+  //     const dish = row.original
+  //     const sanitizedHTML = DOMPurify.sanitize(dish.dish_description)
+  //     return (
+  //       <ScrollArea className='h-[200px] w-[200px] rounded-md border p-4'>
+  //         <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+  //       </ScrollArea>
+  //     )
+  //   },
+  //   enableHiding: true
+  // },
   {
     accessorKey: 'dish_status',
     id: 'Trạng thái',
