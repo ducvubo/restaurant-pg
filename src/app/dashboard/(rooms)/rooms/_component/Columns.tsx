@@ -26,8 +26,20 @@ export const columns: ColumnDef<IRoom>[] = [
     id: 'Ảnh',
     header: () => <div className='font-semibold'>Ảnh</div>,
     cell: ({ row }) => {
-      const room = row.original
-      return <Image src={JSON.parse(room.room_images)[0].image_cloud} alt='vuducbo' width={50} height={50} />
+      const room = row.original;
+      let imageUrl = null;
+
+      try {
+        const images = JSON.parse(room.room_images);
+        if (Array.isArray(images) && images.length > 0 && images[0].image_cloud) {
+          imageUrl = images[0].image_cloud;
+        }
+      } catch (e) {
+      }
+
+      return imageUrl ? (
+        <Image src={imageUrl} alt='Ảnh phòng' width={50} height={50} />
+      ) : null;
     },
     enableHiding: true
   },

@@ -79,6 +79,7 @@ export default function AddOrEdit({ id, inforRoom }: Props) {
         body: formData
       })
     ).json()
+    console.log("🚀 ~ uploadImage ~ res:", res)
 
     return res
   }

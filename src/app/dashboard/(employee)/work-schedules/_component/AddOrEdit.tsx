@@ -1,18 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger
-} from '@/components/ui/sheet'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -37,6 +25,8 @@ import { useRouter } from 'next/navigation'
 import { MultiSelect } from '@/components/Multipleselect'
 import { IEmployee } from '../../employees/employees.interface'
 import EditorTiny from '@/components/EditorTiny'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/redux/store'
 interface IProps {
   id: string
   inforWorkSchedule?: IWorkSchedule
@@ -56,9 +46,8 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
   const router = useRouter()
   const [listLabel, setListLabel] = React.useState<ILabel[]>([])
   const [listWorkingShift, setListWorkingShift] = React.useState<IWorkingShift[]>([])
-  // const [editorState, setEditorState] = useState<SerializedEditorState>(
-  //   JSON.parse(inforWorkSchedule?.ws_note || 'null')
-  // )
+  const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant)
+  const inforEmployee = useSelector((state: RootState) => state.inforEmployee)
   const refNote = React.useRef<any>('')
   const [listEmployee, setListEmployee] = useState<
     {
@@ -90,6 +79,17 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
     findListWorkingShift()
     findListEmployee()
   }, [])
+
+  useEffect(() => {
+    if (inforEmployee._id) {
+      toast({
+        title: 'Thông báo',
+        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ chủ nhà hàng để biết thêm chi tiết',
+        variant: 'destructive'
+      })
+      router.push('/dashboard/work-schedules')
+    }
+  }, [inforRestaurant, inforEmployee])
 
   const findListLabel = async () => {
     const res: IBackendRes<ILabel[]> = await getAllLabel()
@@ -190,11 +190,11 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
     }
   }
 
-    useEffect(() => {
-      if (inforWorkSchedule?.ws_note) {
-        refNote.current = inforWorkSchedule.ws_note
-      }
-    }, [inforWorkSchedule, id])
+  useEffect(() => {
+    if (inforWorkSchedule?.ws_note) {
+      refNote.current = inforWorkSchedule.ws_note
+    }
+  }, [inforWorkSchedule, id])
 
   async function onSubmit(data: z.infer<typeof FormSchema>, event: React.FormEvent) {
     event.preventDefault()
@@ -370,8 +370,8 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
         </div>
 
         <div className='h-[390px]'>
-                 <EditorTiny editorRef={refNote} height='390px' />
-               </div>
+          <EditorTiny editorRef={refNote} height='390px' />
+        </div>
 
         <Button type='submit' className='!mt-5'>
           {id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}

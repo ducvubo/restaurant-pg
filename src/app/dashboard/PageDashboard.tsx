@@ -1,932 +1,829 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
-import { Badge } from '@/components/ui/badge';
-import {
-  DollarSign,
-  Users,
-  Utensils,
-  BookOpen,
-  Package,
-  Table,
-  ShoppingCart,
-  Pizza,
-} from 'lucide-react';
-import {
-  getTotalReservations,
-  getReservationTrends,
-  getCustomerDistribution,
-  getTotalRevenue,
-  getRevenueTrends,
-  getTopDishes,
-  getRecentOrders,
-  getTotalRevenueFood,
-  getRevenueTrendsFood,
-  getTopFoods,
-  getRecentOrdersFood,
-  getOrderStatusDistributionFood,
-  getTotalComboRevenue,
-  getComboRevenueTrends,
-  getTopCombos,
-  getRecentComboOrders,
-  getTotalStockValue,
-  getStockInTrends,
-  getStockOutTrends,
-  getLowStockIngredients,
-  getTopIngredients,
-  getRecentStockTransactions,
-  getStockByCategory,
-} from './dashboard.api';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "@/hooks/use-toast";
+import BpmnModeler from "bpmn-js/lib/Modeler";
+import "bpmn-js/dist/assets/diagram-js.css";
+import "bpmn-js/dist/assets/bpmn-font/css/bpmn.css";
+import { useEffect, useRef, useState } from "react";
+import { parseStringPromise } from "xml2js";
+import { v4 as uuidv4 } from "uuid";
+import CustomPaletteProvider from "./customPaletteProvider";
 
-// Constants
-const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFCE56', '#36A2EB'];
-const blogPerformance = [
-  { title: 'Top món ăn mùa hè', views: 1200, likes: 150 },
-  { title: 'Cách làm phở ngon', views: 800, likes: 90 },
-  { title: 'Chuyện nhà hàng', views: 600, likes: 70 },
+// Định nghĩa type cho các dependency của CustomContextPadProvider
+interface ContextPadProvider {
+  registerProvider(provider: CustomContextPadProvider): void;
+}
+
+interface Modeling {
+  updateProperties(element: BpmnElement, properties: Record<string, any>): void;
+}
+
+interface ElementFactory {
+  // Có thể thêm các method cụ thể nếu cần
+}
+
+interface Translate {
+  // Có thể thêm các method cụ thể nếu cần
+}
+
+interface EventBus {
+  on(event: string, callback: (event: any) => void): void;
+}
+
+interface Canvas {
+  zoom(level: string): void;
+}
+
+interface Palette {
+  // Có thể thêm các method cụ thể nếu cần
+}
+
+// Type cho BPMN element
+interface BpmnElement {
+  id: string;
+  type: string;
+  businessObject: {
+    name?: string;
+    get(key: string): any;
+    [key: string]: any;
+  };
+}
+
+// Type cho field của form động
+interface FormField {
+  id: string;
+  label: string;
+  type: "text" | "textarea" | "number" | "datetime" | "select" | "upload";
+  required: boolean;
+  options?: string[]; // Chỉ dùng cho type = "select"
+  allowedTypes?: string[]; // Chỉ dùng cho type = "upload" (ví dụ: ["image/*", "application/pdf"])
+  maxSize?: number; // Chỉ dùng cho type = "upload" (kích thước tối đa, MB)
+}
+
+// Class CustomContextPadProvider
+class CustomContextPadProvider {
+  private modeling: Modeling;
+  private elementFactory: ElementFactory;
+  private translate: Translate;
+  private eventBus: EventBus;
+
+  constructor(
+    contextPad: ContextPadProvider,
+    modeling: Modeling,
+    elementFactory: ElementFactory,
+    translate: Translate,
+    eventBus: EventBus,
+    canvas: Canvas,
+    palette: Palette
+  ) {
+    this.modeling = modeling;
+    this.elementFactory = elementFactory;
+    this.translate = translate;
+    this.eventBus = eventBus;
+    contextPad.registerProvider(this);
+  }
+
+  getContextPadEntries(element: BpmnElement) {
+    return (entries: Record<string, any>) => {
+      delete entries["replace"];
+      delete entries["append.intermediate-event"];
+      delete entries["append.append-task"];
+      delete entries["append.end-event"];
+      delete entries["append.gateway"];
+      return entries;
+    };
+  }
+}
+
+// Định nghĩa dependency injection cho CustomContextPadProvider
+CustomContextPadProvider.$inject = [
+  "contextPad",
+  "modeling",
+  "elementFactory",
+  "connect",
+  "translate",
+  "eventBus",
+  "canvas",
+  "palette",
 ];
 
-// Utility function
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+// Component Design
+export default function Design() {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const modelerRef = useRef<BpmnModeler | null>(null);
+  const [bpmnContent, setBpmnContent] = useState<string>(
+    `<?xml version="1.0" encoding="UTF-8"?>
+    <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                id="Definitions_1"
+                targetNamespace="http://bpmn.io/schema/bpmn">
+      <process id="Process_1" isExecutable="true" />
+      <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1" />
+      </bpmndi:BPMNDiagram>
+    </definitions>`
+  );
+  const [selectedElement, setSelectedElement] = useState<BpmnElement | null>(null);
+  const [performer, setPerformer] = useState<string>("");
+  const [wfTitle, setWfTitle] = useState<string>("");
+  const [useForm, setUseForm] = useState<boolean>(false);
+  // Lưu formFields theo taskId
+  const [formFieldsByTask, setFormFieldsByTask] = useState<Record<string, FormField[]>>({});
+  const [newField, setNewField] = useState<Omit<FormField, "id">>({
+    label: "",
+    type: "text",
+    required: false,
+    options: [],
+    allowedTypes: ["image/*", "application/pdf"],
+    maxSize: 5, // Mặc định 5MB
+  });
+  const [newOption, setNewOption] = useState<string>("");
 
-export default function PageDashboard() {
-  // State declarations (unchanged for brevity)
-  const [totalReservations, setTotalReservations] = useState<number>(0);
-  const [reservationTrends, setReservationTrends] = useState<
-    { date: string; reservations: number }[]
-  >([]);
-  const [customerData, setCustomerData] = useState<
-    { type: string; value: number }[]
-  >([]);
-  const [totalRevenueDish, setTotalRevenueDish] = useState<number>(0);
-  const [revenueTrendsDish, setRevenueTrendsDish] = useState<
-    { date: string; revenue: number }[]
-  >([]);
-  const [topDishes, setTopDishes] = useState<
-    { name: string; orders: number; revenue: number }[]
-  >([]);
-  const [recentOrdersDish, setRecentOrdersDish] = useState<
-    { id: string; customer: string; total: number; status: string }[]
-  >([]);
-  const [totalRevenueFood, setTotalRevenueFood] = useState<number>(0);
-  const [revenueTrendsFood, setRevenueTrendsFood] = useState<
-    { date: string; revenue: number }[]
-  >([]);
-  const [topFoods, setTopFoods] = useState<
-    { name: string; orders: number; revenue: number }[]
-  >([]);
-  const [recentOrdersFood, setRecentOrdersFood] = useState<
-    { id: string; customer: string; total: number; status: string }[]
-  >([]);
-  const [orderStatusDistribution, setOrderStatusDistribution] = useState<
-    { type: string; value: number }[]
-  >([]);
-  const [totalRevenueCombo, setTotalRevenueCombo] = useState<number>(0);
-  const [revenueTrendsCombo, setRevenueTrendsCombo] = useState<
-    { date: string; revenue: number }[]
-  >([]);
-  const [topCombos, setTopCombos] = useState<
-    { name: string; orders: number; revenue: number }[]
-  >([]);
-  const [recentOrdersCombo, setRecentOrdersCombo] = useState<
-    { id: string; customer: string; total: number; status: string }[]
-  >([]);
-  const [totalStockValue, setTotalStockValue] = useState<number>(0);
-  const [stockInTrends, setStockInTrends] = useState<
-    { date: string; quantity: number; value: number }[]
-  >([]);
-  const [stockOutTrends, setStockOutTrends] = useState<
-    { date: string; quantity: number; value: number }[]
-  >([]);
-  const [lowStockIngredients, setLowStockIngredients] = useState<
-    { igd_name: string; stock: number; unit: string }[]
-  >([]);
-  const [topIngredients, setTopIngredients] = useState<
-    { igd_name: string; quantity: number; value: number }[]
-  >([]);
-  const [recentStockTransactions, setRecentStockTransactions] = useState<
-    { id: string; code: string; ingredient: string; quantity: number; date: string; type: 'in' | 'out' }[]
-  >([]);
-  const [stockByCategory, setStockByCategory] = useState<
-    { category: string; stock: number; value: number }[]
-  >([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const onChangeTask = (type: string, data: string | number | null) => {
+    if (!selectedElement || selectedElement.type !== "bpmn:Task" || !modelerRef.current) {
+      console.error("Không thể lưu: selectedElement hoặc modelerRef không hợp lệ", {
+        selectedElement,
+        modelerRef: !!modelerRef.current,
+      });
+      toast({
+        title: "Lỗi",
+        description: "Không thể lưu thay đổi: Vui lòng chọn lại bước",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const restaurantId = '123';
-  const queryParams = {
-    restaurantId,
-    startDate: '2024-01-01',
-    endDate: '2026-04-12',
+    try {
+      const modeling = modelerRef.current.get("modeling") as Modeling;
+      modeling.updateProperties(selectedElement, {
+        [type]: data,
+      });
+      console.log(`Đã lưu ${type}:`, data);
+      toast({
+        title: "Thành công",
+        description: `Đã lưu ${type === "formFields" ? "thông tin field" : type}`,
+      });
+    } catch (error) {
+      console.error(`Lỗi khi lưu ${type}:`, error);
+      toast({
+        title: "Lỗi",
+        description: `Không thể lưu ${type}`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const onEventBus = async (element: BpmnElement | null) => {
+    if (!element || element.type !== "bpmn:Task") {
+      setSelectedElement(null);
+      setPerformer("");
+      setWfTitle("");
+      setUseForm(false);
+      setNewField({
+        label: "",
+        type: "text",
+        required: false,
+        options: [],
+        allowedTypes: ["image/*", "application/pdf"],
+        maxSize: 5,
+      });
+      setNewOption("");
+    } else {
+      setSelectedElement(element);
+      setPerformer(element.businessObject.get("performer") || "");
+      setWfTitle(element.businessObject.name || "");
+      setUseForm(element.businessObject.get("useForm") === "true" || false);
+      try {
+        const fields = element.businessObject.get("formFields");
+        const taskFields = fields ? JSON.parse(fields) : [];
+        setFormFieldsByTask((prev) => ({
+          ...prev,
+          [element.id]: taskFields,
+        }));
+      } catch {
+        setFormFieldsByTask((prev) => ({
+          ...prev,
+          [element.id]: [],
+        }));
+      }
+      // Reset newField khi chuyển task
+      setNewField({
+        label: "",
+        type: "text",
+        required: false,
+        options: [],
+        allowedTypes: ["image/*", "application/pdf"],
+        maxSize: 5,
+      });
+      setNewOption("");
+    }
+  };
+
+  // Hàm bật/tắt form
+  const toggleUseForm = (checked: boolean) => {
+    if (!selectedElement) return;
+    setUseForm(checked);
+    onChangeTask("useForm", checked.toString());
+    if (!checked) {
+      setFormFieldsByTask((prev) => ({
+        ...prev,
+        [selectedElement.id]: [],
+      }));
+      onChangeTask("formFields", null);
+    }
+  };
+
+  // Hàm thêm field mới
+  const addFormField = () => {
+    if (!selectedElement) return;
+    if (!newField.label) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng nhập tên field",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (newField.type === "select" && (!newField.options || newField.options.length === 0)) {
+      toast({
+        title: "Lỗi",
+        description: "Field select phải có ít nhất 1 tùy chọn",
+        variant: "destructive",
+      });
+      return;
+    }
+    const field: FormField = { id: uuidv4(), ...newField };
+    const updatedFields = [...(formFieldsByTask[selectedElement.id] || []), field];
+    setFormFieldsByTask((prev) => ({
+      ...prev,
+      [selectedElement.id]: updatedFields,
+    }));
+    onChangeTask("formFields", JSON.stringify(updatedFields));
+    setNewField({
+      label: "",
+      type: "text",
+      required: false,
+      options: [],
+      allowedTypes: ["image/*", "application/pdf"],
+      maxSize: 5,
+    });
+    setNewOption("");
+  };
+
+  // Hàm xóa field
+  const deleteFormField = (id: string) => {
+    if (!selectedElement) return;
+    const updatedFields = (formFieldsByTask[selectedElement.id] || []).filter(
+      (field) => field.id !== id
+    );
+    setFormFieldsByTask((prev) => ({
+      ...prev,
+      [selectedElement.id]: updatedFields,
+    }));
+    onChangeTask("formFields", JSON.stringify(updatedFields));
+  };
+
+  // Hàm cập nhật field
+  const updateFormField = (id: string, key: keyof FormField, value: any) => {
+    if (!selectedElement) {
+      console.error("Không thể cập nhật field: Không có selectedElement");
+      return;
+    }
+    const updatedFields = (formFieldsByTask[selectedElement.id] || []).map((field) =>
+      field.id === id ? { ...field, [key]: value } : field
+    );
+    setFormFieldsByTask((prev) => ({
+      ...prev,
+      [selectedElement.id]: updatedFields,
+    }));
+    console.log(`Cập nhật field ${id}, ${key}:`, value);
+    onChangeTask("formFields", JSON.stringify(updatedFields));
+  };
+
+  // Hàm thêm tùy chọn cho select
+  const addOption = () => {
+    if (!newOption) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng nhập tùy chọn",
+        variant: "destructive",
+      });
+      return;
+    }
+    const updatedOptions = [...(newField.options || []), newOption];
+    setNewField({ ...newField, options: updatedOptions });
+    setNewOption("");
+    toast({
+      title: "Thành công",
+      description: "Đã thêm tùy chọn",
+    });
+  };
+
+  // Hàm xóa tùy chọn cho select
+  const deleteOption = (option: string) => {
+    const updatedOptions = (newField.options || []).filter((opt) => opt !== option);
+    setNewField({ ...newField, options: updatedOptions });
+    toast({
+      title: "Thành công",
+      description: "Đã xóa tùy chọn",
+    });
+  };
+
+  // Hàm kiểm tra tính hợp lệ của quy trình BPMN
+  const validateBpmn = async (xml: string): Promise<string | null> => {
+    try {
+      const result = await parseStringPromise(xml);
+      const process = result.definitions.process?.[0];
+      if (!process) return "Quy trình không tồn tại";
+
+      // Kiểm tra start event
+      const startEvents = process.startEvent || [];
+      if (startEvents.length === 0) return "Quy trình phải có ít nhất 1 sự kiện bắt đầu";
+      if (startEvents.length > 1) return "Quy trình chỉ được có 1 sự kiện bắt đầu";
+
+      // Kiểm tra end event
+      const endEvents = process.endEvent || [];
+      if (endEvents.length === 0) return "Quy trình phải có ít nhất 1 sự kiện kết thúc";
+      if (endEvents.length > 1) return "Quy trình chỉ được có 1 sự kiện kết thúc";
+
+      // Kiểm tra task
+      const tasks = process.task || [];
+      if (tasks.length === 0) return "Quy trình phải có ít nhất 1 bước (task)";
+
+      // Kiểm tra performer và form fields hợp lệ cho tasks
+      for (const task of tasks) {
+        const performer = task.$.performer;
+        if (!performer || !["restaurant", "customer"].includes(performer)) {
+          return `Task ${task.$.id} phải có đối tượng thực hiện hợp lệ`;
+        }
+        const useForm = task.$.useForm === "true";
+        const formFields = task.$.formFields;
+        if (useForm && (!formFields || JSON.parse(formFields).length === 0)) {
+          return `Task ${task.$.id} bật form nhưng không có field nào`;
+        }
+        if (formFields) {
+          const fields = JSON.parse(formFields);
+          for (const field of fields) {
+            if (
+              !field.label ||
+              !["text", "textarea", "number", "datetime", "select", "upload"].includes(field.type)
+            ) {
+              return `Task ${task.$.id} có field không hợp lệ`;
+            }
+            if (field.type === "select" && (!field.options || field.options.length === 0)) {
+              return `Task ${task.$.id} có field select không có tùy chọn`;
+            }
+          }
+        }
+      }
+
+      // Kiểm tra kết nối (sequence flows)
+      const sequenceFlows = process.sequenceFlow || [];
+      if (sequenceFlows.length === 0) return "Các bước phải được kết nối với nhau";
+
+      // Kiểm tra tất cả các phần tử có được kết nối
+      const allElements = [...startEvents, ...endEvents, ...tasks, ...(process.gateway || [])];
+      const elementIds = allElements.map((el: any) => el.$.id);
+      const connectedSources = sequenceFlows.map((flow: any) => flow.$.sourceRef);
+      const connectedTargets = sequenceFlows.map((flow: any) => flow.$.targetRef);
+
+      for (const elementId of elementIds) {
+        if (!connectedSources.includes(elementId) && !connectedTargets.includes(elementId)) {
+          return `Phần tử ${elementId} không được kết nối`;
+        }
+      }
+
+      // Kiểm tra đường dẫn từ start đến end
+      const reachable = new Set<string>();
+      const stack = [startEvents[0].$.id];
+      while (stack.length > 0) {
+        const currentId = stack.pop()!;
+        if (!reachable.has(currentId)) {
+          reachable.add(currentId);
+          const outgoingFlows = sequenceFlows.filter(
+            (flow: any) => flow.$.sourceRef === currentId
+          );
+          for (const flow of outgoingFlows) {
+            stack.push(flow.$.targetRef);
+          }
+        }
+      }
+
+      if (!reachable.has(endEvents[0].$.id)) {
+        return "Không có đường dẫn từ sự kiện bắt đầu đến sự kiện kết thúc";
+      }
+
+      return null; // Quy trình hợp lệ
+    } catch (e) {
+      return "XML không hợp lệ hoặc lỗi khi phân tích";
+    }
+  };
+
+  // Hàm xử lý lưu quy trình
+  const handleSave = async () => {
+    if (!modelerRef.current) {
+      toast({
+        title: "Lỗi",
+        description: "Không thể lưu quy trình: Modeler chưa được khởi tạo",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const { xml } = await modelerRef.current.saveXML({ format: true });
+    const validationError = await validateBpmn(xml);
+
+    if (validationError) {
+      toast({
+        title: "Quy trình không hợp lệ",
+        description: validationError,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Lấy dữ liệu các bước
+    try {
+      const result = await parseStringPromise(xml);
+      const process = result.definitions.process?.[0];
+      const tasks = process.task || [];
+      const steps = tasks.map((task: any) => ({
+        id: task.$.id,
+        name: task.$.name || "",
+        performer: task.$.performer || "",
+        useForm: task.$.useForm === "true",
+        formFields: task.$.formFields ? JSON.parse(task.$.formFields) : [],
+      }));
+
+      // Log mảng các bước
+      console.log("Danh sách các bước:", JSON.stringify(steps, null, 2));
+    } catch (e) {
+      console.error("Lỗi khi parse XML để lấy steps:", e);
+    }
+
+    // Lưu XML (gửi đến API hoặc console.log)
+    console.log("Lưu BPMN XML:", xml);
+    toast({
+      title: "Thành công",
+      description: "Quy trình đã được lưu thành công",
+    });
+
+    // Ví dụ: Gửi đến API
+    /*
+    try {
+      await fetch("/api/save-workflow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ xml }),
+      });
+      toast({
+        title: "Thành công",
+        description: "Quy trình đã được lưu thành công",
+      });
+    } catch (e) {
+      toast({
+        title: "Lỗi",
+        description: "Không thể lưu quy trình",
+        variant: "destructive",
+      });
+    }
+    */
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Fetch data (unchanged for brevity, same API calls)
-        const totalRes = await getTotalReservations(queryParams);
-        if (totalRes.statusCode === 200 && totalRes.data) {
-          setTotalReservations(totalRes.data.totalReservations);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && containerRef.current) {
+          if (!modelerRef.current) {
+            modelerRef.current = new BpmnModeler({
+              container: containerRef.current,
+              additionalModules: [
+                {
+                  paletteProvider: ["type", CustomPaletteProvider],
+                },
+                {
+                  __init__: ["customContextPadProvider"],
+                  customContextPadProvider: ["type", CustomContextPadProvider],
+                },
+              ],
+            });
+
+            const eventBus = modelerRef.current.get("eventBus") as EventBus;
+            eventBus.on("element.click", async (event: { element: BpmnElement }) => {
+              onEventBus(event.element.type === "bpmn:Task" ? event.element : null);
+            });
+            eventBus.on("shape.remove", async (event: { element: BpmnElement }) => {
+              if (event.element.type === "bpmn:Task") {
+                setFormFieldsByTask((prev) => {
+                  const newFields = { ...prev };
+                  delete newFields[event.element.id];
+                  return newFields;
+                });
+                onEventBus(null);
+              }
+            });
+            eventBus.on("shape.added", async (event: { element: BpmnElement }) => {
+              if (event.element.type === "bpmn:Task") {
+                onEventBus(event.element);
+              }
+            });
+            eventBus.on("commandStack.changed", async () => {
+              if (modelerRef.current) {
+                const { xml } = await modelerRef.current.saveXML({ format: true });
+                setBpmnContent(xml);
+              }
+            });
+
+            let content = bpmnContent;
+            if (!isBpmnXml(bpmnContent)) {
+              content = `<?xml version="1.0" encoding="UTF-8"?>
+                          <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                                      id="Definitions_1"
+                                      targetNamespace="http://bpmn.io/schema/bpmn">
+                            <process id="Process_1" isExecutable="true" />
+                            <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+                              <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1" />
+                            </bpmndi:BPMNDiagram>
+                          </definitions>`;
+            }
+
+            modelerRef.current.importXML(content).then(() => {
+              const canvas = modelerRef.current!.get("canvas") as Canvas;
+              canvas.zoom("fit-viewport");
+            }).catch((err: Error) => {
+              console.error("Error loading BPMN:", err);
+            });
+          }
         }
-        const trendsRes = await getReservationTrends(queryParams);
-        if (trendsRes.statusCode === 200 && trendsRes.data) {
-          setReservationTrends(trendsRes.data);
-        }
-        const customerRes = await getCustomerDistribution(queryParams);
-        if (customerRes.statusCode === 200 && customerRes.data) {
-          setCustomerData([
-            { type: 'Khách mới', value: customerRes.data.newCustomers },
-            { type: 'Khách quen', value: customerRes.data.returningCustomers },
-          ]);
-        }
-        const totalRevenueDishRes = await getTotalRevenue(queryParams);
-        if (totalRevenueDishRes.statusCode === 200 && totalRevenueDishRes.data) {
-          setTotalRevenueDish(totalRevenueDishRes.data.totalRevenue);
-        }
-        const revenueTrendsDishRes = await getRevenueTrends(queryParams);
-        if (revenueTrendsDishRes.statusCode === 200 && revenueTrendsDishRes.data) {
-          setRevenueTrendsDish(revenueTrendsDishRes.data);
-        }
-        const topDishesRes = await getTopDishes(queryParams);
-        if (topDishesRes.statusCode === 200 && topDishesRes.data) {
-          setTopDishes(topDishesRes.data);
-        }
-        const recentOrdersDishRes = await getRecentOrders(queryParams);
-        if (recentOrdersDishRes.statusCode === 200 && recentOrdersDishRes.data) {
-          setRecentOrdersDish(recentOrdersDishRes.data);
-        }
-        const totalRevenueFoodRes = await getTotalRevenueFood(queryParams);
-        if (totalRevenueFoodRes.statusCode === 200 && totalRevenueFoodRes.data) {
-          setTotalRevenueFood(totalRevenueFoodRes.data.totalRevenue);
-        }
-        const revenueTrendsFoodRes = await getRevenueTrendsFood(queryParams);
-        if (revenueTrendsFoodRes.statusCode === 200 && revenueTrendsFoodRes.data) {
-          setRevenueTrendsFood(revenueTrendsFoodRes.data);
-        }
-        const topFoodsRes = await getTopFoods(queryParams);
-        if (topFoodsRes.statusCode === 200 && topFoodsRes.data) {
-          setTopFoods(topFoodsRes.data);
-        }
-        const recentOrdersFoodRes = await getRecentOrdersFood(queryParams);
-        if (recentOrdersFoodRes.statusCode === 200 && recentOrdersFoodRes.data) {
-          setRecentOrdersFood(recentOrdersFoodRes.data);
-        }
-        const statusDistributionRes = await getOrderStatusDistributionFood(queryParams);
-        if (statusDistributionRes.statusCode === 200 && statusDistributionRes.data) {
-          setOrderStatusDistribution(statusDistributionRes.data);
-        }
-        const totalRevenueComboRes = await getTotalComboRevenue(queryParams);
-        if (totalRevenueComboRes.statusCode === 200 && totalRevenueComboRes.data) {
-          setTotalRevenueCombo(totalRevenueComboRes.data.totalComboRevenue);
-        }
-        const revenueTrendsComboRes = await getComboRevenueTrends(queryParams);
-        if (revenueTrendsComboRes.statusCode === 200 && revenueTrendsComboRes.data) {
-          setRevenueTrendsCombo(revenueTrendsComboRes.data);
-        }
-        const topCombosRes = await getTopCombos(queryParams);
-        if (topCombosRes.statusCode === 200 && topCombosRes.data) {
-          setTopCombos(topCombosRes.data);
-        }
-        const recentOrdersComboRes = await getRecentComboOrders(queryParams);
-        if (recentOrdersComboRes.statusCode === 200 && recentOrdersComboRes.data) {
-          setRecentOrdersCombo(recentOrdersComboRes.data);
-        }
-        const totalStockRes = await getTotalStockValue(queryParams);
-        if (totalStockRes.statusCode === 200 && totalStockRes.data) {
-          setTotalStockValue(totalStockRes.data.totalStockValue);
-        }
-        const stockInTrendsRes = await getStockInTrends(queryParams);
-        if (stockInTrendsRes.statusCode === 200 && stockInTrendsRes.data) {
-          setStockInTrends(stockInTrendsRes.data);
-        }
-        const stockOutTrendsRes = await getStockOutTrends(queryParams);
-        if (stockOutTrendsRes.statusCode === 200 && stockOutTrendsRes.data) {
-          setStockOutTrends(stockOutTrendsRes.data);
-        }
-        const lowStockRes = await getLowStockIngredients({
-          ...queryParams,
-          threshold: 10,
-        });
-        if (lowStockRes.statusCode === 200 && lowStockRes.data) {
-          setLowStockIngredients(lowStockRes.data);
-        }
-        const topIngredientsRes = await getTopIngredients(queryParams);
-        if (topIngredientsRes.statusCode === 200 && topIngredientsRes.data) {
-          setTopIngredients(topIngredientsRes.data);
-        }
-        const recentStockRes = await getRecentStockTransactions(queryParams);
-        if (recentStockRes.statusCode === 200 && recentStockRes.data) {
-          setRecentStockTransactions(recentStockRes.data);
-        }
-        const stockByCategoryRes = await getStockByCategory(queryParams);
-        if (stockByCategoryRes.statusCode === 200 && stockByCategoryRes.data) {
-          setStockByCategory(stockByCategoryRes.data);
-        }
-        setError(null);
-      } catch (err: any) {
-        setError(err.message || 'Đã xảy ra lỗi khi tải dữ liệu');
-      } finally {
-        setLoading(false);
-      }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
     };
-    fetchData();
-  }, []);
+  }, [bpmnContent]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-base text-gray-600">Đang tải...</p>
-      </div>
-    );
-  }
+  function isBpmnXml(xml: string): boolean {
+    try {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xml, "application/xml");
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-base text-red-600">Lỗi: {error}</p>
-      </div>
-    );
+      const definitions = xmlDoc.getElementsByTagName("definitions")[0];
+      if (!definitions) return false;
+
+      const namespace = definitions.namespaceURI;
+      return namespace === "http://www.omg.org/spec/BPMN/20100524/MODEL";
+    } catch (e) {
+      console.error("Invalid XML:", e);
+      return false;
+    }
   }
 
   return (
-    <div className="p-4 space-y-4 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="text-center sm:text-left">
-        <h1 className="text-2xl font-bold text-indigo-600">Dashboard Nhà Hàng</h1>
-        <p className="mt-1 text-sm text-gray-600">
-          Tổng quan kinh doanh, đặt bàn, kho hàng
-        </p>
+    <>
+      <div className="p-4">
+        <Button onClick={handleSave}>Lưu</Button>
       </div>
-
-      {/* Key Metrics */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {[
-          {
-            title: 'Doanh Thu Món',
-            value: formatCurrency(totalRevenueDish),
-            change: '+20%',
-            icon: Utensils,
-            color: 'text-green-600',
-          },
-          {
-            title: 'Doanh Thu Online',
-            value: formatCurrency(totalRevenueFood),
-            change: '+18%',
-            icon: ShoppingCart,
-            color: 'text-yellow-600',
-          },
-          {
-            title: 'Doanh Thu Combo',
-            value: formatCurrency(totalRevenueCombo),
-            change: '+15%',
-            icon: Pizza,
-            color: 'text-red-600',
-          },
-          {
-            title: 'Khách Hàng',
-            value: customerData.reduce((sum, item) => sum + item.value, 0).toString(),
-            change: '+15%',
-            icon: Users,
-            color: 'text-blue-600',
-          },
-          {
-            title: 'Đặt Bàn',
-            value: totalReservations.toString(),
-            change: '+12%',
-            icon: Table,
-            color: 'text-teal-600',
-          },
-          {
-            title: 'Tồn Kho',
-            value: formatCurrency(totalStockValue),
-            change: 'Cập nhật',
-            icon: Package,
-            color: 'text-gray-600',
-          },
-          {
-            title: 'Lượt Xem Blog',
-            value: '2600',
-            change: '+25%',
-            icon: BookOpen,
-            color: 'text-purple-600',
-          },
-        ].map((metric) => (
-          <Card key={metric.title} className="bg-white shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between pb-1">
-              <CardTitle className="text-sm font-medium text-gray-700">
-                {metric.title}
-              </CardTitle>
-              <metric.icon className="h-4 w-4 text-gray-500" />
-            </CardHeader>
-            <CardContent>
-              <div className={`text-xl font-semibold ${metric.color}`}>
-                {metric.value}
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="h-full"
+        style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }}
+      >
+        <ResizablePanel maxSize={80} minSize={20} defaultSize={70}>
+          <div ref={containerRef} className="w-full h-full" />
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel maxSize={80} minSize={20} defaultSize={30}>
+          <h3 className="p-4 text-blue-900 font-semibold uppercase border-b border-gray-200">
+            Thiết lập bước
+          </h3>
+          {selectedElement && selectedElement.type === "bpmn:Task" ? (
+            <div className="flex flex-col gap-4 p-4">
+              <h4 className="font-semibold">Tên bước: {wfTitle}</h4>
+              <div className="flex flex-col gap-2">
+                <span className="text-sm">Đối tượng thực hiện</span>
+                <Select
+                  value={performer}
+                  onValueChange={(value) => {
+                    setPerformer(value);
+                    onChangeTask("performer", value);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Chọn đối tượng thực hiện" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="restaurant">Nhà hàng</SelectItem>
+                    <SelectItem value="customer">Khách hàng</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <p className="text-xs text-gray-500">{metric.change}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Charts Section */}
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-        {/* Dish Revenue */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-indigo-600">
-              Doanh Thu Món
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={revenueTrendsDish}>
-                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
-                <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
-                  stroke="#6B7280"
-                  fontSize={12}
-                />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#4F46E5"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Top Dishes */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-green-600">
-              Top Món Ăn
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={topDishes}>
-                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
-                <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
-                  stroke="#6B7280"
-                  fontSize={12}
-                />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Bar dataKey="revenue" fill="#10B981" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Food Revenue */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-purple-600">
-              Doanh Thu Online
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={revenueTrendsFood}>
-                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
-                <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
-                  stroke="#6B7280"
-                  fontSize={12}
-                />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#8B5CF6"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Top Foods */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-amber-600">
-              Top Món Online
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={topFoods}>
-                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
-                <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
-                  stroke="#6B7280"
-                  fontSize={12}
-                />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Bar dataKey="revenue" fill="#F59E0B" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Combo Revenue */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-pink-600">
-              Doanh Thu Combo
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={revenueTrendsCombo}>
-                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
-                <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
-                  stroke="#6B7280"
-                  fontSize={12}
-                />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#EC4899"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Top Combos */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-red-600">
-              Top Combo
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={topCombos}>
-                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
-                <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
-                  stroke="#6B7280"
-                  fontSize={12}
-                />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Bar dataKey="revenue" fill="#EF4444" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Stock In Trends */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-green-600">
-              Nhập Kho
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={stockInTrends}>
-                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
-                <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
-                <Line
-                  type="monotone"
-                  dataKey="quantity"
-                  stroke="#10B981"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Stock Out Trends */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-red-600">
-              Xuất Kho
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={stockOutTrends}>
-                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
-                <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
-                <Line
-                  type="monotone"
-                  dataKey="quantity"
-                  stroke="#EF4444"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Low Stock Ingredients */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-yellow-600">
-              Nguyên Liệu Sắp Hết
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {lowStockIngredients.length ? (
-                lowStockIngredients.map((item) => (
-                  <div
-                    key={item.igd_name}
-                    className="flex justify-between border-b py-1 text-sm"
-                  >
-                    <span>{item.igd_name}</span>
-                    <Badge variant="outline">
-                      {item.stock} {item.unit}
-                    </Badge>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500">Không có nguyên liệu sắp hết.</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Top Ingredients */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-blue-600">
-              Nguyên Liệu Phổ Biến
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={topIngredients}>
-                <XAxis dataKey="igd_name" stroke="#6B7280" fontSize={12} />
-                <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
-                <Bar dataKey="quantity" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Recent Stock Transactions */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-600">
-              Giao Dịch Kho
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {recentStockTransactions.length ? (
-                recentStockTransactions.map((transaction) => (
-                  <div
-                    key={transaction.id}
-                    className="flex justify-between border-b py-1 text-sm"
-                  >
-                    <div>
-                      <p>{transaction.ingredient}</p>
-                      <p className="text-xs text-gray-500">{transaction.code}</p>
-                    </div>
-                    <div className="text-right">
-                      <p>{transaction.quantity} đơn vị</p>
-                      <Badge
-                        variant={transaction.type === 'in' ? 'default' : 'destructive'}
-                      >
-                        {transaction.type === 'in' ? 'Nhập' : 'Xuất'}
-                      </Badge>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500">Không có giao dịch.</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Stock by Category */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-purple-600">
-              Tồn Kho Theo Loại
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={stockByCategory}
-                  dataKey="stock"
-                  nameKey="category"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                >
-                  {stockByCategory.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {stockByCategory.map((entry) => (
-                <Badge key={entry.category} variant="outline">
-                  {entry.category}: {entry.stock}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Order Status Distribution */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-orange-600">
-              Trạng Thái Đơn Online
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={orderStatusDistribution}
-                  dataKey="value"
-                  nameKey="type"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                >
-                  {orderStatusDistribution.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => `${value} đơn`} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {orderStatusDistribution.map((entry) => (
-                <Badge key={entry.type} variant="outline">
-                  {entry.type}: {entry.value}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Customer Distribution */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-cyan-600">
-              Loại Khách Hàng
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={customerData}
-                  dataKey="value"
-                  nameKey="type"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                >
-                  {customerData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => `${value} khách`} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {customerData.map((entry) => (
-                <Badge key={entry.type} variant="outline">
-                  {entry.type}: {entry.value}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Reservation Trends */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-teal-600">
-              Đặt Bàn
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={reservationTrends}>
-                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
-                <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip formatter={(value: number) => `${value} bàn`} />
-                <Line
-                  type="monotone"
-                  dataKey="reservations"
-                  stroke="#14B8A6"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Recent Dish Orders */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-600">
-              Đơn Món Gần Đây
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {recentOrdersDish.length ? (
-                recentOrdersDish.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex justify-between border-b py-1 text-sm"
-                  >
-                    <span>{order.customer}</span>
-                    <div className="text-right">
-                      <p>{formatCurrency(order.total)}</p>
-                      <Badge
-                        variant={
-                          order.status === 'Hoàn thành'
-                            ? 'default'
-                            : order.status === 'Từ chối'
-                              ? 'destructive'
-                              : 'secondary'
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <Switch checked={useForm} onCheckedChange={toggleUseForm} />
+                  <span>Sử dụng Form</span>
+                </div>
+                {useForm && (
+                  <>
+                    <h4 className="font-semibold">Cấu hình Form</h4>
+                    {formFieldsByTask[selectedElement.id]?.length > 0 && (
+                      <div className="flex flex-col gap-2">
+                        {formFieldsByTask[selectedElement.id].map((field) => (
+                          <div key={field.id} className="border p-2 rounded">
+                            <div className="flex flex-col gap-2">
+                              <Input
+                                value={field.label}
+                                onChange={(e) => updateFormField(field.id, "label", e.target.value)}
+                                placeholder="Tên field"
+                              />
+                              <Select
+                                value={field.type}
+                                onValueChange={(value) =>
+                                  updateFormField(field.id, "type", value as FormField["type"])
+                                }
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Chọn kiểu" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="text">Text</SelectItem>
+                                  <SelectItem value="textarea">Textarea</SelectItem>
+                                  <SelectItem value="number">Number</SelectItem>
+                                  <SelectItem value="datetime">Datetime</SelectItem>
+                                  <SelectItem value="select">Select</SelectItem>
+                                  <SelectItem value="upload">Upload</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              {field.type === "select" && (
+                                <div className="flex flex-col gap-2">
+                                  <span className="text-sm">Tùy chọn</span>
+                                  {field.options?.map((option) => (
+                                    <div key={option} className="flex items-center gap-2">
+                                      <Input value={option} readOnly />
+                                      <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() =>
+                                          updateFormField(
+                                            field.id,
+                                            "options",
+                                            field.options?.filter((opt) => opt !== option)
+                                          )
+                                        }
+                                      >
+                                        Xóa
+                                      </Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {field.type === "upload" && (
+                                <div className="flex flex-col gap-2">
+                                  <span className="text-sm">Loại file cho phép</span>
+                                  <Input
+                                    value={field.allowedTypes?.join(", ") || ""}
+                                    onChange={(e) =>
+                                      updateFormField(field.id, "allowedTypes", e.target.value.split(", "))
+                                    }
+                                    placeholder="Ví dụ: image/*, application/pdf"
+                                  />
+                                  <span className="text-sm">Kích thước tối đa (MB)</span>
+                                  <Input
+                                    type="number"
+                                    value={field.maxSize || 5}
+                                    onChange={(e) =>
+                                      updateFormField(field.id, "maxSize", Number(e.target.value))
+                                    }
+                                  />
+                                </div>
+                              )}
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={field.required}
+                                  onCheckedChange={(checked) =>
+                                    updateFormField(field.id, "required", checked)
+                                  }
+                                />
+                                <span>Bắt buộc</span>
+                              </div>
+                              <Button
+                                variant="destructive"
+                                onClick={() => deleteFormField(field.id)}
+                              >
+                                Xóa Field
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex flex-col gap-2 border-t pt-2">
+                      <h5 className="font-semibold">Thêm Field Mới</h5>
+                      <Input
+                        value={newField.label}
+                        onChange={(e) => setNewField({ ...newField, label: e.target.value })}
+                        placeholder="Tên field"
+                      />
+                      <Select
+                        value={newField.type}
+                        onValueChange={(value) =>
+                          setNewField({ ...newField, type: value as FormField["type"] })
                         }
                       >
-                        {order.status}
-                      </Badge>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn kiểu" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="text">Text</SelectItem>
+                          <SelectItem value="textarea">Textarea</SelectItem>
+                          <SelectItem value="number">Number</SelectItem>
+                          <SelectItem value="datetime">Datetime</SelectItem>
+                          <SelectItem value="select">Select</SelectItem>
+                          <SelectItem value="upload">Upload</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {newField.type === "select" && (
+                        <div className="flex flex-col gap-2">
+                          <span className="text-sm">Tùy chọn</span>
+                          {newField.options?.map((option) => (
+                            <div key={option} className="flex items-center gap-2">
+                              <Input value={option} readOnly />
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => deleteOption(option)}
+                              >
+                                Xóa
+                              </Button>
+                            </div>
+                          ))}
+                          <div className="flex gap-2">
+                            <Input
+                              value={newOption}
+                              onChange={(e) => setNewOption(e.target.value)}
+                              placeholder="Nhập tùy chọn"
+                            />
+                            <Button onClick={addOption}>Thêm</Button>
+                          </div>
+                        </div>
+                      )}
+                      {newField.type === "upload" && (
+                        <div className="flex flex-col gap-2">
+                          <span className="text-sm">Loại file cho phép</span>
+                          <Input
+                            value={newField.allowedTypes?.join(", ") || ""}
+                            onChange={(e) =>
+                              setNewField({ ...newField, allowedTypes: e.target.value.split(", ") })
+                            }
+                            placeholder="Ví dụ: image/*, application/pdf"
+                          />
+                          <span className="text-sm">Kích thước tối đa (MB)</span>
+                          <Input
+                            type="number"
+                            value={newField.maxSize || 5}
+                            onChange={(e) =>
+                              setNewField({ ...newField, maxSize: Number(e.target.value) })
+                            }
+                          />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={newField.required}
+                          onCheckedChange={(checked) =>
+                            setNewField({ ...newField, required: checked })
+                          }
+                        />
+                        <span>Bắt buộc</span>
+                      </div>
+                      <Button onClick={addFormField}>Thêm Field</Button>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500">Không có đơn hàng.</p>
-              )}
+                  </>
+                )}
+              </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Food Orders */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-600">
-              Đơn Online Gần Đây
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {recentOrdersFood.length ? (
-                recentOrdersFood.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex justify-between border-b py-1 text-sm"
-                  >
-                    <span>{order.customer}</span>
-                    <div className="text-right">
-                      <p>{formatCurrency(order.total)}</p>
-                      <Badge
-                        variant={
-                          order.status === 'Hoàn thành'
-                            ? 'default'
-                            : order.status.includes('hủy')
-                              ? 'destructive'
-                              : 'secondary'
-                        }
-                      >
-                        {order.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500">Không có đơn hàng.</p>
-              )}
+          ) : (
+            <div className="flex flex-col gap-4 p-4">
+              <div className="text-center">
+                <p className="text-gray-500">Chọn bước để thiết lập</p>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Combo Orders */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-600">
-              Đơn Combo Gần Đây
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {recentOrdersCombo.length ? (
-                recentOrdersCombo.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex justify-between border-b py-1 text-sm"
-                  >
-                    <span>{order.customer}</span>
-                    <div className="text-right">
-                      <p>{formatCurrency(order.total)}</p>
-                      <Badge
-                        variant={
-                          order.status === 'Hoàn thành'
-                            ? 'default'
-                            : order.status.includes('hủy')
-                              ? 'destructive'
-                              : 'secondary'
-                        }
-                      >
-                        {order.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500">Không có đơn hàng.</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Blog Performance */}
-        <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-orange-600">
-              Hiệu Suất Blog
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={blogPerformance}>
-                <XAxis dataKey="title" stroke="#6B7280" fontSize={12} />
-                <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip
-                  formatter={(value: number, name: string) => [
-                    value,
-                    name === 'views' ? 'Lượt xem' : 'Lượt thích',
-                  ]}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="views"
-                  stroke="#F97316"
-                  strokeWidth={2}
-                  dot={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="likes"
-                  stroke="#EF4444"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-            <div className="mt-2 flex gap-2 justify-center">
-              <Badge variant="outline">
-                Xem: {blogPerformance.reduce((sum, item) => sum + item.views, 0)}
-              </Badge>
-              <Badge variant="outline">
-                Thích: {blogPerformance.reduce((sum, item) => sum + item.likes, 0)}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+          )}
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </>
   );
 }
