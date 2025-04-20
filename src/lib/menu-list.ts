@@ -149,6 +149,21 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               href: '/dashboard/work-schedules',
               label: 'Quản lý lịch làm việc',
               active: pathname === '/dashboard/work-schedules'
+            },
+            {
+              href: '/dashboard/leave-application',
+              label: 'Quản lý đơn xin nghỉ phép',
+              active: pathname === '/dashboard/leave-application'
+            },
+            {
+              href: '/dashboard/working-schedules',
+              label: 'Quản lý lịch làm việc',
+              active: pathname === '/dashboard/working-schedules'
+            },
+            {
+              href: '/dashboard/working-schedule-templates',
+              label: 'Quản lý mẫu lịch làm việc',
+              active: pathname === '/dashboard/working-schedule-templates'
             }
           ]
         },
@@ -371,7 +386,12 @@ export function getMenuListEmployee(pathname: string): Group[] {
               href: '/dashboard/work-schedules',
               label: 'Quản lý lịch làm việc',
               active: pathname === '/dashboard/work-schedules'
-            }
+            },
+            {
+              href: '/dashboard/leave-application',
+              label: 'Quản lý đơn xin nghỉ phép',
+              active: pathname === '/dashboard/leave-application'
+            },
           ]
         },
         {

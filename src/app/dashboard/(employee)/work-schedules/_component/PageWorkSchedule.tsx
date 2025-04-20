@@ -160,7 +160,7 @@ export default function PageWorkSchedule() {
               <Button
                 variant="outline"
                 className={cn(
-                  'w-[240px] justify-start text-left font-normal bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-all',
+                  'w-[240px] justify-start text-left font-normal  backdrop-blur-sm shadow-sm  transition-all',
                   !startDate && 'text-muted-foreground'
                 )}
               >
@@ -183,7 +183,7 @@ export default function PageWorkSchedule() {
               <Button
                 variant="outline"
                 className={cn(
-                  'w-[240px] justify-start text-left font-normal bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white/90 transition-all',
+                  'w-[240px] justify-start text-left font-normal  backdrop-blur-sm shadow-sm  transition-all',
                   !endDate && 'text-muted-foreground'
                 )}
               >
@@ -214,7 +214,7 @@ export default function PageWorkSchedule() {
 
       </div>
 
-      <Card className="w-full bg-white/90 backdrop-blur-sm shadow-lg rounded-xl overflow-hidden">
+      <Card className="w-full  backdrop-blur-sm shadow-lg rounded-xl overflow-hidden">
         <CardContent className="p-0">
           <ScrollArea className="w-full" style={{ height: 'calc(100vh - 160px)' }}>
             {isLoading ? (
@@ -236,10 +236,10 @@ export default function PageWorkSchedule() {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
                     >
-                      <Card className="w-80 bg-gradient-to-b from-white to-gray-50 shadow-md hover:shadow-lg transition-shadow">
+                      <Card className="w-80 bg-gradient-to-b  to-gray-50 shadow-md hover:shadow-lg transition-shadow">
                         <CardContent className="p-4">
                           <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-bold text-lg text-gray-800">{item.date}</h3>
+                            <h3 className="font-bold text-lg ">{item.date}</h3>
                           </div>
                           <ScrollArea className="h-[400px] pr-4">
                             <Link href={`/dashboard/work-schedules/${item.ws_id}`}
@@ -264,14 +264,14 @@ export default function PageWorkSchedule() {
                                   item.workingShift.map((shift, shiftIndex: number) => (
                                     <Card
                                       key={shiftIndex}
-                                      className="p-3 bg-blue-50/50 hover:bg-blue-100 transition-colors"
+                                      className="p-3 transition-colors"
                                       data-tooltip-id={`shift-tooltip-${shiftIndex}-${index}`}
                                       data-tooltip-content={shift.wks_description || 'Không có ghi chú'}
                                     >
                                       <div className="flex justify-between items-center">
                                         <div>
-                                          <p className="font-semibold text-blue-700">{shift.wks_name}</p>
-                                          <p className="text-sm text-gray-600">
+                                          <p className="font-semibold ">{shift.wks_name}</p>
+                                          <p className="text-sm ">
                                             {shift.wks_start_time} - {shift.wks_end_time}
                                           </p>
                                           {/* <p
@@ -313,16 +313,14 @@ export default function PageWorkSchedule() {
                                         </div>
 
                                       </div>
-                                      <Tooltip
+                                      {/* <Tooltip
                                         id={`shift-tooltip-${shiftIndex}-${index}`}
                                         style={{
-                                          backgroundColor: '#1e3a8a',
-                                          color: '#ffffff',
                                           borderRadius: '8px',
                                           padding: '8px',
                                           maxWidth: '200px',
                                         }}
-                                      />
+                                      /> */}
                                     </Card>
                                   ))
                                 ) : (
