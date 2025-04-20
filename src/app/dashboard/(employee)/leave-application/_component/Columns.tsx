@@ -22,7 +22,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { RootState } from '@/app/redux/store'
 import { useSelector } from 'react-redux'
-import { approveLeaveApplication, cancelLeaveApplication, rejectLeaveApplication, sendLeaveApplication } from '../leave-application.api'
+import { approveLeaveApplication, cancelLeaveApplication, deleteLeaveApplicationWithEmployee, rejectLeaveApplication, sendLeaveApplication } from '../leave-application.api'
 import { ILeaveApplication } from '../leave-application.interface'
 
 const getTextStatus = (status: string) => {
@@ -372,16 +372,88 @@ export const columns: ColumnDef<ILeaveApplication>[] = [
         }
       }
 
+      const handleDeleteLeaveApplication = async () => {
+        const res: IBackendRes<ILeaveApplication> = await deleteLeaveApplicationWithEmployee(leaveApplication.leaveAppId)
+        setLoading(true)
+        if (res.statusCode === 200) {
+          setLoading(false)
+          toast({
+            title: 'Thành công',
+            description: 'Xóa đơn xin nghỉ thành công',
+            variant: 'default'
+          })
+          router.push(`/dashboard/leave-application?a=${Math.floor(Math.random() * 100000) + 1}`)
+          router.refresh()
+        } else if (res.statusCode === 400) {
+          setLoading(false)
+          if (Array.isArray(res.message)) {
+            res.message.map((item: string) => {
+              toast({
+                title: 'Thất bại',
+                description: item,
+                variant: 'destructive'
+              })
+            })
+          } else {
+            toast({
+              title: 'Thất bại',
+              description: res.message,
+              variant: 'destructive'
+            })
+          }
+        } else if (res.statusCode === 404) {
+          setLoading(false)
+          toast({
+            title: 'Thông báo',
+            description: 'Đơn xin nghỉ không tồn tại, vui lòng thử lại sau',
+            variant: 'destructive'
+          })
+        } else if (res.code === -10) {
+          setLoading(false)
+          toast({
+            title: 'Thông báo',
+            description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
+            variant: 'destructive'
+          })
+          await deleteCookiesAndRedirect()
+        } else if (res.code === -11) {
+          toast({
+            title: 'Thông báo',
+            description:
+              'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+            variant: 'destructive'
+          })
+        } else {
+          toast({
+            title: 'Thất bại',
+            description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+            variant: 'destructive'
+          })
+        }
+      }
+
       return (
         <>
           {inforEmployee._id && (
             <div className="flex gap-2">
               {leaveApplication.status === 'DRAFT' && (
-                <Button onClick={handleSendLeaveApplication}>Gửi đơn</Button>
+                <>
+                  <Button onClick={() => router.push(`/dashboard/leave-application/${leaveApplication.leaveAppId}`)}>
+                    Chỉnh sửa
+                  </Button>
+                  <Button onClick={handleSendLeaveApplication}>Gửi đơn</Button>
+                </>
               )}
               {leaveApplication.status === 'PENDING' && (
                 <Button onClick={handleCancelLeaveApplication}>Hủy đơn</Button>
               )}
+              {
+                leaveApplication.status === 'DRAFT' || leaveApplication.status === 'CANCELED' ? (
+                  <Button onClick={handleDeleteLeaveApplication}>
+                    Xóa
+                  </Button>
+                ) : null
+              }
             </div>
           )}
           {inforRestaurant._id && (

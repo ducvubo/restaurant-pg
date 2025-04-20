@@ -85,7 +85,7 @@ export const columns: ColumnDef<IBookTable>[] = [
         <div className='flex flex-col'>
           <span>
             {bookTable.book_tb_hour} -{' '}
-            {format(bookTable.book_tb_date, "EEEE, dd 'Tháng' MM 'Năm' yyyy", { locale: vi })}
+            {format(bookTable.book_tb_date, "EEEE, dd/MM/yyyy", { locale: vi })}
           </span>
         </div>
       )

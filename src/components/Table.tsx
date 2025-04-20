@@ -75,7 +75,7 @@ export function TableCompnonent<TData, TValue>({
   return (
     <div className='flex w-full flex-col gap-2' style={{ height: `calc(100vh - ${height ? height : '9rem'})` }}>
       <div className='flex items-center justify-end'>
-        <DataTableViewOptions table={table} />
+        {/* <DataTableViewOptions table={table} /> */}
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>
         <div className='overflow-y-auto h-full  relative'>

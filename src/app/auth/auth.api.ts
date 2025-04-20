@@ -25,6 +25,10 @@ export const login = async (payload: { restaurant_email: string; restaurant_pass
   })
 
   if (res.statusCode === 201 && res.data) {
+    cookies().delete('access_token_rtr')
+    cookies().delete('refresh_token_rtr')
+    cookies().delete('access_token_epl')
+    cookies().delete('refresh_token_epl')
     const data = await Promise.all([
       await cookies().set({
         name: 'access_token_rtr',
@@ -214,6 +218,11 @@ export const loginEmployee = async (payload: {
     body: payload
   })
   if (res.statusCode === 201 && res.data) {
+    cookies().delete('access_token_rtr')
+    cookies().delete('refresh_token_rtr')
+    cookies().delete('access_token_epl')
+    cookies().delete('refresh_token_epl')
+
     const data = await Promise.all([
       await cookies().set({
         name: 'access_token_epl',

@@ -127,8 +127,16 @@ export const rejectLeaveApplication = async (data: {
 
 export const cancelLeaveApplication = async (id: string) => {
   const res: IBackendRes<ILeaveApplication> = await sendRequest({
-    url: `${process.env.URL_SERVER_EMPLOYEE}/leave-application/cancel`,
+    url: `${process.env.URL_SERVER_EMPLOYEE}/leave-application/cancel/${id}`,
     method: 'PATCH',
+  })
+  return res
+}
+
+export const deleteLeaveApplicationWithEmployee = async (id: string) => {
+  const res: IBackendRes<ILeaveApplication> = await sendRequest({
+    url: `${process.env.URL_SERVER_EMPLOYEE}/leave-application/${id}`,
+    method: 'DELETE',
   })
   return res
 }

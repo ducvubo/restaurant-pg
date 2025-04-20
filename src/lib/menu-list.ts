@@ -155,16 +155,6 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               label: 'Quản lý đơn xin nghỉ phép',
               active: pathname === '/dashboard/leave-application'
             },
-            {
-              href: '/dashboard/working-schedules',
-              label: 'Quản lý lịch làm việc',
-              active: pathname === '/dashboard/working-schedules'
-            },
-            {
-              href: '/dashboard/working-schedule-templates',
-              label: 'Quản lý mẫu lịch làm việc',
-              active: pathname === '/dashboard/working-schedule-templates'
-            }
           ]
         },
         {
