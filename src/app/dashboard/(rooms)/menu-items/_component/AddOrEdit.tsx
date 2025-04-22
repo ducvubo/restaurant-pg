@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { createMenuItems, getAllMenuCategoryName, updateMenuItems } from '../menu-items.api'
+import { createMenuItems, updateMenuItems } from '../menu-items.api'
 import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
@@ -15,7 +15,6 @@ import { useRouter } from 'next/navigation'
 import { IMenuItems } from '../menu-items.interface'
 import { Label } from '@/components/ui/label'
 import EditorTiny from '@/components/EditorTiny'
-import { IMenuCategory } from '../../menu-category/menu-category.interface'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ImageUrl } from '@/app/dashboard/(food)/foods/_component/AddOrEdit'
 import { Loader2, UploadIcon } from 'lucide-react'
@@ -27,7 +26,6 @@ interface Props {
 }
 const FormSchema = z.object({
   mitems_name: z.string().nonempty({ message: 'Vui lòng nhập tên' }),
-  mcat_id: z.string().nonempty({ message: 'Vui lòng chọn danh mục' }),
   mitems_price: z.preprocess((value) => {
     if (typeof value === 'string' && value.trim() === '') {
       return undefined
@@ -49,10 +47,8 @@ export default function AddOrEdit({ id, inforMenuItems }: Props) {
       mitems_description: inforMenuItems?.mitems_description || '',
       mitems_price: inforMenuItems?.mitems_price || 0,
       mitems_note: inforMenuItems?.mitems_note || '',
-      mcat_id: inforMenuItems?.mcat_id || ''
     }
   })
-  const [listMenuCategory, setListMenuCategory] = useState<IMenuCategory[]>([])
 
   const [uploadedUrlsItemsImage, setUploadedUrlsItemsImage] = useState<{
     image_cloud: string
@@ -63,32 +59,6 @@ export default function AddOrEdit({ id, inforMenuItems }: Props) {
   })
   const [isUploadingItemsImage, setIsUploadingItemsImage] = useState(false)
   const fileInputItemsImageRef = useRef<HTMLInputElement | null>(null)
-
-  const getListMenuCategoryName = async () => {
-    const res: IBackendRes<IMenuCategory[]> = await getAllMenuCategoryName()
-
-    if (res.statusCode === 200 && res.data) {
-      setListMenuCategory(res.data)
-    } else if (res.code === -10) {
-      toast({
-        title: 'Thông báo',
-        description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
-        variant: 'destructive'
-      })
-      await deleteCookiesAndRedirect()
-    } else if (res.code === -11) {
-      toast({
-        title: 'Thông báo',
-        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết'
-      })
-    } else {
-      toast({
-        title: 'Thông báo',
-        description: 'Đã có lỗi xảy ra vui lòng thử lại sau ít phút',
-        variant: 'destructive'
-      })
-    }
-  }
 
   const uploadImage = async (file: File, type: string) => {
     const formData = new FormData()
@@ -137,10 +107,6 @@ export default function AddOrEdit({ id, inforMenuItems }: Props) {
   }
 
   useEffect(() => {
-    getListMenuCategoryName()
-  }, [])
-
-  useEffect(() => {
     if (id === 'add') {
       return
     } else {
@@ -161,7 +127,6 @@ export default function AddOrEdit({ id, inforMenuItems }: Props) {
       mitems_description: data.mitems_description,
       mitems_price: data.mitems_price,
       mitems_note: data.mitems_note,
-      mcat_id: data.mcat_id
     }
 
     const res = id === 'add' ? await createMenuItems(payload) : await updateMenuItems({ ...payload, mitems_id: id })
@@ -271,31 +236,6 @@ export default function AddOrEdit({ id, inforMenuItems }: Props) {
               <FormControl>
                 <Input placeholder='Tên danh mục thực đơn...' {...field} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='mcat_id'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên danh mục</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Chọn danh mục...' />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {listMenuCategory.map((category) => (
-                    <SelectItem key={category.mcat_id} value={category.mcat_id}>
-                      {category.mcat_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}

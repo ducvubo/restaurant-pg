@@ -39,18 +39,6 @@ export const columns: ColumnDef<IFood>[] = [
     enableHiding: true
   },
   {
-    accessorKey: 'food_cat_id',
-    id: 'Danh mục',
-    header: () => <div className='font-semibold'>Danh mục</div>,
-    cell: ({ row }) => {
-      const food = row.original
-      return typeof food.food_cat_id === 'object' && food.food_cat_id !== null
-        ? food.food_cat_id.cat_res_name
-        : 'Chưa có danh mục'
-    },
-    enableHiding: true
-  },
-  {
     accessorKey: 'food_image',
     id: 'Ảnh',
     header: () => <div className='font-semibold'>Ảnh</div>,

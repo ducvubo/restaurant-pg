@@ -38,19 +38,6 @@ export const columns: ColumnDef<IMenuItems>[] = [
     enableHiding: true
   },
   {
-    accessorKey: 'mitems_image',
-    id: 'Danh mục',
-    header: () => <div className='font-semibold'>Danh mục</div>,
-    cell: ({ row }) => {
-      const menuItems = row.original
-      return typeof menuItems.category === 'object' && menuItems.category !== null
-        ? menuItems.category.mcat_name
-        : 'Chưa có danh mục'
-    },
-    enableHiding: true
-  },
-
-  {
     accessorKey: 'mitems_price',
     id: 'Giá thực đơn',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Giá thực đơn' />,

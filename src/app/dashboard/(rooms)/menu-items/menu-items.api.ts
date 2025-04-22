@@ -2,7 +2,6 @@
 
 import { sendRequest } from '@/lib/api'
 import { IMenuItems } from './menu-items.interface'
-import { IMenuCategory } from '../menu-category/menu-category.interface'
 
 const URL_SERVER_BOOK = process.env.URL_SERVER_BOOK
 
@@ -95,17 +94,5 @@ export const updateStatus = async ({
       mitems_status
     }
   })
-  return res
-}
-
-export const getAllMenuCategoryName = async () => {
-  const res: IBackendRes<IMenuCategory[]> = await sendRequest({
-    url: `${URL_SERVER_BOOK}/menu-category/cat-name`,
-    method: 'GET',
-    nextOption: {
-      cache: 'no-store'
-    }
-  })
-  console.log('🚀 ~ getAllMenuCategoryName ~ res:', res)
   return res
 }

@@ -11,8 +11,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { useRouter } from 'next/navigation'
-import { ICategories } from '../../categories/category.interface'
-import { createFood, getAllCategories, updateFood } from '../food.api'
+import { createFood, updateFood } from '../food.api'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import EditorTiny from '@/components/EditorTiny'
 import { Label } from '@/components/ui/label'
@@ -37,7 +36,6 @@ export interface ImageUrl {
 }
 
 const FormSchema = z.object({
-  food_cat_id: z.string().nonempty('Danh mục không được để trống'),
   food_name: z.string().nonempty('Tên món ăn không được để trống'),
   food_price: z.preprocess((value) => {
     if (typeof value === 'string' && value.trim() === '') {
@@ -74,7 +72,6 @@ const FormSchema = z.object({
 export default function AddOrEdit({ id, inforFood }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-  const [categories, setCategories] = useState<ICategories[]>([])
   const refContent = useRef<any>('')
 
   const [uploadedUrlsImageFood, setUploadedUrlsImageFood] = useState<
@@ -103,7 +100,6 @@ export default function AddOrEdit({ id, inforFood }: Props) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      food_cat_id: id !== 'add' ? (inforFood?.food_cat_id as ICategories)._id || '' : '',
       food_name: inforFood?.food_name || '',
       food_price: inforFood?.food_price || 0,
       food_note: inforFood?.food_note || '',
@@ -116,32 +112,6 @@ export default function AddOrEdit({ id, inforFood }: Props) {
     control: form.control,
     name: 'food_options'
   })
-
-  const getListCategory = async () => {
-    const res: IBackendRes<ICategories[]> = await getAllCategories()
-
-    if (res.statusCode === 200 && res.data) {
-      setCategories(res.data)
-    } else if (res.code === -10) {
-      toast({
-        title: 'Thông báo',
-        description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
-        variant: 'destructive'
-      })
-      await deleteCookiesAndRedirect()
-    } else if (res.code === -11) {
-      toast({
-        title: 'Thông báo',
-        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết'
-      })
-    } else {
-      toast({
-        title: 'Thông báo',
-        description: 'Đã có lỗi xảy ra vui lòng thử lại sau ít phút',
-        variant: 'destructive'
-      })
-    }
-  }
 
   const uploadImage = async (file: File, type: string) => {
     const formData = new FormData()
@@ -156,6 +126,7 @@ export default function AddOrEdit({ id, inforFood }: Props) {
         body: formData
       })
     ).json()
+    console.log("🚀 ~ uploadImage ~ res:", res)
 
     return res
   }
@@ -207,10 +178,6 @@ export default function AddOrEdit({ id, inforFood }: Props) {
 
     return res
   }
-
-  useEffect(() => {
-    getListCategory()
-  }, [])
 
   const handSelectTime = (type: 'open' | 'close', state: 'hour' | 'minute', value: string) => {
     if (type === 'open') {
@@ -272,7 +239,6 @@ export default function AddOrEdit({ id, inforFood }: Props) {
     }
 
     const payload: Partial<IFood> = {
-      food_cat_id: data.food_cat_id,
       food_name: data.food_name,
       food_price: data.food_price,
       food_image: JSON.stringify(uploadedUrlsImageFood),
@@ -406,30 +372,6 @@ export default function AddOrEdit({ id, inforFood }: Props) {
           />
           <FormField
             control={form.control}
-            name='food_cat_id'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tên danh mục</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Chọn danh mục...' />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category._id} value={category._id}>
-                        {category.cat_res_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
             name='food_price'
             render={({ field }) => (
               <FormItem>
@@ -475,8 +417,8 @@ export default function AddOrEdit({ id, inforFood }: Props) {
                   {`${food_open_time.hour.toString().padStart(2, '0')}:${food_open_time.minute
                     .toString()
                     .padStart(2, '0')} - ${food_close_time.hour.toString().padStart(2, '0')}:${food_close_time.minute
-                    .toString()
-                    .padStart(2, '0')}`}
+                      .toString()
+                      .padStart(2, '0')}`}
                 </Button>
               </div>
             </PopoverTrigger>

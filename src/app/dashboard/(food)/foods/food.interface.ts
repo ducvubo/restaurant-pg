@@ -1,9 +1,7 @@
-import { ICategories } from '../categories/category.interface'
 
 export interface IFood {
   food_id: string
   food_res_id: string
-  food_cat_id: ICategories | string
   food_name: string
   food_slug: string
   food_open_time: string

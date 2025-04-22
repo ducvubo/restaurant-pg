@@ -176,11 +176,11 @@ export function getMenuListRestaurant(pathname: string): Group[] {
           active: pathname.includes('/dishes'),
           icon: Salad,
           submenus: [
-            {
-              href: '/dashboard/categories',
-              label: 'Quản lý danh mục',
-              active: pathname === '/dashboard/categories'
-            },
+            // {
+            //   href: '/dashboard/categories',
+            //   label: 'Quản lý danh mục',
+            //   active: pathname === '/dashboard/categories'
+            // },
             {
               href: '/dashboard/dishes',
               label: 'Quản lý món ăn',
@@ -403,11 +403,11 @@ export function getMenuListEmployee(pathname: string): Group[] {
           active: pathname.includes('/dishes'),
           icon: Salad,
           submenus: [
-            {
-              href: '/dashboard/categories',
-              label: 'Quản lý danh mục',
-              active: pathname === '/dashboard/categories'
-            },
+            // {
+            //   href: '/dashboard/categories',
+            //   label: 'Quản lý danh mục',
+            //   active: pathname === '/dashboard/categories'
+            // },
             {
               href: '/dashboard/dishes',
               label: 'Quản lý món ăn',

@@ -2,7 +2,6 @@
 
 import { sendRequest } from '@/lib/api'
 import { IFoodComboRes } from './food-combos.interface'
-import { ICategories } from '../categories/category.interface'
 import { IFood } from '../foods/food.interface'
 
 export const getAllFoodCombos = async ({
@@ -35,18 +34,6 @@ export const getAllFoodCombos = async ({
   return res
 }
 
-export const getAllCategories = async () => {
-  const url = `${process.env.URL_SERVER}/category-restaurant/all`
-  const res: IBackendRes<ICategories[]> = await sendRequest({
-    url,
-    method: 'GET',
-    nextOption: {
-      cache: 'no-store'
-    }
-  })
-
-  return res
-}
 
 export const createFoodCombo = async (payload: Partial<IFoodComboRes>) => {
   const res: IBackendRes<IFoodComboRes> = await sendRequest({

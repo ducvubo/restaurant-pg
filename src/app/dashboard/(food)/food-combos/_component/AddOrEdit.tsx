@@ -11,7 +11,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { useRouter } from 'next/navigation'
-import { createFoodCombo, getAllCategories, getListFood, updateFoodCombo } from '../food-combos.api'
+import { createFoodCombo, getListFood, updateFoodCombo } from '../food-combos.api'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import EditorTiny from '@/components/EditorTiny'
 import { Label } from '@/components/ui/label'
@@ -468,8 +468,8 @@ export default function AddOrEdit({ id, inforFoodCombo }: Props) {
                   {`${fcb_open_time.hour.toString().padStart(2, '0')}:${fcb_open_time.minute
                     .toString()
                     .padStart(2, '0')} - ${fcb_close_time.hour.toString().padStart(2, '0')}:${fcb_close_time.minute
-                    .toString()
-                    .padStart(2, '0')}`}
+                      .toString()
+                      .padStart(2, '0')}`}
                 </Button>
               </div>
             </PopoverTrigger>

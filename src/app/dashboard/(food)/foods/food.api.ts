@@ -2,7 +2,6 @@
 
 import { sendRequest } from '@/lib/api'
 import { IFood } from './food.interface'
-import { ICategories } from '../categories/category.interface'
 
 export const getAllFoods = async ({
   current,
@@ -31,20 +30,6 @@ export const getAllFoods = async ({
       cache: 'no-store'
     }
   })
-  console.log('🚀 ~ res:', res)
-  return res
-}
-
-export const getAllCategories = async () => {
-  const url = `${process.env.URL_SERVER}/category-restaurant/all`
-  const res: IBackendRes<ICategories[]> = await sendRequest({
-    url,
-    method: 'GET',
-    nextOption: {
-      cache: 'no-store'
-    }
-  })
-
   return res
 }
 
