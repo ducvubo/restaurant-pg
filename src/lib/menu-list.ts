@@ -113,11 +113,6 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               label: 'Quản lý dịch vụ'
             },
             {
-              active: pathname === '/dashboard/menu-category',
-              href: '/dashboard/menu-category',
-              label: 'Quản lý danh mục thực đơn'
-            },
-            {
               active: pathname === '/dashboard/menu-items',
               href: '/dashboard/menu-items',
               label: 'Quản lý thực đơn'
@@ -176,11 +171,6 @@ export function getMenuListRestaurant(pathname: string): Group[] {
           active: pathname.includes('/dishes'),
           icon: Salad,
           submenus: [
-            // {
-            //   href: '/dashboard/categories',
-            //   label: 'Quản lý danh mục',
-            //   active: pathname === '/dashboard/categories'
-            // },
             {
               href: '/dashboard/dishes',
               label: 'Quản lý món ăn',

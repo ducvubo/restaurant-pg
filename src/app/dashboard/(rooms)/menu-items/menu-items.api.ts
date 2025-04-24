@@ -96,3 +96,15 @@ export const updateStatus = async ({
   })
   return res
 }
+
+
+export const getAllMenuItemsName = async () => {
+  const res: IBackendRes<IMenuItems[]> = await sendRequest({
+    url: `${URL_SERVER_BOOK}/menu-items/menu-name`,
+    method: 'GET',
+    nextOption: {
+      cache: 'no-store'
+    }
+  })
+  return res
+}

@@ -4,6 +4,7 @@ export interface IRoom {
   room_name?: string
   room_fix_ame?: string
   room_max_guest?: number
+  room_deposit?: number
   room_base_price?: number
   room_area?: string
   room_note?: string
