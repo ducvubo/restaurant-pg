@@ -158,7 +158,7 @@ export default function AddOrEdit({ id, inforRoom }: Props) {
       setLoading(false);
       toast({
         title: 'Thành công',
-        description: id === 'add' ? 'Thêm dịch vụ mới thành công' : 'Chỉnh sửa thông tin dịch vụ thành công',
+        description: id === 'add' ? 'Thêm phòng/sảnh mới thành công' : 'Chỉnh sửa thông tin phòng/sảnh thành công',
         variant: 'default',
       });
       router.push('/dashboard/rooms');

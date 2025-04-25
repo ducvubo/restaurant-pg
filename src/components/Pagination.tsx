@@ -24,7 +24,7 @@ export function Pagination({ meta, defaultRow, pageIndex, pageSize, setPageIndex
     <div className='flex items-center justify-between px-2 -mb-10'>
       <div className='flex items-center space-x-6 lg:space-x-8'>
         <div className='flex items-center space-x-2 -mr-10'>
-          <p className='text-sm font-medium'>Rows per page</p>
+          <p className='text-sm font-medium'>Số bản ghi</p>
           <Select
             value={`${pageSize}`}
             onValueChange={(value) => {
@@ -45,7 +45,7 @@ export function Pagination({ meta, defaultRow, pageIndex, pageSize, setPageIndex
           </Select>
         </div>
         <div className='flex w-[100px] items-center justify-center text-sm font-medium'>
-          Page {pageIndex} of {meta.totalPage}
+          TRang {pageIndex} của {meta.totalPage}
         </div>
         <div className='flex items-center space-x-2'>
           <Button

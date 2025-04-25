@@ -71,6 +71,11 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               label: 'Danh sách đặt combo',
               active: pathname === '/dashboard/order-combo'
             },
+            {
+              href: '/dashboard/book-room',
+              label: 'Danh sách đặt phòng',
+              active: pathname === '/dashboard/book-room'
+            },
           ]
         },
       ]
