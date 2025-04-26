@@ -250,56 +250,58 @@ export default function AddOrEdit({ id, inforFood }: Props) {
       food_options: data.food_options ? data.food_options : []
     }
 
-    const res = id === 'add' ? await createFood(payload) : await updateFood({ ...payload, food_id: id })
-    if (res.statusCode === 201 || res.statusCode === 200) {
-      setLoading(false)
-      toast({
-        title: 'Thành công',
-        description: id === 'add' ? 'Thêm món ăn mới thành công' : 'Chỉnh sửa thông tin món ăn thành công',
-        variant: 'default'
-      })
-      router.push('/dashboard/foods')
-      router.refresh()
-    } else if (res.statusCode === 400) {
-      setLoading(false)
-      if (Array.isArray(res.message)) {
-        res.message.map((item: string) => {
-          toast({
-            title: 'Thất bại',
-            description: item,
-            variant: 'destructive'
-          })
-        })
-      } else {
-        toast({
-          title: 'Thất bại',
-          description: res.message,
-          variant: 'destructive'
-        })
-      }
-    } else if (res.code === -10) {
-      setLoading(false)
-      toast({
-        title: 'Thông báo',
-        description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
-        variant: 'destructive'
-      })
-      await deleteCookiesAndRedirect()
-    } else if (res.code === -11) {
-      setLoading(false)
-      toast({
-        title: 'Thông báo',
-        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
-        variant: 'destructive'
-      })
-    } else {
-      setLoading(false)
-      toast({
-        title: 'Thông báo',
-        description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
-        variant: 'destructive'
-      })
-    }
+    console.log('payload', payload);
+
+    // const res = id === 'add' ? await createFood(payload) : await updateFood({ ...payload, food_id: id })
+    // if (res.statusCode === 201 || res.statusCode === 200) {
+    //   setLoading(false)
+    //   toast({
+    //     title: 'Thành công',
+    //     description: id === 'add' ? 'Thêm món ăn mới thành công' : 'Chỉnh sửa thông tin món ăn thành công',
+    //     variant: 'default'
+    //   })
+    //   router.push('/dashboard/foods')
+    //   router.refresh()
+    // } else if (res.statusCode === 400) {
+    //   setLoading(false)
+    //   if (Array.isArray(res.message)) {
+    //     res.message.map((item: string) => {
+    //       toast({
+    //         title: 'Thất bại',
+    //         description: item,
+    //         variant: 'destructive'
+    //       })
+    //     })
+    //   } else {
+    //     toast({
+    //       title: 'Thất bại',
+    //       description: res.message,
+    //       variant: 'destructive'
+    //     })
+    //   }
+    // } else if (res.code === -10) {
+    //   setLoading(false)
+    //   toast({
+    //     title: 'Thông báo',
+    //     description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
+    //     variant: 'destructive'
+    //   })
+    //   await deleteCookiesAndRedirect()
+    // } else if (res.code === -11) {
+    //   setLoading(false)
+    //   toast({
+    //     title: 'Thông báo',
+    //     description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+    //     variant: 'destructive'
+    //   })
+    // } else {
+    //   setLoading(false)
+    //   toast({
+    //     title: 'Thông báo',
+    //     description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+    //     variant: 'destructive'
+    //   })
+    // }
   }
 
   return (

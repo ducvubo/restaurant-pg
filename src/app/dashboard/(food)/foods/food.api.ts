@@ -30,6 +30,7 @@ export const getAllFoods = async ({
       cache: 'no-store'
     }
   })
+  console.log("🚀 ~ res:", res)
   return res
 }
 
