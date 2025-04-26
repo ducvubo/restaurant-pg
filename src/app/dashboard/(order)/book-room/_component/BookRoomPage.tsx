@@ -88,7 +88,7 @@ const getTextStatus = (status: BookRoomStatus) => {
     [BookRoomStatus.RESTAURANT_REFUND_DEPOSIT]: 'Hoàn cọc đầy đủ',
     [BookRoomStatus.RESTAURANT_REFUND_ONE_THIRD_DEPOSIT]: 'Hoàn 1/3 cọc',
     [BookRoomStatus.RESTAURANT_REFUND_ONE_TWO_DEPOSITE]: 'Hoàn 1/2 cọc',
-    [BookRoomStatus.RESTAURANT_NO_DEPOSIT]: 'Không cọc',
+    [BookRoomStatus.RESTAURANT_NO_DEPOSIT]: 'Không hoàn cọc',
     [BookRoomStatus.IN_USE]: 'Đang sử dụng',
     [BookRoomStatus.RESTAURANT_CONFIRM_PAYMENT]: 'Xác nhận thanh toán',
     [BookRoomStatus.GUEST_COMPLAINT]: 'Khiếu nại',
@@ -635,7 +635,7 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
                     <DialogHeader>
                       <DialogTitle>Nhập số tiền bổ sung</DialogTitle>
                       <DialogDescription>
-                        Vui lòng nhập số tiền bổ sung (nếu có) để xác nhận thanh toán.
+                        Vui lòng nhập số tiền bổ sung (có thể nhập số âm để giảm bớt hóa đơn) để xác nhận thanh toán.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
