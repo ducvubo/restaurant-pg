@@ -45,7 +45,7 @@ export function Pagination({ meta, defaultRow, pageIndex, pageSize, setPageIndex
           </Select>
         </div>
         <div className='flex w-[100px] items-center justify-center text-sm font-medium'>
-          TRang {pageIndex} của {meta.totalPage}
+          Trang {pageIndex} của {meta.totalPage}
         </div>
         <div className='flex items-center space-x-2'>
           <Button

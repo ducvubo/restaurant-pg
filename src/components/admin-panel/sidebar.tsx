@@ -56,7 +56,7 @@ export function Sidebar({ inforEmployee, inforRestaurant }: Props) {
                 sidebar?.isOpen === false ? '-translate-x-96 opacity-0 hidden' : 'translate-x-0 opacity-100'
               )}
             >
-              {inforRestaurant.restaurant_email ? inforRestaurant._id : inforEmployee.epl_email}
+              {inforRestaurant.restaurant_email ? inforRestaurant.restaurant_name : inforEmployee.epl_name}
             </h1>
           </Link>
         </Button>

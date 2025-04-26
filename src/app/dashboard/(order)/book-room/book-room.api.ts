@@ -2,6 +2,8 @@
 
 import { sendRequest } from "@/lib/api"
 import { IBookRoom } from "./book-room.interface"
+import { IAmenities } from "../../(rooms)/amenities/amenities.interface"
+import { IMenuItems } from "../../(rooms)/menu-items/menu-items.interface"
 
 
 export const restaurantConfirmDepositBookRoom = async (bkr_id: string) => {
@@ -194,7 +196,6 @@ export const getListBookRoomRestaurantPagination = async ({
     method: 'GET',
     queryParams: { pageIndex, pageSize, keyword, bkr_status, fromDate, toDate }
   })
-  console.log("🚀 ~ res:", res)
 
   return res
 }
@@ -204,6 +205,24 @@ export const doneComplaintBookRoom = async (bkr_id: string) => {
     url: `${process.env.URL_SERVER_BOOK}/book-room/done-complaint`,
     method: 'PATCH',
     body: { bkr_id }
+  })
+
+  return res
+}
+
+export const getAllAmenities = async () => {
+  const res: IBackendRes<IAmenities[]> = await sendRequest({
+    url: `${process.env.URL_SERVER_BOOK}/amenities/ame-name`,
+    method: 'GET'
+  })
+
+  return res
+}
+
+export const getAllMenuItems = async () => {
+  const res: IBackendRes<IMenuItems[]> = await sendRequest({
+    url: `${process.env.URL_SERVER_BOOK}/menu-items/menu-name`,
+    method: 'GET'
   })
 
   return res

@@ -22,51 +22,51 @@ export enum BookRoomStatus {
   GUEST_EXCEPTION = 'GUEST_EXCEPTION'
 }
 export interface IBookRoom {
-  bkr_id?: string
-  bkr_res_id?: string
-  bkr_guest_id?: string
-  bkr_ame?: string
-  bkr_email?: string
-  bkr_phone?: string
-  bkr_time_start?: Date
-  bkr_time_end?: Date
-  bkr_check_in?: Date
-  bkr_check_out?: Date
-  bkr_created_at?: Date
-  bkr_note?: string
-  bkr_note_res?: string
-  bkr_feedback?: string
-  bkr_reply?: string
-  bkr_star?: 1 | 2 | 3 | 4 | 5
-  bkr_reason_cancel?: string
-  bkr_detail_history?: string
+  bkr_id: string
+  bkr_res_id: string
+  bkr_guest_id: string
+  bkr_ame: string
+  bkr_email: string
+  bkr_phone: string
+  bkr_time_start: Date
+  bkr_time_end: Date
+  bkr_check_in: Date
+  bkr_check_out: Date
+  bkr_created_at: Date
+  bkr_note: string
+  bkr_note_res: string
+  bkr_feedback: string
+  bkr_reply: string
+  bkr_star: 1 | 2 | 3 | 4 | 5
+  bkr_reason_cancel: string
+  bkr_detail_history: string
   bkr_status: BookRoomStatus
-  bkr_plus_price?: number
-  amenities?: IAmenitiesSnap[]
-  menuItems?: IMenuItemsSnap[]
+  bkr_plus_price: number
+  amenities: IAmenitiesSnap[]
+  menuItems: IMenuItemsSnap[]
 }
 
 export interface IAmenitiesSnap {
-  ame_snap_id?: string
-  ame_snap_bkr_id?: string
-  ame_snap_res_id?: string
-  ame_snap_name?: string
-  ame_snap_price?: number
-  ame_snap_note?: string
-  ame_snap_description?: string
-  ame_snap_quantity?: number
-  bookRoom?: IBookRoom
+  ame_snap_id: string
+  ame_snap_bkr_id: string
+  ame_snap_res_id: string
+  ame_snap_name: string
+  ame_snap_price: number
+  ame_snap_note: string
+  ame_snap_description: string
+  ame_snap_quantity: number
+  bookRoom: IBookRoom
 }
 
 export interface IMenuItemsSnap {
-  mitems_snap_id?: string
-  mitems_snap_res_id?: string
-  mitems_snap_bkr_id?: string
-  mitems_snap_name?: string
-  mitems_snap_price?: number
-  mitems_snap_image?: string
-  mitems_snap_note?: string
-  mitems_snap_description?: string
-  mitems_snap_quantity?: number
-  bookRoom?: IBookRoom
+  mitems_snap_id: string
+  mitems_snap_res_id: string
+  mitems_snap_bkr_id: string
+  mitems_snap_name: string
+  mitems_snap_price: number
+  mitems_snap_image: string
+  mitems_snap_note: string
+  mitems_snap_description: string
+  mitems_snap_quantity: number
+  bookRoom: IBookRoom
 }

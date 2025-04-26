@@ -15,7 +15,7 @@ import { debounce } from 'lodash'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { Input } from '@/components/ui/input'
-import { IBookRoom, BookRoomStatus } from '../book-room.interface'
+import { IBookRoom, BookRoomStatus, IMenuItemsSnap, IAmenitiesSnap } from '../book-room.interface'
 import {
   restaurantConfirmDepositBookRoom,
   restaurantConfirmBookRoom,
@@ -35,7 +35,9 @@ import {
   getListBookRoomRestaurantPagination,
   doneComplaintBookRoom,
   addMenuItemsToBookRoom,
-  addAmenitiesToBookRoom
+  addAmenitiesToBookRoom,
+  getAllAmenities,
+  getAllMenuItems
 } from '../book-room.api'
 import {
   Card,
@@ -58,6 +60,8 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
 import { Pagination } from '@/components/Pagination'
+import { IAmenities } from '@/app/dashboard/(rooms)/amenities/amenities.interface'
+import { IMenuItems } from '@/app/dashboard/(rooms)/menu-items/menu-items.interface'
 
 const formatVietnameseDate = (date: Date) => {
   const day = date.getDate()
@@ -118,13 +122,115 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
   const [cancelReason, setCancelReason] = useState('')
   const [isConfirmPaymentDialogOpen, setIsConfirmPaymentDialogOpen] = useState(false)
   const [plusPrice, setPlusPrice] = useState<string>('')
+  const [isAddMenuItemsDialogOpen, setIsAddMenuItemsDialogOpen] = useState(false)
+  const [isAddAmenitiesDialogOpen, setIsAddAmenitiesDialogOpen] = useState(false)
+  const [menuItems, setMenuItems] = useState<IMenuItems[]>([])
+  const [amenities, setAmenities] = useState<IAmenities[]>([])
+  const [selectedMenuItems, setSelectedMenuItems] = useState<{ id: string; quantity: number }[]>([])
+  const [selectedAmenities, setSelectedAmenities] = useState<{ id: string; quantity: number }[]>([])
 
   const totalPrice = (bookRoom.bkr_plus_price || 0) +
-    (bookRoom.menuItems?.reduce((sum, item) => sum + (item.mitems_snap_price * item.mitems_snap_quantity), 0) || 0) +
-    (bookRoom.amenities?.reduce((sum, item) => sum + (item.ame_snap_price * item.ame_snap_quantity), 0) || 0)
+    (bookRoom.menuItems?.reduce((sum, item: IMenuItemsSnap) => sum + (item.mitems_snap_price * item.mitems_snap_quantity), 0) || 0) +
+    (bookRoom.amenities?.reduce((sum, item: IAmenitiesSnap) => sum + (item.ame_snap_price * item.ame_snap_quantity), 0) || 0) + bookRoom.bkr_plus_price
 
   const statusLabel = getTextStatus(bookRoom.bkr_status)
   const statusVariant = getStatusVariant(bookRoom.bkr_status)
+
+  const fetchMenuItems = async () => {
+    const res = await getAllMenuItems()
+    if (res.statusCode === 200 && res.data) {
+      setMenuItems(res.data)
+    } else {
+      toast({ title: 'Thất bại', description: res.message || 'Không thể tải danh sách món ăn.', variant: 'destructive' })
+    }
+  }
+
+  const fetchAmenities = async () => {
+    const res = await getAllAmenities()
+    if (res.statusCode === 200 && res.data) {
+      setAmenities(res.data)
+    } else {
+      toast({ title: 'Thất bại', description: res.message || 'Không thể tải danh sách tiện ích.', variant: 'destructive' })
+    }
+  }
+
+  const handleAddMenuItems = async () => {
+    await fetchMenuItems()
+    setIsAddMenuItemsDialogOpen(true)
+  }
+
+  const handleAddAmenities = async () => {
+    await fetchAmenities()
+    setIsAddAmenitiesDialogOpen(true)
+  }
+
+  const handleMenuItemQuantityChange = (id: string, quantity: number) => {
+    if (quantity < 0) return
+    setSelectedMenuItems((prev) => {
+      const existing = prev.find((item) => item.id === id)
+      if (existing) {
+        if (quantity === 0) {
+          return prev.filter((item) => item.id !== id)
+        }
+        return prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+      }
+      return [...prev, { id, quantity }]
+    })
+  }
+
+  const handleAmenityQuantityChange = (id: string, quantity: number) => {
+    if (quantity < 0) return
+    setSelectedAmenities((prev) => {
+      const existing = prev.find((item) => item.id === id)
+      if (existing) {
+        if (quantity === 0) {
+          return prev.filter((item) => item.id !== id)
+        }
+        return prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+      }
+      return [...prev, { id, quantity }]
+    })
+  }
+
+  const handleSubmitMenuItems = async () => {
+    if (selectedMenuItems.length === 0) {
+      toast({ title: 'Lỗi', description: 'Vui lòng chọn ít nhất một món ăn.', variant: 'destructive' })
+      return
+    }
+    const payload: { menu_id: string; bkr_menu_quantity: number }[] = selectedMenuItems.map((item) => ({
+      menu_id: item.id,
+      bkr_menu_quantity: item.quantity,
+    }))
+    const res = await addMenuItemsToBookRoom(bookRoom.bkr_id!, payload)
+    if (res.statusCode === 200 || res.statusCode === 201) {
+      toast({ title: 'Thành công', description: 'Đã thêm món ăn vào đặt phòng.', variant: 'default' })
+      setIsAddMenuItemsDialogOpen(false)
+      setSelectedMenuItems([])
+      refresh()
+    } else {
+      toast({ title: 'Thất bại', description: res.message || 'Không thể thêm món ăn.', variant: 'destructive' })
+    }
+  }
+
+  const handleSubmitAmenities = async () => {
+    if (selectedAmenities.length === 0) {
+      toast({ title: 'Lỗi', description: 'Vui lòng chọn ít nhất một tiện ích.', variant: 'destructive' })
+      return
+    }
+    const payload: { ame_id: string; bkr_ame_quantity: number }[] = selectedAmenities.map((item) => ({
+      ame_id: item.id,
+      bkr_ame_quantity: item.quantity,
+    }))
+    const res = await addAmenitiesToBookRoom(bookRoom.bkr_id!, payload)
+    if (res.statusCode === 200 || res.statusCode === 201) {
+      toast({ title: 'Thành công', description: 'Đã thêm tiện ích vào đặt phòng.', variant: 'default' })
+      setIsAddAmenitiesDialogOpen(false)
+      setSelectedAmenities([])
+      refresh()
+    } else {
+      toast({ title: 'Thất bại', description: res.message || 'Không thể thêm tiện ích.', variant: 'destructive' })
+    }
+  }
 
   const handleConfirmDeposit = async () => {
     const res = await restaurantConfirmDepositBookRoom(bookRoom.bkr_id!)
@@ -253,10 +359,10 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
   }
 
   const handleConfirmPayment = async () => {
-    // if (!plusPrice.trim() || isNaN(Number(plusPrice)) || Number(plusPrice) < 0) {
-    //   toast({ title: 'Lỗi', description: 'Vui lòng nhập số tiền hợp lệ.', variant: 'destructive' })
-    //   return
-    // }
+    if (Number(plusPrice) > Number(totalPrice)) {
+      toast({ title: 'Lỗi', description: 'Vui lòng nhập số tiền hợp lệ.', variant: 'destructive' })
+      return
+    }
     const res = await restaurantConfirmPaymentBookRoom(bookRoom.bkr_id!, plusPrice)
     if (res.statusCode === 200) {
       toast({ title: 'Thành công', description: 'Đã xác nhận thanh toán.', variant: 'default' })
@@ -276,14 +382,6 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
     } else {
       toast({ title: 'Thất bại', description: res.message || 'Không thể ghi nhận ngoại lệ.', variant: 'destructive' })
     }
-  }
-
-  const handleAddMenuItems = async () => {
-    toast({ title: 'Thông báo', description: 'Chức năng thêm món ăn chưa được triển khai.', variant: 'default' })
-  }
-
-  const handleAddAmenities = async () => {
-    toast({ title: 'Thông báo', description: 'Chức năng thêm tiện ích chưa được triển khai.', variant: 'default' })
   }
 
   const handleSubmitFeedback = async () => {
@@ -349,7 +447,6 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
                   <Button variant="outline" size="sm" onClick={handleConfirmDeposit}>
                     Xác nhận đặt cọc
                   </Button>
-
                   <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" onClick={() => setIsCancelDialogOpen(true)}>
@@ -395,7 +492,6 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
                     Khách không đến
                   </Button>
                 </>
-
               )}
               {bookRoom.bkr_status === BookRoomStatus.GUEST_CHECK_IN && (
                 <Button variant="outline" size="sm" onClick={handleInUse}>
@@ -410,12 +506,122 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
                   <Button variant="outline" size="sm" onClick={handleCheckOutOvertime}>
                     Check-out quá giờ
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleAddMenuItems}>
-                    Thêm món ăn
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleAddAmenities}>
-                    Thêm tiện ích
-                  </Button>
+                  <Dialog open={isAddMenuItemsDialogOpen} onOpenChange={setIsAddMenuItemsDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" onClick={handleAddMenuItems}>
+                        Thêm món ăn
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[600px]">
+                      <DialogHeader>
+                        <DialogTitle>Thêm món ăn</DialogTitle>
+                        <DialogDescription>
+                          Chọn món ăn và số lượng để thêm vào đặt phòng.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4 max-h-[400px] overflow-y-auto">
+                        {menuItems.map((item) => (
+                          <div key={item.mitems_id} className="flex items-center gap-4">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={item.mitems_image || '/placeholder-image.jpg'} alt={item.mitems_name} />
+                              <AvatarFallback>{item.mitems_name?.[0]}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <p className="font-medium">{item.mitems_name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.mitems_price || 0)}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleMenuItemQuantityChange(item.mitems_id!, (selectedMenuItems.find((i) => i.id === item.mitems_id)?.quantity || 0) - 1)}
+                              >
+                                -
+                              </Button>
+                              <Input
+                                type="number"
+                                min="0"
+                                value={selectedMenuItems.find((i) => i.id === item.mitems_id)?.quantity || 0}
+                                onChange={(e) => handleMenuItemQuantityChange(item.mitems_id!, parseInt(e.target.value) || 0)}
+                                className="w-16 text-center"
+                              />
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleMenuItemQuantityChange(item.mitems_id!, (selectedMenuItems.find((i) => i.id === item.mitems_id)?.quantity || 0) + 1)}
+                              >
+                                +
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => { setIsAddMenuItemsDialogOpen(false); setSelectedMenuItems([]); }}>
+                          Đóng
+                        </Button>
+                        <Button onClick={handleSubmitMenuItems}>Xác nhận</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog open={isAddAmenitiesDialogOpen} onOpenChange={setIsAddAmenitiesDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" onClick={handleAddAmenities}>
+                        Thêm tiện ích
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[600px]">
+                      <DialogHeader>
+                        <DialogTitle>Thêm tiện ích</DialogTitle>
+                        <DialogDescription>
+                          Chọn tiện ích và số lượng để thêm vào đặt phòng.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4 max-h-[400px] overflow-y-auto">
+                        {amenities.map((item) => (
+                          <div key={item.ame_id} className="flex items-center gap-4">
+                            <div className="flex-1">
+                              <p className="font-medium">{item.ame_name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.ame_price || 0)} x
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleAmenityQuantityChange(item.ame_id!, (selectedAmenities.find((i) => i.id === item.ame_id)?.quantity || 0) - 1)}
+                              >
+                                -
+                              </Button>
+                              <Input
+                                type="number"
+                                min="0"
+                                value={selectedAmenities.find((i) => i.id === item.ame_id)?.quantity || 0}
+                                onChange={(e) => handleAmenityQuantityChange(item.ame_id!, parseInt(e.target.value) || 0)}
+                                className="w-16 text-center"
+                              />
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleAmenityQuantityChange(item.ame_id!, (selectedAmenities.find((i) => i.id === item.ame_id)?.quantity || 0) + 1)}
+                              >
+                                +
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => { setIsAddAmenitiesDialogOpen(false); setSelectedAmenities([]); }}>
+                          Đóng
+                        </Button>
+                        <Button onClick={handleSubmitAmenities}>Xác nhận</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </>
               )}
               {(bookRoom.bkr_status === BookRoomStatus.GUEST_CHECK_OUT || bookRoom.bkr_status === BookRoomStatus.GUEST_CHECK_OUT_OVERTIME) && (
@@ -477,10 +683,12 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
                     Không hoàn cọc
                   </Button>
                 </>
-              )}
-              <Button variant="outline" size="sm" onClick={handleRestaurantException}>
-                Ngoại lệ nhà hàng
-              </Button>
+              )}{
+                bookRoom.bkr_status === BookRoomStatus.RESTAURANT_CONFIRM && <Button variant="outline" size="sm" onClick={handleRestaurantException}>
+                  Ngoại lệ nhà hàng
+                </Button>
+              }
+
             </div>
           </div>
         </div>
@@ -519,27 +727,29 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
             <AccordionContent>
               {bookRoom.menuItems?.length > 0 ? (
                 <div className="space-y-3">
-                  {bookRoom.menuItems.map((item) => (
-                    <div key={item.mitems_snap_id} className="flex items-center gap-2 sm:gap-3">
-                      <Avatar className="h-20 w-20 !rounded-md">
-                        <AvatarImage
-                          src={item.mitems_snap_image ? JSON.parse(item.mitems_snap_image)[0]?.image_cloud : '/placeholder-image.jpg'}
-                          alt="Menu item"
-                        />
-                        <AvatarFallback>ITEM</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <p className="font-medium text-sm sm:text-base">
-                          {item.mitems_snap_name} (
-                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.mitems_snap_price * item.mitems_snap_quantity)}
-                          )
-                        </p>
-                        <p className="text-xs sm:text-sm text-muted-foreground">
-                          Giá: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.mitems_snap_price)} x {item.mitems_snap_quantity}
-                        </p>
+                  {bookRoom.menuItems.map((item) => {
+                    return (
+                      <div key={item.mitems_snap_id} className="flex items-center gap-2 sm:gap-3">
+                        <Avatar className="h-12 w-12 !rounded-md">
+                          <AvatarImage
+                            src={item.mitems_snap_image ? JSON.parse(item.mitems_snap_image)?.image_cloud : '/placeholder-image.jpg'}
+                            alt="Menu item"
+                          />
+                          <AvatarFallback>ITEM</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <p className="font-medium text-sm sm:text-base">
+                            {item.mitems_snap_name} (
+                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.mitems_snap_price * item.mitems_snap_quantity)}
+                            )
+                          </p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">
+                            Giá: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.mitems_snap_price)} x {item.mitems_snap_quantity}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               ) : (
                 <p className="text-xs sm:text-sm text-muted-foreground">Không có món ăn nào</p>
