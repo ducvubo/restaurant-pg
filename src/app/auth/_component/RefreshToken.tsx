@@ -78,7 +78,6 @@ export default function RefreshToken() {
         })
 
         socket.on('notification_account', (data: INotification) => {
-          console.log("🚀 ~ socket.on ~ notification_account:", data)
           runAddNotification(data)
         })
       }
@@ -137,7 +136,7 @@ export default function RefreshToken() {
           }
         }
       } else {
-        router.push('/')
+        router.push('/auth/login')
         if (socket) {
           socket.disconnect()
         }

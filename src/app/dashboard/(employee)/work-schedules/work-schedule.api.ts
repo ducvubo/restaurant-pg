@@ -72,3 +72,12 @@ export const getAllEmployee = async () => {
   })
   return res
 }
+
+
+export const deleteWorkSchedule = async (id: string) => {
+  const res: IBackendRes<IWorkSchedule> = await sendRequest({
+    url: `${URL_SERVER_EMPLOYEE}/work-schedule/${id}`,
+    method: 'DELETE'
+  })
+  return res
+}

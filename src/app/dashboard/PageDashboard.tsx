@@ -251,7 +251,7 @@ export default function PageDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-base text-gray-600">Đang tải...</p>
+        <p className="text-base ">Đang tải...</p>
       </div>
     );
   }
@@ -265,7 +265,7 @@ export default function PageDashboard() {
   }
 
   return (
-    <div className="p-4 space-y-4 bg-gray-50 min-h-screen">
+    <div className="p-4 space-y-4 min-h-screen">
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {[
           {
@@ -308,7 +308,7 @@ export default function PageDashboard() {
             value: formatCurrency(totalStockValue),
             change: 'Cập nhật',
             icon: Package,
-            color: 'text-gray-600',
+            color: '',
           },
           {
             title: 'Lượt Xem Blog',
@@ -318,18 +318,18 @@ export default function PageDashboard() {
             color: 'text-purple-600',
           },
         ].map((metric) => (
-          <Card key={metric.title} className="bg-white shadow-md">
+          <Card key={metric.title} className=" shadow-md">
             <CardHeader className="flex flex-row items-center justify-between pb-1">
-              <CardTitle className="text-sm font-medium text-gray-700">
+              <CardTitle className="text-sm font-medium ">
                 {metric.title}
               </CardTitle>
-              <metric.icon className="h-4 w-4 text-gray-500" />
+              <metric.icon className="h-4 w-4 " />
             </CardHeader>
             <CardContent>
               <div className={`text-xl font-semibold ${metric.color}`}>
                 {metric.value}
               </div>
-              <p className="text-xs text-gray-500">{metric.change}</p>
+              <p className="text-xs ">{metric.change}</p>
             </CardContent>
           </Card>
         ))}
@@ -338,7 +338,7 @@ export default function PageDashboard() {
       {/* Charts Section */}
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         {/* Dish Revenue */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-indigo-600">
               Doanh Thu Tại Bàn
@@ -367,7 +367,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Top Dishes */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-green-600">
               Top Món Ăn
@@ -390,7 +390,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Food Revenue */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-purple-600">
               Doanh Thu Online
@@ -419,7 +419,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Top Foods */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-amber-600">
               Top Món Online
@@ -442,7 +442,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Combo Revenue */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-pink-600">
               Doanh Thu Combo
@@ -471,7 +471,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Top Combos */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-red-600">
               Top Combo
@@ -494,7 +494,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Stock In Trends */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-green-600">
               Nhập Kho
@@ -519,7 +519,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Stock Out Trends */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-red-600">
               Xuất Kho
@@ -544,7 +544,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Low Stock Ingredients */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-yellow-600">
               Nguyên Liệu Sắp Hết
@@ -553,7 +553,7 @@ export default function PageDashboard() {
           <CardContent>
             <div className="space-y-2">
               {lowStockIngredients.length ? (
-                lowStockIngredients.slice(0,5).map((item) => (
+                lowStockIngredients.slice(0, 5).map((item) => (
                   <div
                     key={item.igd_name}
                     className="flex justify-between border-b py-1 text-sm"
@@ -565,14 +565,14 @@ export default function PageDashboard() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-500">Không có nguyên liệu sắp hết.</p>
+                <p className="text-sm ">Không có nguyên liệu sắp hết.</p>
               )}
             </div>
           </CardContent>
         </Card>
 
         {/* Top Ingredients */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-blue-600">
               Nguyên Liệu Phổ Biến
@@ -591,23 +591,23 @@ export default function PageDashboard() {
         </Card>
 
         {/* Recent Stock Transactions */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-600">
+            <CardTitle className="text-base font-medium ">
               Giao Dịch Kho
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               {recentStockTransactions.length ? (
-                recentStockTransactions.slice(0,5).map((transaction) => (
+                recentStockTransactions.slice(0, 5).map((transaction) => (
                   <div
                     key={transaction.id}
                     className="flex justify-between border-b py-1 text-sm"
                   >
                     <div>
                       <p>{transaction.ingredient}</p>
-                      <p className="text-xs text-gray-500">{transaction.code}</p>
+                      <p className="text-xs ">{transaction.code}</p>
                     </div>
                     <div className="text-right">
                       <p>{transaction.quantity} đơn vị</p>
@@ -620,14 +620,14 @@ export default function PageDashboard() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-500">Không có giao dịch.</p>
+                <p className="text-sm ">Không có giao dịch.</p>
               )}
             </div>
           </CardContent>
         </Card>
 
         {/* Stock by Category */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-purple-600">
               Tồn Kho Theo Loại
@@ -662,7 +662,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Order Status Distribution */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-orange-600">
               Trạng Thái Đơn Online
@@ -697,7 +697,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Customer Distribution */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-cyan-600">
               Loại Khách Hàng
@@ -732,7 +732,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Reservation Trends */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-teal-600">
               Đặt Bàn
@@ -757,9 +757,9 @@ export default function PageDashboard() {
         </Card>
 
         {/* Recent Dish Orders */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-600">
+            <CardTitle className="text-base font-medium ">
               Đơn Món Gần Đây
             </CardTitle>
           </CardHeader>
@@ -789,16 +789,16 @@ export default function PageDashboard() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-500">Không có đơn hàng.</p>
+                <p className="text-sm ">Không có đơn hàng.</p>
               )}
             </div>
           </CardContent>
         </Card>
 
         {/* Recent Food Orders */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-600">
+            <CardTitle className="text-base font-medium ">
               Đơn Online Gần Đây
             </CardTitle>
           </CardHeader>
@@ -820,16 +820,16 @@ export default function PageDashboard() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-500">Không có đơn hàng.</p>
+                <p className="text-sm ">Không có đơn hàng.</p>
               )}
             </div>
           </CardContent>
         </Card>
 
         {/* Recent Combo Orders */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-600">
+            <CardTitle className="text-base font-medium ">
               Đơn Combo Gần Đây
             </CardTitle>
           </CardHeader>
@@ -859,14 +859,14 @@ export default function PageDashboard() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-500">Không có đơn hàng.</p>
+                <p className="text-sm ">Không có đơn hàng.</p>
               )}
             </div>
           </CardContent>
         </Card>
 
         {/* Blog Performance */}
-        <Card className="bg-white shadow-md">
+        <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-orange-600">
               Hiệu Suất Blog
