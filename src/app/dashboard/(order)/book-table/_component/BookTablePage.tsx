@@ -55,7 +55,7 @@ export default function BookTablePage() {
   const defaultToDate = new Date(today.setHours(0, 0, 0, 0))
   const defaultFromDate = new Date(defaultToDate)
   defaultFromDate.setDate(defaultFromDate.getDate() + 70)
-
+  defaultToDate.setDate(defaultToDate.getDate() - 10)
   const [toDate, setToDate] = useState<Date>(defaultToDate)
   const [fromDate, setFromDate] = useState<Date>(defaultFromDate)
   const [pageIndex, setPageIndex] = useState(1)

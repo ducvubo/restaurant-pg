@@ -20,11 +20,10 @@ import { useState } from 'react'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
-import { cn } from '@/lib/utils'
-import { Separator } from '@/components/ui/separator'
 import { IEmployee } from '@/app/dashboard/(employee)/employees/employees.interface'
 import { endAppEmployee, startAppEmployee } from '../InforEmployee.slice'
 import { Card, CardContent } from '@/components/ui/card'
+import { Loader2 } from 'lucide-react' // Thêm icon loading từ lucide-react
 
 const FormSchema = z.object({
   email: z
@@ -50,6 +49,7 @@ export function LoginForm() {
   const dispatch = useDispatch()
   const router = useRouter()
   const [type, setType] = useState<'restaurant' | 'employee'>('restaurant')
+  const [isLoading, setIsLoading] = useState(false) // Thêm trạng thái loading
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -60,15 +60,14 @@ export function LoginForm() {
 
   const [open, setOpen] = useState(false)
   const [restaurantId, setRestaurantId] = useState('')
-
-  const [filteredRestaurants, setFilteredRestaurants] = useState<IRestaurantSearch[]>([]) // Mảng tìm kiếm mặc định rỗng
+  const [filteredRestaurants, setFilteredRestaurants] = useState<IRestaurantSearch[]>([])
 
   const handleRestaurantSearch = async (searchTerm: string) => {
     if (!searchTerm) setRestaurantId('')
     try {
       const restaurants: any = await searchRestaurant({ search: searchTerm })
       if (Array.isArray(restaurants)) {
-        setFilteredRestaurants(restaurants) // Cập nhật danh sách nhà hàng được tìm kiếm
+        setFilteredRestaurants(restaurants)
       } else {
         console.error('API did not return an array of restaurants:', restaurants)
       }
@@ -85,7 +84,9 @@ export function LoginForm() {
   }
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    // setLoading(true)
+    setIsLoading(true) // Bật trạng thái loading
+    setLoading(true)
+
     if (type === 'restaurant') {
       const payload = {
         restaurant_email: data.email,
@@ -94,16 +95,17 @@ export function LoginForm() {
       const res = await login(payload)
       if (res?.code === 0 && res.data) {
         setLoading(false)
+        setIsLoading(false) // Tắt trạng thái loading
         runAppRestaurant(res.data)
         dispatch(endAppEmployee(''))
         toast({
           title: 'Thành công',
           description: 'Đăng nhập thành công'
         })
-        // router.push('/dashboard/order/dish')
         router.push(localStorage.getItem('currentUrl') || '/dashboard')
       } else if (res?.code === -5) {
         setLoading(false)
+        setIsLoading(false) // Tắt trạng thái loading
         if (Array.isArray(res.message)) {
           res.message.map((item: string) => {
             toast({
@@ -121,6 +123,7 @@ export function LoginForm() {
         }
       } else {
         setLoading(false)
+        setIsLoading(false) // Tắt trạng thái loading
         toast({
           title: 'Thất bại',
           description: res?.message || 'Đã có lỗi xảy ra, vui lòng thử lại sau',
@@ -136,6 +139,7 @@ export function LoginForm() {
       const res = await loginEmployee(payload)
       if (res?.code === 0 && res.data) {
         setLoading(false)
+        setIsLoading(false) // Tắt trạng thái loading
         runAppEmployee(res.data)
         dispatch(endAppRestaurant(''))
         toast({
@@ -145,6 +149,7 @@ export function LoginForm() {
         router.push('/dashboard/order/dish')
       } else if (res?.code === -5) {
         setLoading(false)
+        setIsLoading(false) // Tắt trạng thái loading
         if (Array.isArray(res.message)) {
           res.message.map((item: string) => {
             toast({
@@ -162,6 +167,7 @@ export function LoginForm() {
         }
       } else {
         setLoading(false)
+        setIsLoading(false) // Tắt trạng thái loading
         toast({
           title: 'Thất bại',
           description: res?.message || 'Đã có lỗi xảy ra, vui lòng thử lại sau',
@@ -253,8 +259,16 @@ export function LoginForm() {
                   <Label htmlFor='r2'>Nhân viên</Label>
                 </div>
               </RadioGroup>
-              <Button type='submit' className='btn-primary'>
-                Đăng nhập
+
+              <Button type='submit' className='btn-primary' disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    Đang đăng nhập...
+                  </>
+                ) : (
+                  'Đăng nhập'
+                )}
               </Button>
             </form>
           </div>
