@@ -340,9 +340,17 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
         <Button variant={'outline'}>
           <Link href={'/dashboard/dishes/add'}>Thêm</Link>
         </Button>
-        <Button variant={'outline'}>
-          <Link href={'/dashboard/dishes/recycle'}>Danh sách đã xóa</Link>
-        </Button>
+        {
+          pathname === 'recycle' ? (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/dishes'}>Danh sách</Link>
+            </Button>
+          ) : (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/dishes/recycle'}>Danh sách đã xóa</Link>
+            </Button>
+          )
+        }
         <Button variant={'outline'} asChild>
           <label>
             Tải ảnh menu

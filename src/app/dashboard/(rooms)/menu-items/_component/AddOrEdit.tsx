@@ -277,6 +277,7 @@ export default function AddOrEdit({ id, inforMenuItems }: Props) {
             </FormItem>
           )}
         />
+
         <Button type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>

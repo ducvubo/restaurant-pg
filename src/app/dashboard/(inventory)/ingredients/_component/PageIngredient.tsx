@@ -54,7 +54,6 @@ export function PageIngredient<TData, TValue>({ columns, meta, data }: DataTable
       columnVisibility
     }
   })
-    console.log("🚀 ~ data:", data)
 
   const [pageIndex, setPageIndex] = React.useState(meta.current)
   const [pageSize, setPageSize] = React.useState(meta.pageSize)
@@ -76,9 +75,17 @@ export function PageIngredient<TData, TValue>({ columns, meta, data }: DataTable
         <Button variant={'outline'}>
           <Link href={'/dashboard/ingredients/add'}>Thêm</Link>
         </Button>
-        <Button variant={'outline'}>
-          <Link href={'/dashboard/ingredients/recycle'}>Danh sách đã xóa</Link>
-        </Button>
+        {
+          pathname === 'recycle' ? (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/ingredients'}>Danh sách</Link>
+            </Button>
+          ) : (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/ingredients/recycle'}>Danh sách đã xóa</Link>
+            </Button>
+          )
+        }
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>

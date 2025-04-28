@@ -75,9 +75,17 @@ export function PageTables<TData, TValue>({ columns, meta, data }: DataTableProp
         <Button variant={'outline'}>
           <Link href={'/dashboard/tables/add'}>Thêm</Link>
         </Button>
-        <Button variant={'outline'}>
-          <Link href={'/dashboard/tables/recycle'}>Danh sách đã xóa</Link>
-        </Button>
+        {
+          pathname === 'recycle' ? (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/tables'}>Danh sách</Link>
+            </Button>
+          ) : (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/tables/recycle'}>Danh sách đã xóa</Link>
+            </Button>
+          )
+        }
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>

@@ -43,6 +43,7 @@ export function PageMenuItems<TData, TValue>({ columns, data, meta }: DataTableP
   const { setLoading } = useLoading();
   const router = useRouter();
   const pathname = usePathname().split('/').pop();
+  console.log("🚀 ~ pathname:", pathname)
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -328,9 +329,17 @@ export function PageMenuItems<TData, TValue>({ columns, data, meta }: DataTableP
         <Button variant={'outline'}>
           <Link href={'/dashboard/menu-items/add'}>Thêm</Link>
         </Button>
-        <Button variant={'outline'}>
-          <Link href={'/dashboard/menu-items/recycle'}>Danh sách đã xóa</Link>
-        </Button>
+        {
+          pathname === 'recycle' ? (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/menu-items'}>Danh sách</Link>
+            </Button>
+          ) : (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/menu-items/recycle'}>Danh sách đã xóa</Link>
+            </Button>
+          )
+        }
         <Button variant={'outline'} asChild>
           <label>
             Tải ảnh menu
@@ -388,7 +397,7 @@ export function PageMenuItems<TData, TValue>({ columns, data, meta }: DataTableP
         />
       </div>
 
-      {/* Dialog hiển thị danh sách món ăn mới */}
+
       <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50" />

@@ -75,9 +75,17 @@ export function PageFoodCombos<TData, TValue>({ columns, meta, data }: DataTable
         <Button variant={'outline'}>
           <Link href={'/dashboard/food-combos/add'}>Thêm</Link>
         </Button>
-        <Button variant={'outline'}>
-          <Link href={'/dashboard/food-combos/recycle'}>Danh sách đã xóa</Link>
-        </Button>
+        {
+          pathname === 'recycle' ? (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/food-combos'}>Danh sách</Link>
+            </Button>
+          ) : (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/food-combos/recycle'}>Danh sách đã xóa</Link>
+            </Button>
+          )
+        }
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>

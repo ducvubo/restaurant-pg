@@ -75,9 +75,17 @@ export function PageAmenities<TData, TValue>({ columns, meta, data }: DataTableP
         <Button variant={'outline'}>
           <Link href={'/dashboard/amenities/add'}>Thêm</Link>
         </Button>
-        <Button variant={'outline'}>
-          <Link href={'/dashboard/amenities/recycle'}>Danh sách đã xóa</Link>
-        </Button>
+        {
+          pathname === 'recycle' ? (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/amenities'}>Danh sách</Link>
+            </Button>
+          ) : (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/amenities/recycle'}>Danh sách đã xóa</Link>
+            </Button>
+          )
+        }
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>

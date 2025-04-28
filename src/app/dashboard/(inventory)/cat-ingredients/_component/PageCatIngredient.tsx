@@ -77,9 +77,17 @@ export function PageCatIngredient<TData, TValue>({ columns, meta, data }: DataTa
         <Button variant={'outline'}>
           <Link href={'/dashboard/cat-ingredients/add'}>Thêm</Link>
         </Button>
-        <Button variant={'outline'}>
-          <Link href={'/dashboard/cat-ingredients/recycle'}>Danh sách đã xóa</Link>
-        </Button>
+        {
+          pathname === 'recycle' ? (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/cat-ingredients'}>Danh sách</Link>
+            </Button>
+          ) : (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/cat-ingredients/recycle'}>Danh sách đã xóa</Link>
+            </Button>
+          )
+        }
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>

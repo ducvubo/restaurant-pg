@@ -316,9 +316,17 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
         <Button variant={'outline'}>
           <Link href={'/dashboard/foods/add'}>Thêm</Link>
         </Button>
-        <Button variant={'outline'}>
-          <Link href={'/dashboard/foods/recycle'}>Danh sách đã xóa</Link>
-        </Button>
+        {
+          pathname === 'recycle' ? (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/foods'}>Danh sách</Link>
+            </Button>
+          ) : (
+            <Button variant={'outline'}>
+              <Link href={'/dashboard/foods/recycle'}>Danh sách đã xóa</Link>
+            </Button>
+          )
+        }
         <Button variant={'outline'} asChild>
           <label>
             Tải ảnh món ăn

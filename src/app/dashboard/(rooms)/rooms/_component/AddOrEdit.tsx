@@ -209,21 +209,21 @@ export default function AddOrEdit({ id, inforRoom }: Props) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
         <div>
-          <h1 className="-mb-3">Ảnh phòng sảnh</h1>
-          <div className="flex gap-2 flex-wrap">
+          <span >Ảnh phòng sảnh</span>
+          <div className="flex flex-wrap gap-4">
             <div
               onClick={() => {
                 if (fileInputImageRoomRef.current) {
                   fileInputImageRoomRef.current.click();
                 }
               }}
-              className="mt-4 relative flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 aspect-square rounded-md border-2 border-dashed border-gray-300 transition-colors hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-600 focus-within:outline-2 focus-within:outline-dashed focus-within:outline-gray-500 dark:focus-within:outline-gray-400"
+              className="relative flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 aspect-square rounded-md border-2 border-dashed border-gray-300 transition-colors hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-600 focus-within:outline-2 focus-within:outline-dashed focus-within:outline-gray-500 dark:focus-within:outline-gray-400"
             >
               <div className="text-center">
                 {isUploadingImageRoom ? (
-                  <Loader2 className="animate-spin" />
+                  <Loader2 className="animate-spin w-6 h-6 sm:w-8 sm:h-8" />
                 ) : (
-                  <UploadIcon className="mx-auto text-gray-400 w-8 h-8" />
+                  <UploadIcon className="mx-auto text-gray-400 w-6 h-6 sm:w-8 sm:h-8" />
                 )}
                 <Input
                   ref={fileInputImageRoomRef}
@@ -238,11 +238,11 @@ export default function AddOrEdit({ id, inforRoom }: Props) {
               </div>
             </div>
             {uploadedUrlsImageRoom.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4">
                 {uploadedUrlsImageRoom.map((url, index) => (
                   <div
                     key={index}
-                    className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 aspect-square rounded-md border-2 border-gray-300 transition-colors hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-600"
+                    className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 aspect-square rounded-md border-2 border-gray-300 transition-colors hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-600"
                   >
                     <Image
                       src={url.image_cloud}
@@ -264,92 +264,118 @@ export default function AddOrEdit({ id, inforRoom }: Props) {
           </div>
         </div>
 
-        <FormField
-          control={form.control}
-          name="room_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên dịch vụ</FormLabel>
-              <FormControl>
-                <Input placeholder="Tên dịch vụ..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="room_deposit"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tiền đặt cọc</FormLabel>
-              <FormControl>
-                <Input type="number" placeholder="Tiền đặt cọc..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="room_base_price"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Giá cơ bản</FormLabel>
-              <FormControl>
-                <Input type="number" placeholder="Giá cơ bản..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="room_max_guest"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Số khách tối đa</FormLabel>
-              <FormControl>
-                <Input type="number" placeholder="Số khách tối đa..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="room_area"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Diện tích</FormLabel>
-              <FormControl>
-                <Input placeholder="Diện tích..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="room_fix_ame"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Dịch vụ đi kèm</FormLabel>
-              <FormControl>
-                <Input placeholder="Dịch vụ đi kèm..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <FormField
+            control={form.control}
+            name="room_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm sm:text-base">Tên dịch vụ</FormLabel>
+                <FormControl>
+                  <Input placeholder="Tên dịch vụ..." {...field} className="text-sm sm:text-base" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="room_deposit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm sm:text-base">Tiền đặt cọc</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="Tiền đặt cọc..."
+                    {...field}
+                    className="text-sm sm:text-base"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="room_base_price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm sm:text-base">Giá cơ bản</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="Giá cơ bản..."
+                    {...field}
+                    className="text-sm sm:text-base"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="room_max_guest"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm sm:text-base">Số khách tối đa</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="Số khách tối đa..."
+                    {...field}
+                    className="text-sm sm:text-base"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="room_area"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm sm:text-base">Diện tích</FormLabel>
+                <FormControl>
+                  <Input placeholder="Diện tích..." {...field} className="text-sm sm:text-base" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="room_fix_ame"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm sm:text-base">Dịch vụ đi kèm</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Dịch vụ đi kèm..."
+                    {...field}
+                    className="text-sm sm:text-base"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="room_note"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Ghi chú</FormLabel>
+              <FormLabel className="text-sm sm:text-base">Ghi chú</FormLabel>
               <FormControl>
-                <Textarea placeholder="Ghi chú..." {...field} />
+                <Textarea
+                  placeholder="Ghi chú..."
+                  {...field}
+                  className="text-sm sm:text-base min-h-[100px]"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -360,16 +386,22 @@ export default function AddOrEdit({ id, inforRoom }: Props) {
           name="room_description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Mô tả</FormLabel>
+              <FormLabel className="text-sm sm:text-base">Mô tả</FormLabel>
               <FormControl>
-                <Textarea placeholder="Mô tả..." {...field} />
+                <Textarea
+                  placeholder="Mô tả..."
+                  {...field}
+                  className="text-sm sm:text-base min-h-[100px]"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit">{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
+        <Button type="submit" className="w-full sm:w-auto">
+          {id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}
+        </Button>
       </form>
     </Form>
   );
