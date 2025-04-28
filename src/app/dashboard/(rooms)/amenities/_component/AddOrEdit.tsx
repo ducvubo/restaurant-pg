@@ -111,59 +111,60 @@ export default function AddOrEdit({ id, inforAmenities }: Props) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
-        <FormField
-          control={form.control}
-          name='ame_name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên dịch vụ</FormLabel>
-              <FormControl>
-                <Input placeholder='Tên dịch vụ...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='ame_price'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Giá dịch vụ</FormLabel>
-              <FormControl>
-                <Input type='number' placeholder='Giá dịch vụ...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='ame_note'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Ghi chú</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Ghi chú...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='ame_description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Mô tả...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name='ame_name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên dịch vụ</FormLabel>
+                <FormControl>
+                  <Input placeholder='Tên dịch vụ...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='ame_price'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Giá dịch vụ</FormLabel>
+                <FormControl>
+                  <Input type='number' placeholder='Giá dịch vụ...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='ame_note'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ghi chú</FormLabel>
+                <FormControl>
+                  <Textarea placeholder='Ghi chú...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='ame_description'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mô tả</FormLabel>
+                <FormControl>
+                  <Textarea placeholder='Mô tả...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <Button type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>

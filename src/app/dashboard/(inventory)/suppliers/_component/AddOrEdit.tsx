@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import {  createSupplier, updateSupplier } from '../supplier.api'
+import { createSupplier, updateSupplier } from '../supplier.api'
 import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
@@ -116,97 +116,97 @@ export default function AddOrEdit({ id, inforSupplier }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
-        <FormField
-          control={form.control}
-          name='spli_name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên nhà cung cấp</FormLabel>
-              <FormControl>
-                <Input placeholder='Tên nhà cung cấp...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='spli_email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder='Email...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='spli_phone'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Số điện thoại</FormLabel>
-              <FormControl>
-                <Input placeholder='Số điện thoại...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='spli_address'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Địa chỉ</FormLabel>
-              <FormControl>
-                <Input placeholder='Địa chỉ...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='spli_description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Mô tả...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="spli_type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Loại</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name='spli_name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên nhà cung cấp</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Chọn loại...." />
-                  </SelectTrigger>
+                  <Input placeholder='Tên nhà cung cấp...' {...field} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="supplier">Nhà cung cấp</SelectItem>
-                  <SelectItem value="customer">Khách hàng</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='spli_email'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder='Email...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='spli_phone'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Số điện thoại</FormLabel>
+                <FormControl>
+                  <Input placeholder='Số điện thoại...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='spli_address'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Địa chỉ</FormLabel>
+                <FormControl>
+                  <Input placeholder='Địa chỉ...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="spli_type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Loại</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn loại...." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="supplier">Nhà cung cấp</SelectItem>
+                    <SelectItem value="customer">Khách hàng</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='spli_description'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mô tả</FormLabel>
+                <FormControl>
+                  <Textarea placeholder='Mô tả...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-
-        <Button  type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
+        <Button type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>
   )

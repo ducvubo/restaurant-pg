@@ -316,7 +316,7 @@ export default function AddOrEdit({ id, inforIngredient }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
         <div>
           <FormField
             control={form.control}
@@ -395,85 +395,85 @@ export default function AddOrEdit({ id, inforIngredient }: Props) {
             </div>
           )}
         </div>
-
-        <FormField
-          control={form.control}
-          name='igd_name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên nguyên liệu</FormLabel>
-              <FormControl>
-                <Input placeholder='Tên nguyên liệu...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='cat_igd_id'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Danh mục</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name='igd_name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên nguyên liệu</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Chọn danh mục...' />
-                  </SelectTrigger>
+                  <Input placeholder='Tên nguyên liệu...' {...field} />
                 </FormControl>
-                <SelectContent>
-                  {listCategories.map((category) => (
-                    <SelectItem key={category.cat_igd_id} value={category.cat_igd_id}>
-                      {category.cat_igd_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name='unt_id'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Danh mục</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+          <FormField
+            control={form.control}
+            name='cat_igd_id'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Danh mục</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Chọn danh mục...' />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {listCategories.map((category) => (
+                      <SelectItem key={category.cat_igd_id} value={category.cat_igd_id}>
+                        {category.cat_igd_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='unt_id'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Danh mục</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Chọn đơn vị đo...' />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {listUnits.map((unit) => (
+                      <SelectItem key={unit.unt_id} value={unit.unt_id}>
+                        {unit.unt_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='igd_description'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mô tả</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Chọn đơn vị đo...' />
-                  </SelectTrigger>
+                  <Textarea placeholder='Mô tả...' {...field} />
                 </FormControl>
-                <SelectContent>
-                  {listUnits.map((unit) => (
-                    <SelectItem key={unit.unt_id} value={unit.unt_id}>
-                      {unit.unt_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='igd_description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Mô tả...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         {/* <Button type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button> */}
         <Button disabled={loading_upload_image} type='submit'>
           {loading_upload_image ? (

@@ -261,7 +261,7 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
   return (
     <div className='flex gap-5'>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 w-full'>
           <div>
             <FormField
               control={form.control}
@@ -342,93 +342,107 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
             )}
           </div>
 
-          <FormField
-            control={form.control}
-            name='epl_email'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder='Email...' type='email' {...field} disabled={inforEmployee ? true : false} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='epl_password'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <PasswordInput placeholder='Password...' {...field} disabled={inforEmployee ? true : false} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='epl_name'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tên</FormLabel>
-                <FormControl>
-                  <Input placeholder='Tên...' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='epl_gender'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Giới tính</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="epl_email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Chọn giới tính' />
-                    </SelectTrigger>
+                    <Input
+                      placeholder="Email..."
+                      type="email"
+                      {...field}
+                      disabled={inforEmployee ? true : false}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value='Khác'>Khác</SelectItem>
-                    <SelectItem value='Nam'>Nam</SelectItem>
-                    <SelectItem value='Nữ'>Nữ</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='epl_phone'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Số điện thoại</FormLabel>
-                <FormControl>
-                  <Input placeholder='Số điện thoại...' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='epl_address'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Địa chỉ</FormLabel>
-                <FormControl>
-                  <Input placeholder='Địa chỉ...' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="epl_password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <PasswordInput
+                      placeholder="Password..."
+                      {...field}
+                      disabled={inforEmployee ? true : false}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="epl_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tên</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Tên..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="epl_gender"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Giới tính</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Chọn giới tính" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Khác">Khác</SelectItem>
+                      <SelectItem value="Nam">Nam</SelectItem>
+                      <SelectItem value="Nữ">Nữ</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="epl_phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Số điện thoại</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Số điện thoại..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="epl_address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Địa chỉ</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Địa chỉ..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <Button type='submit' disabled={loading_upload_avatar}>
             {id === 'add' ? 'Thêm nhân viên' : 'Chỉnh sửa'}
           </Button>

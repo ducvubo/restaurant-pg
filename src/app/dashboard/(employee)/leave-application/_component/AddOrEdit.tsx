@@ -121,120 +121,124 @@ export default function AddOrEdit({ id, inforLeaveApplication }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField
-          control={form.control}
-          name="leaveType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Loại đơn</FormLabel>
-              <FormControl>
-                <Input placeholder="Loại đơn..." {...field}
-                  disabled={inforLeaveApplication?.status !== 'DRAFT' && inforRestaurant?._id ? true : false}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="reason"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Lý do</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Lý do..." {...field}
-                  disabled={inforLeaveApplication?.status !== 'DRAFT' && inforRestaurant?._id ? true : false}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="flex gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="startDate"
+            name="leaveType"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Ngày bắt đầu</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={'outline'}
-                        className={cn(
-                          'w-[240px] pl-3 text-left font-normal',
-                          !field.value && 'text-muted-foreground',
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, 'dd/MM/yyyy', { locale: vi })
-                        ) : (
-                          <span>Chọn ngày bắt đầu</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={inforLeaveApplication?.status !== 'DRAFT' && inforRestaurant?._id ? true : false}
-                      locale={vi}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+              <FormItem>
+                <FormLabel>Loại đơn</FormLabel>
+                <FormControl>
+                  <Input placeholder="Loại đơn..." {...field}
+                    disabled={inforLeaveApplication?.status !== 'DRAFT' && inforRestaurant?._id ? true : false}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+          <div className="flex gap-4 mt-[9px]">
+            <FormField
+              control={form.control}
+              name="startDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Ngày bắt đầu</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'w-[240px] pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground',
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, 'dd/MM/yyyy', { locale: vi })
+                          ) : (
+                            <span>Chọn ngày bắt đầu</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={inforLeaveApplication?.status !== 'DRAFT' && inforRestaurant?._id ? true : false}
+                        locale={vi}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Ngày kết thúc</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'w-[240px] pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground',
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, 'dd/MM/yyyy', { locale: vi })
+                          ) : (
+                            <span>Chọn ngày kết thúc</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        locale={vi}
+                        initialFocus
+                        disabled={inforLeaveApplication?.status !== 'DRAFT' && inforRestaurant?._id ? true : false}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
-            name="endDate"
+            name="reason"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Ngày kết thúc</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={'outline'}
-                        className={cn(
-                          'w-[240px] pl-3 text-left font-normal',
-                          !field.value && 'text-muted-foreground',
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, 'dd/MM/yyyy', { locale: vi })
-                        ) : (
-                          <span>Chọn ngày kết thúc</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      locale={vi}
-                      initialFocus
-                      disabled={inforLeaveApplication?.status !== 'DRAFT' && inforRestaurant?._id ? true : false}
-                    />
-                  </PopoverContent>
-                </Popover>
+              <FormItem>
+                <FormLabel>Lý do</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Lý do..." {...field}
+                    disabled={inforLeaveApplication?.status !== 'DRAFT' && inforRestaurant?._id ? true : false}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </div>
 
+
+
+        </div>
         <Button type="submit">{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>

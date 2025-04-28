@@ -11,10 +11,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { useRouter } from 'next/navigation'
-import {  ICategory } from '../category-blog.interface'
-import { HexColorPicker } from 'react-colorful'
-import { useState } from 'react'
-import { Label } from '@/components/ui/label'
+import { ICategory } from '../category-blog.interface'
 
 interface Props {
   id: string
@@ -23,12 +20,12 @@ interface Props {
 const FormSchema = z.object({
   catName: z.string().nonempty({ message: 'Vui lòng nhập tên danh mục' }),
   catDescription: z.string().nonempty({ message: 'Vui lòng nhập mô tả' }),
-  catOrder:  z.preprocess((value) => {
-      if (typeof value === 'string' && value.trim() === '') {
-        return undefined
-      }
-      return Number(value)
-    }, z.number({ message: 'Vui lòng nhập số thứ tự' }).min(1, { message: 'Số thứ tự phải dương' })),
+  catOrder: z.preprocess((value) => {
+    if (typeof value === 'string' && value.trim() === '') {
+      return undefined
+    }
+    return Number(value)
+  }, z.number({ message: 'Vui lòng nhập số thứ tự' }).min(1, { message: 'Số thứ tự phải dương' })),
 })
 
 export default function AddOrEdit({ id, inforCategory }: Props) {
@@ -107,51 +104,49 @@ export default function AddOrEdit({ id, inforCategory }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
-    
-      <FormField
-          control={form.control}
-          name='catName'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên danh mục</FormLabel>
-              <FormControl>
-                <Input placeholder='Tên danh mục...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name='catName'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên danh mục</FormLabel>
+                <FormControl>
+                  <Input placeholder='Tên danh mục...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='catOrder'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Số thứ tự</FormLabel>
+                <FormControl>
+                  <Input type='number' placeholder='Số thứ tự...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='catDescription'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mô tả</FormLabel>
+                <FormControl>
+                  <Textarea placeholder='Mô tả...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name='catDescription'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Mô tả...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-    
-
-        <FormField
-          control={form.control}
-          name='catOrder'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Số thứ tự</FormLabel>
-              <FormControl>
-                <Input type='number' placeholder='Số thứ tự...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-   
+        </div>
 
         <Button type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
       </form>

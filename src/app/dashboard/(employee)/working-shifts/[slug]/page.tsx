@@ -32,7 +32,7 @@ async function Component({ searchParams, params }: PageProps) {
   const id = params.slug
   if (id === 'add') {
     return (
-      <ContentLayout title='Thêm ca làm việc ăn'>
+      <ContentLayout title='Thêm ca làm việc'>
         <AddOrEdit id='add' />
       </ContentLayout>
     )

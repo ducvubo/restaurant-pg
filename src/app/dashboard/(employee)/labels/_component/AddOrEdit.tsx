@@ -118,41 +118,51 @@ export default function AddOrEdit({ id, inforLabel }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
-        <div className='w-full'>
-          <Label>Tên nhãn</Label>
-          <Input
-            placeholder='Tên nhãn...'
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            name='lb_name'
-            className='!w-full'
-            required
-          />
+      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <div>
+            <div className='w-full'>
+              <Label>Tên nhãn</Label>
+              <Input
+                placeholder='Tên nhãn...'
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                name='lb_name'
+                className='!w-full'
+                required
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name='lb_description'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mô tả</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder='Mô tả...' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div>
+
+            <div className='w-full '>
+              <div className='flex gap-2'>
+                <span>Chọn màu</span>
+                <div
+                  className='w-20 h-6 rounded-md text-sm flex justify-center items-center'
+                  style={{ backgroundColor: color }}
+                >
+                  <span>{name}</span>
+                </div></div>
+              <HexColorPicker className='!w-full !h-32' color={color} onChange={setColor} />
+            </div>
+          </div>
+
         </div>
-        <FormField
-          control={form.control}
-          name='lb_description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Mô tả...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div
-          className='w-20  h-6 rounded-md text-sm flex justify-center items-center'
-          style={{ backgroundColor: color }}
-        >
-          <span>{name}</span>
-        </div>
-        <div className='w-full'>
-          <Label>Chọn màu</Label>
-          <HexColorPicker className='!w-full' color={color} onChange={setColor} />
-        </div>
+
 
         <Button type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
       </form>

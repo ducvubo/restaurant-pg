@@ -127,7 +127,7 @@ export default function AddOrEdit({ id, inforSpecialOffer }: Props) {
           <div className='flex justify-between items-end'>
             <Label>Giới thiệu</Label>
           </div>
-          <EditorTiny editorRef={refContent} height='500px' />
+          <EditorTiny editorRef={refContent} height='400px' />
         </div>
 
         <Button type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>

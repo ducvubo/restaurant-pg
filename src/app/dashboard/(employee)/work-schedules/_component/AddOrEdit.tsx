@@ -274,105 +274,106 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
         }}
         className='w-full space-y-6'
       >
-        <FormField
-          control={form.control}
-          name='wks_id'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Ca làm việc</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Chọn ca làm việc...' />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {listWorkingShift.map((workingShift) => (
-                    <SelectItem key={workingShift.wks_id} value={workingShift.wks_id}>
-                      <Label>{workingShift.wks_name}</Label>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='lb_id'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nhãn</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Chọn nhãn...' />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {listLabel.map((label) => (
-                    <SelectItem key={label.lb_id} value={label.lb_id}>
-                      <Label>{label.lb_name}</Label>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='ws_date'
-          render={({ field }) => (
-            <FormItem className='flex flex-col'>
-              <FormLabel>Ngày</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name='wks_id'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ca làm việc</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <Button
-                      variant={'outline'}
-                      className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
-                    >
-                      {field.value ? format(field.value, 'dd/MM/yyyy') : <span>Pick a date</span>}
-                      <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                    </Button>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Chọn ca làm việc...' />
+                    </SelectTrigger>
                   </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className='w-auto p-0' align='start'>
-                  <Calendar
-                    mode='single'
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) => date < new Date('1900-01-01')}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className='w-full'>
-          <Label>Loại hình nhà hàng</Label>
-          <MultiSelect
-            options={listEmployee}
-            onValueChange={setSelectedEmployee}
-            defaultValue={selectedEmployee}
-            placeholder='Chọn nhân viên'
-            variant='inverted'
-            animation={2}
-            maxCount={5}
+                  <SelectContent>
+                    {listWorkingShift.map((workingShift) => (
+                      <SelectItem key={workingShift.wks_id} value={workingShift.wks_id}>
+                        <Label>{workingShift.wks_name}</Label>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
           />
+          <FormField
+            control={form.control}
+            name='lb_id'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nhãn</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Chọn nhãn...' />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {listLabel.map((label) => (
+                      <SelectItem key={label.lb_id} value={label.lb_id}>
+                        <Label>{label.lb_name}</Label>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='ws_date'
+            render={({ field }) => (
+              <FormItem className='flex flex-col'>
+                <FormLabel>Ngày</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={'outline'}
+                        className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
+                      >
+                        {field.value ? format(field.value, 'dd/MM/yyyy') : <span>Pick a date</span>}
+                        <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-auto p-0' align='start'>
+                    <Calendar
+                      mode='single'
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) => date < new Date('1900-01-01')}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className='w-full'>
+            <Label>Nhân viên</Label>
+            <MultiSelect
+              options={listEmployee}
+              onValueChange={setSelectedEmployee}
+              defaultValue={selectedEmployee}
+              placeholder='Chọn nhân viên'
+              variant='inverted'
+              animation={2}
+              maxCount={5}
+            />
+          </div>
         </div>
 
         <div className='h-[390px]'>
           <EditorTiny editorRef={refNote} height='390px' />
         </div>
-
         <Button type='submit' className='!mt-5'>
           {id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}
         </Button>

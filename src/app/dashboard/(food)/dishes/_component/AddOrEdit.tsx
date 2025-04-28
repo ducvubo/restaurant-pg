@@ -381,126 +381,127 @@ export default function AddOrEdit({ id, inforDish }: Props) {
             </div>
           )}
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name='dish_name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên món ăn</FormLabel>
+                <FormControl>
+                  <Input placeholder='Tên món ăn...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='dish_price'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Giá</FormLabel>
+                <FormControl>
+                  <Input placeholder='Giá...' type='number' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name='dish_name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên món ăn</FormLabel>
-              <FormControl>
-                <Input placeholder='Tên món ăn...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          <FormField
+            control={form.control}
+            name='dish_short_description'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mô tả ngắn</FormLabel>
+                <FormControl>
+                  <Textarea placeholder='Mô tả ngắn...' {...field} />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='dish_note'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ghi chú</FormLabel>
+                <FormControl>
+                  <Textarea placeholder='Ghi chú...' {...field} />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+
+          <FormField
+            control={form.control}
+            name='dish_priority'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Điểm ưu tiên</FormLabel>
+                <FormControl>
+                  <Input placeholder='Điểm ưu tiên...' type='number' {...field} />
+                </FormControl>
+                <FormDescription>
+                  Điểm ưu tiên càng cao thì món ăn sẽ hiển thị lên trước, mặc định sẽ là 0
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className='mt-8'>
+            <label className='flex items-center'>
+              <span>Áp dụng giảm giá</span>
+              <Switch checked={isSaleEnabled} onCheckedChange={setIsSaleEnabled} className='ml-2' />
+            </label>
+          </div>
+          {isSaleEnabled && (
+            <>
+              <div className='mt-4'>
+                <Controller
+                  name='dish_sale.sale_type'
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Chọn loại khuyến mãi' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='percentage'>Giảm giá theo %</SelectItem>
+                        <SelectItem value='fixed'>Giảm giá trực tiếp</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              <div className='mt-4'>
+                <Controller
+                  name='dish_sale.sale_value'
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <div>
+                      <Input {...field} placeholder='Giá trị sale' type='number' />
+                      {finalPrice !== null && (
+                        <p className='mt-2 text-sm text-gray-600'>Giá sau khi giảm: {finalPrice.toLocaleString()} VND</p>
+                      )}
+                    </div>
+                  )}
+                />
+              </div>
+            </>
           )}
-        />
-        <FormField
-          control={form.control}
-          name='dish_price'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Giá</FormLabel>
-              <FormControl>
-                <Input placeholder='Giá...' type='number' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
-        <FormField
-          control={form.control}
-          name='dish_short_description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả ngắn</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Mô tả ngắn...' {...field} />
-              </FormControl>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='dish_note'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Ghi chú</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Ghi chú...' {...field} />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className='mt-4'>
-          <label className='flex items-center'>
-            <span>Áp dụng giảm giá</span>
-            <Switch checked={isSaleEnabled} onCheckedChange={setIsSaleEnabled} className='ml-2' />
-          </label>
         </div>
-
-        {isSaleEnabled && (
-          <>
-            <div className='mt-4'>
-              <Controller
-                name='dish_sale.sale_type'
-                control={control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Chọn loại khuyến mãi' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='percentage'>Giảm giá theo %</SelectItem>
-                      <SelectItem value='fixed'>Giảm giá trực tiếp</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-
-            <div className='mt-4'>
-              <Controller
-                name='dish_sale.sale_value'
-                control={control}
-                render={({ field, fieldState }) => (
-                  <div>
-                    <Input {...field} placeholder='Giá trị sale' type='number' />
-                    {finalPrice !== null && (
-                      <p className='mt-2 text-sm text-gray-600'>Giá sau khi giảm: {finalPrice.toLocaleString()} VND</p>
-                    )}
-                  </div>
-                )}
-              />
-            </div>
-          </>
-        )}
-
-        <FormField
-          control={form.control}
-          name='dish_priority'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Điểm ưu tiên</FormLabel>
-              <FormControl>
-                <Input placeholder='Điểm ưu tiên...' type='number' {...field} />
-              </FormControl>
-              <FormDescription>
-                Điểm ưu tiên càng cao thì món ăn sẽ hiển thị lên trước, mặc định sẽ là 0
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <EditorTiny editorRef={refDescription} />
-        {/* <div dangerouslySetInnerHTML={{ __html: description }} /> */}
         <Button type='submit'>{id === 'add' ? 'Thêm món ăn mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>

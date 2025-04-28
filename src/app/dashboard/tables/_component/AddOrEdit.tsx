@@ -110,47 +110,49 @@ export default function AddOrEdit({ id, inforTable }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
-        <FormField
-          control={form.control}
-          name='tbl_name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên bàn</FormLabel>
-              <FormControl>
-                <Input placeholder='Tên bàn...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='tbl_capacity'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Số lượng khách</FormLabel>
-              <FormControl>
-                <Input placeholder='Số lượng khách...' type='number' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='tbl_description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Mô tả...' {...field} />
-              </FormControl>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name='tbl_name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên bàn</FormLabel>
+                <FormControl>
+                  <Input placeholder='Tên bàn...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='tbl_capacity'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Số lượng khách</FormLabel>
+                <FormControl>
+                  <Input placeholder='Số lượng khách...' type='number' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='tbl_description'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mô tả</FormLabel>
+                <FormControl>
+                  <Textarea placeholder='Mô tả...' {...field} />
+                </FormControl>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <Button type='submit'>{id === 'add' ? 'Thêm bàn mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>

@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import {  createCatIngredient, updateCatIngredient } from '../cat-ingredient.api'
+import { createCatIngredient, updateCatIngredient } from '../cat-ingredient.api'
 import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
@@ -98,36 +98,37 @@ export default function AddOrEdit({ id, inforCatIngredient }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
-        <FormField
-          control={form.control}
-          name='cat_igd_name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên danh mục nguyên liệu</FormLabel>
-              <FormControl>
-                <Input placeholder='Tên danh mục nguyên liệu...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name='cat_igd_name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên danh mục nguyên liệu</FormLabel>
+                <FormControl>
+                  <Input placeholder='Tên danh mục nguyên liệu...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name='cat_igd_description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Mô tả...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button  type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
+          <FormField
+            control={form.control}
+            name='cat_igd_description'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mô tả</FormLabel>
+                <FormControl>
+                  <Textarea placeholder='Mô tả...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <Button type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>
   )

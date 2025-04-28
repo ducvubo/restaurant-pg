@@ -223,61 +223,61 @@ export default function AddOrEdit({ id, inforMenuItems }: Props) {
             )}
           </div>
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name='mitems_name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên danh mục thực đơn</FormLabel>
+                <FormControl>
+                  <Input placeholder='Tên danh mục thực đơn...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name='mitems_name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên danh mục thực đơn</FormLabel>
-              <FormControl>
-                <Input placeholder='Tên danh mục thực đơn...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='mitems_price'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Giá tiền</FormLabel>
-              <FormControl>
-                <Input type='number' placeholder='Giá tiền...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='mitems_note'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Ghi chú</FormLabel>
-              <FormControl>
-                <Input placeholder='Ghi chú...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='mitems_description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Mô tả...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
+          <FormField
+            control={form.control}
+            name='mitems_price'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Giá tiền</FormLabel>
+                <FormControl>
+                  <Input type='number' placeholder='Giá tiền...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='mitems_note'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ghi chú</FormLabel>
+                <FormControl>
+                  <Input placeholder='Ghi chú...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='mitems_description'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mô tả</FormLabel>
+                <FormControl>
+                  <Textarea placeholder='Mô tả...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <Button type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>

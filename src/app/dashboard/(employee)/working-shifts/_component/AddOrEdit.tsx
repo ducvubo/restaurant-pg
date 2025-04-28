@@ -165,132 +165,135 @@ export default function AddOrEdit({ id, inforWorkingShift }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
-        <FormField
-          control={form.control}
-          name='wks_name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên ca làm việc</FormLabel>
-              <FormControl>
-                <Input placeholder='Tên ca làm việc...' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='wks_description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mô tả</FormLabel>
-              <FormControl>
-                <Textarea placeholder='Mô tả...' {...field} />
-              </FormControl>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full space-y-6'>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name='wks_name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên ca làm việc</FormLabel>
+                <FormControl>
+                  <Input placeholder='Tên ca làm việc...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Popover>
-          <PopoverTrigger asChild>
-            <div className='flex flex-col mt-2 gap-3'>
-              <Label>Giờ bắt đầu / kết thúc</Label>
-              <Button type='button' variant={'outline'}>
-                {`${wks_start_time.hour.toString().padStart(2, '0')}:${wks_start_time.minute
-                  .toString()
-                  .padStart(2, '0')} - ${wks_end_time.hour.toString().padStart(2, '0')}:${wks_end_time.minute
-                  .toString()
-                  .padStart(2, '0')}`}
-              </Button>
-            </div>
-          </PopoverTrigger>
-          <PopoverContent className='flex justify-between'>
-            <ScrollArea>
-              <Label>Giờ bắt đầu</Label>
-              <div className='flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x'>
-                <ScrollArea className='w-64 sm:w-auto'>
-                  <div className='flex sm:flex-col p-2'>
-                    {Array.from({ length: 24 }, (_, i) => i)
-                      .reverse()
-                      .map((hour) => (
-                        <Button
-                          key={hour}
-                          size='icon'
-                          variant={wks_start_time.hour === hour ? 'default' : 'ghost'}
-                          className='sm:w-full shrink-0 aspect-square'
-                          onClick={() => handSelectTime('start', 'hour', hour.toString())}
-                        >
-                          {hour.toString().padStart(2, '0')}
-                        </Button>
-                      ))}
-                  </div>
-                  <ScrollBar orientation='horizontal' className='sm:hidden' />
-                </ScrollArea>
-                <ScrollArea className='w-64 sm:w-auto'>
-                  <div className='flex sm:flex-col p-2'>
-                    {Array.from({ length: 60 }, (_, i) => i)
-                      .reverse()
-                      .map((minute) => (
-                        <Button
-                          key={minute}
-                          size='icon'
-                          variant={wks_start_time.minute === minute ? 'default' : 'ghost'}
-                          className='sm:w-full shrink-0 aspect-square'
-                          onClick={() => handSelectTime('start', 'minute', minute.toString())}
-                        >
-                          {minute.toString().padStart(2, '0')}
-                        </Button>
-                      ))}
-                  </div>
-                  <ScrollBar orientation='horizontal' className='sm:hidden' />
-                </ScrollArea>
+          <Popover>
+            <PopoverTrigger asChild>
+              <div className='flex flex-col mt-2 gap-3'>
+                <Label>Giờ bắt đầu / kết thúc</Label>
+                <Button type='button' variant={'outline'}>
+                  {`${wks_start_time.hour.toString().padStart(2, '0')}:${wks_start_time.minute
+                    .toString()
+                    .padStart(2, '0')} - ${wks_end_time.hour.toString().padStart(2, '0')}:${wks_end_time.minute
+                      .toString()
+                      .padStart(2, '0')}`}
+                </Button>
               </div>
-            </ScrollArea>
-            <ScrollArea>
-              <Label>Giờ kết thúc</Label>
-              <div className='flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x'>
-                <ScrollArea className='w-64 sm:w-auto'>
-                  <div className='flex sm:flex-col p-2'>
-                    {Array.from({ length: 24 }, (_, i) => i)
-                      .reverse()
-                      .map((hour) => (
-                        <Button
-                          key={hour}
-                          size='icon'
-                          variant={wks_end_time.hour === hour ? 'default' : 'ghost'}
-                          className='sm:w-full shrink-0 aspect-square'
-                          onClick={() => handSelectTime('close', 'hour', hour.toString())}
-                        >
-                          {hour.toString().padStart(2, '0')}
-                        </Button>
-                      ))}
-                  </div>
-                  <ScrollBar orientation='horizontal' className='sm:hidden' />
-                </ScrollArea>
-                <ScrollArea className='w-64 sm:w-auto'>
-                  <div className='flex sm:flex-col p-2'>
-                    {Array.from({ length: 60 }, (_, i) => i)
-                      .reverse()
-                      .map((minute) => (
-                        <Button
-                          key={minute}
-                          size='icon'
-                          variant={wks_end_time.minute === minute ? 'default' : 'ghost'}
-                          className='sm:w-full shrink-0 aspect-square'
-                          onClick={() => handSelectTime('close', 'minute', minute.toString())}
-                        >
-                          {minute.toString().padStart(2, '0')}
-                        </Button>
-                      ))}
-                  </div>
-                  <ScrollBar orientation='horizontal' className='sm:hidden' />
-                </ScrollArea>
-              </div>
-            </ScrollArea>
-          </PopoverContent>
-        </Popover>
+            </PopoverTrigger>
+            <PopoverContent className='flex justify-between'>
+              <ScrollArea>
+                <Label>Giờ bắt đầu</Label>
+                <div className='flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x'>
+                  <ScrollArea className='w-64 sm:w-auto'>
+                    <div className='flex sm:flex-col p-2'>
+                      {Array.from({ length: 24 }, (_, i) => i)
+                        .reverse()
+                        .map((hour) => (
+                          <Button
+                            key={hour}
+                            size='icon'
+                            variant={wks_start_time.hour === hour ? 'default' : 'ghost'}
+                            className='sm:w-full shrink-0 aspect-square'
+                            onClick={() => handSelectTime('start', 'hour', hour.toString())}
+                          >
+                            {hour.toString().padStart(2, '0')}
+                          </Button>
+                        ))}
+                    </div>
+                    <ScrollBar orientation='horizontal' className='sm:hidden' />
+                  </ScrollArea>
+                  <ScrollArea className='w-64 sm:w-auto'>
+                    <div className='flex sm:flex-col p-2'>
+                      {Array.from({ length: 60 }, (_, i) => i)
+                        .reverse()
+                        .map((minute) => (
+                          <Button
+                            key={minute}
+                            size='icon'
+                            variant={wks_start_time.minute === minute ? 'default' : 'ghost'}
+                            className='sm:w-full shrink-0 aspect-square'
+                            onClick={() => handSelectTime('start', 'minute', minute.toString())}
+                          >
+                            {minute.toString().padStart(2, '0')}
+                          </Button>
+                        ))}
+                    </div>
+                    <ScrollBar orientation='horizontal' className='sm:hidden' />
+                  </ScrollArea>
+                </div>
+              </ScrollArea>
+              <ScrollArea>
+                <Label>Giờ kết thúc</Label>
+                <div className='flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x'>
+                  <ScrollArea className='w-64 sm:w-auto'>
+                    <div className='flex sm:flex-col p-2'>
+                      {Array.from({ length: 24 }, (_, i) => i)
+                        .reverse()
+                        .map((hour) => (
+                          <Button
+                            key={hour}
+                            size='icon'
+                            variant={wks_end_time.hour === hour ? 'default' : 'ghost'}
+                            className='sm:w-full shrink-0 aspect-square'
+                            onClick={() => handSelectTime('close', 'hour', hour.toString())}
+                          >
+                            {hour.toString().padStart(2, '0')}
+                          </Button>
+                        ))}
+                    </div>
+                    <ScrollBar orientation='horizontal' className='sm:hidden' />
+                  </ScrollArea>
+                  <ScrollArea className='w-64 sm:w-auto'>
+                    <div className='flex sm:flex-col p-2'>
+                      {Array.from({ length: 60 }, (_, i) => i)
+                        .reverse()
+                        .map((minute) => (
+                          <Button
+                            key={minute}
+                            size='icon'
+                            variant={wks_end_time.minute === minute ? 'default' : 'ghost'}
+                            className='sm:w-full shrink-0 aspect-square'
+                            onClick={() => handSelectTime('close', 'minute', minute.toString())}
+                          >
+                            {minute.toString().padStart(2, '0')}
+                          </Button>
+                        ))}
+                    </div>
+                    <ScrollBar orientation='horizontal' className='sm:hidden' />
+                  </ScrollArea>
+                </div>
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
+          <FormField
+            control={form.control}
+            name='wks_description'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mô tả</FormLabel>
+                <FormControl>
+                  <Textarea placeholder='Mô tả...' {...field} />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <Button type='submit'>{id === 'add' ? 'Thêm ca làm việc mới' : 'Chỉnh sửa'}</Button>
       </form>
     </Form>
