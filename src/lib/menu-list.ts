@@ -13,7 +13,8 @@ import {
   StickyNote,
   Album,
   Pizza,
-  Component
+  Component,
+  EthernetPort
 } from 'lucide-react'
 
 type Submenu = {
@@ -265,6 +266,30 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               label: 'Xuất kho',
               active: pathname === '/dashboard/stock-out'
             }
+          ]
+        },
+        {
+          href: '/dashboard/other',
+          label: 'Quản lý nội bộ',
+          active: pathname.includes('/other'),
+          icon: EthernetPort,
+          submenus: [
+            {
+              href: '/dashboard/internal-note',
+              label: 'Quản lý ghi chú',
+              active: pathname === '/dashboard/internal-note'
+            },
+            {
+              href: '/dashboard/internal-proposal',
+              label: 'Quản lý đề xuất',
+              active: pathname === '/dashboard/internal-proposal'
+            },
+            {
+              href: '/dashboard/equipment-maintenance',
+              label: 'Quản lý bảo trì thiết bị',
+              active: pathname === '/dashboard/equipment-maintenance'
+            },
+
           ]
         }
       ]

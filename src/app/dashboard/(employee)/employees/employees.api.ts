@@ -84,3 +84,12 @@ export const updateStatus = async ({ _id, epl_status }: { _id: string; epl_statu
   })
   return res
 }
+
+export const saveSystem = async () => {
+  const res: IBackendRes<any> = await sendRequest({
+    url: `${process.env.URL_SERVER_USER}/system-parameter/save`,
+    method: 'POST',
+  })
+  console.log("🚀 ~ saveSystem ~ res:", res)
+  return res
+}

@@ -32,7 +32,7 @@ const FormSchema = z.object({
       return undefined
     }
     return Number(value)
-  }, z.number({ message: 'Vui lòng nhập giá' }).min(1, { message: 'Số người phải lớn hơn hoặc bằng 1' })),
+  }, z.number({ message: 'Vui lòng nhập giá' }).min(1, { message: 'Giá lớn hơn hoặc bằng 1' })),
   dish_short_description: z.string().nonempty({ message: 'Vui lòng nhập mô tả ngắn' }),
   dish_sale: z
     .object({

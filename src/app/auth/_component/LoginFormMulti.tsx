@@ -43,7 +43,7 @@ interface IRestaurantSearch {
   _id: string
 }
 
-export function LoginForm() {
+export function LoginFormMulti() {
   const { setLoading } = useLoading()
   const { toast } = useToast()
   const dispatch = useDispatch()
@@ -134,7 +134,7 @@ export function LoginForm() {
       const payload = {
         epl_email: data.email,
         epl_password: data.password,
-        epl_restaurant_id: "677aac262fc0d1491a5ca032"
+        epl_restaurant_id: restaurantId
       }
       const res = await loginEmployee(payload)
       if (res?.code === 0 && res.data) {
@@ -209,6 +209,45 @@ export function LoginForm() {
                   </FormItem>
                 )}
               />
+
+              {type === 'employee' && (
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant='outline' role='combobox' aria-expanded={open} className='w-full justify-between'>
+                      {restaurantId
+                        ? filteredRestaurants.find((restaurant) => restaurant._id === restaurantId)?.restaurant_name
+                        : 'Chọn nhà hàng...'}
+                      <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-full p-0'>
+                    <Command>
+                      <CommandInput
+                        placeholder='Tìm nhà hàng...'
+                        className='h-9'
+                        onInput={(e) => handleRestaurantSearch(e.currentTarget.value)}
+                      />
+                      <CommandList>
+                        <div className='overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground'>
+                          {filteredRestaurants?.map((restaurant) => {
+                            return (
+                              <div
+                                className='relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50'
+                                onClick={() => {
+                                  setRestaurantId(restaurant._id)
+                                  setOpen(false)
+                                }}
+                              >
+                                {restaurant.restaurant_name}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              )}
 
               <RadioGroup value={type} onValueChange={(value: 'restaurant' | 'employee') => setType(value)}>
                 <div className='flex items-center space-x-2'>
