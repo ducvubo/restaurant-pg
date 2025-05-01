@@ -11,6 +11,7 @@ export const createOperationManual = async (payload: Partial<IOperationManual>) 
     method: 'POST',
     body: payload
   })
+  console.log("🚀 ~ createOperationManual ~ res:", res)
 
   return res
 }

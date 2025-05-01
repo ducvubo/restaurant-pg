@@ -33,12 +33,19 @@ export const columns: ColumnDef<IOperationManual>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Loại tài liệu' />,
     enableHiding: true
   },
-  {
-    accessorKey: 'opera_manual_content',
-    id: 'Nội dung',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Nội dung' />,
-    enableHiding: true
-  },
+  // {
+  //   accessorKey: 'opera_manual_content',
+  //   id: 'Nội dung',
+  //   header: ({ column }) => <DataTableColumnHeader column={column} title='Nội dung' />,
+  //   //render html content
+  //   cell: ({ row }) => {
+  //     const operationManual = row.original
+  //     return (
+  //       <div dangerouslySetInnerHTML={{ __html: operationManual.opera_manual_content }} />
+  //     )
+  //   },
+  //   enableHiding: true
+  // },
   {
     accessorKey: 'opera_manual_note',
     id: 'Ghi chú',

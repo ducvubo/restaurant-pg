@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { z } from 'zod'
 import { FormField, FormItem, FormLabel, FormMessage, Form, FormControl } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
@@ -13,6 +13,8 @@ import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { useRouter } from 'next/navigation'
 import { IOperationManual } from '../operation-manual.interface'
 import { createOperationManual, updateOperationManual } from '../operation-manual.api'
+import { Label } from '@/components/ui/label'
+import EditorTiny from '@/components/EditorTiny'
 
 interface Props {
   id: string
@@ -20,7 +22,6 @@ interface Props {
 }
 const FormSchema = z.object({
   opera_manual_title: z.string().nonempty({ message: 'Vui lòng nhâp tiêu đề' }),
-  opera_manual_content: z.string().nonempty({ message: 'Vui lòng nhập nội dung' }),
   opera_manual_type: z.string().nonempty({ message: 'Vui lòng nhập loại tài liệu' }),
   opera_manual_note: z.string().optional(),
 
@@ -29,23 +30,36 @@ const FormSchema = z.object({
 export default function AddOrEdit({ id, inforOperationManual }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
+  const refContent = useRef<any>('')
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       opera_manual_title: inforOperationManual?.opera_manual_title || '',
-      opera_manual_content: inforOperationManual?.opera_manual_content || '',
       opera_manual_type: inforOperationManual?.opera_manual_type || '',
       opera_manual_note: inforOperationManual?.opera_manual_note || ''
     }
   })
 
+  useEffect(() => {
+    if (id === 'add') {
+      return
+    } else {
+      if (inforOperationManual) {
+        if (inforOperationManual.opera_manual_content) {
+          refContent.current = inforOperationManual.opera_manual_content
+        }
+      }
+    }
+  }, [inforOperationManual, id])
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
+    console.log("🚀 ~ onSubmit ~ data:", data)
     setLoading(true)
 
     const payload = {
       opera_manual_title: data.opera_manual_title,
-      opera_manual_content: data.opera_manual_content,
+      opera_manual_content: refContent.current.getContent(),
       opera_manual_type: data.opera_manual_type,
       opera_manual_note: data.opera_manual_note,
     }
@@ -136,20 +150,6 @@ export default function AddOrEdit({ id, inforOperationManual }: Props) {
 
           <FormField
             control={form.control}
-            name='opera_manual_content'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nội dung</FormLabel>
-                <FormControl>
-                  <Textarea placeholder='Nội dung...' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name='opera_manual_note'
             render={({ field }) => (
               <FormItem>
@@ -162,6 +162,26 @@ export default function AddOrEdit({ id, inforOperationManual }: Props) {
             )}
           />
 
+          {/* <FormField
+            control={form.control}
+            name='opera_manual_content'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nội dung</FormLabel>
+                <FormControl>
+                  <Textarea placeholder='Nội dung...' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          /> */}
+
+        </div>
+        <div className='flex flex-col gap-2 w-full'>
+          <div className='flex justify-between items-end'>
+            <Label>Nội dung</Label>
+          </div>
+          <EditorTiny editorRef={refContent} height='500px' />
         </div>
         <Button type='submit'>{id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}</Button>
       </form>
