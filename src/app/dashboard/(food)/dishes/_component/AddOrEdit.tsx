@@ -48,7 +48,7 @@ const FormSchema = z.object({
         }
         // Chuyển đổi giá trị thành số
         return Number(value)
-      }, z.number({ message: 'Giá trị sale phải là số' }).min(1, { message: 'Giá trị sale phải lớn hơn hoặc bằng 1' }).optional())
+      }, z.number({ message: 'Giá trị sale phải là số' }).min(0, { message: 'Giá trị sale phải lớn hơn hoặc bằng 1' }).optional())
     })
     .optional(),
 
