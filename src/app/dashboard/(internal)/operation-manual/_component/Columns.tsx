@@ -14,90 +14,49 @@ import { DataTableColumnHeader } from '@/components/ColumnHeader'
 import { usePathname, useRouter, } from 'next/navigation'
 import DeleteOrRestore from './DeleteOrRestore'
 import { MoreHorizontal } from 'lucide-react'
-import { IEquipmentMaintenance } from '../equipment-maintenance.interface'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { updateStatusEquipmentMaintenance } from '../equipment-maintenance.api'
+import { IOperationManual } from '../operation-manual.interface'
+import { updateStatusOperationManual } from '../operation-manual.api'
 
-export const columns: ColumnDef<IEquipmentMaintenance>[] = [
-  // eqp_mtn_name: string
-  // eqp_mtn_cost: number
-  // eqp_mtn_date_fixed: Date
-  // eqp_mtn_date_reported: Date
-  // eqp_mtn_issue_description: string
-  // eqp_mtn_location: string
-  // eqp_mtn_note: string
-  // eqp_mtn_performed_by: string
-  // eqp_mtn_reported_by: string
-  // eqp_mtn_status: 'pending' | ' in_progress' | ' done' | ' rejected'
+export const columns: ColumnDef<IOperationManual>[] = [
   {
-    accessorKey: 'eqp_mtn_name',
-    id: 'Tên thiết bị',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Tên thiết bị' />,
+    accessorKey: 'opera_manual_title',
+    id: 'Tiêu đề',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Tiêu đề' />,
     enableHiding: true
   },
   {
-    accessorKey: 'eqp_mtn_cost',
-    id: 'Chi phí',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Chi phí' />,
+    accessorKey: 'opera_manual_type',
+    id: 'Loại tài liệu',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Loại tài liệu' />,
     enableHiding: true
   },
   {
-    accessorKey: 'eqp_mtn_date_fixed',
-    id: 'Ngày sửa chữa',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Ngày sửa chữa' />,
+    accessorKey: 'opera_manual_content',
+    id: 'Nội dung',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Nội dung' />,
     enableHiding: true
   },
   {
-    accessorKey: 'eqp_mtn_date_reported',
-    id: 'Ngày hoàn thành',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Ngày hoàn thành' />,
-
-    enableHiding: true
-  },
-  {
-    accessorKey: 'eqp_mtn_issue_description',
-    id: 'Mô tả sự cố',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Mô tả sự cố' />,
-    enableHiding: true
-  },
-  {
-    accessorKey: 'eqp_mtn_location',
-    id: 'Địa điểm',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Địa điểm' />,
-    enableHiding: true
-  },
-  {
-    accessorKey: 'eqp_mtn_note',
+    accessorKey: 'opera_manual_note',
     id: 'Ghi chú',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Ghi chú' />,
     enableHiding: true
   },
   {
-    accessorKey: 'eqp_mtn_reported_by',
-    id: 'Người báo cáo',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Người báo cáo' />,
-    enableHiding: true
-  },
-  {
-    accessorKey: 'eqp_mtn_performed_by',
-    id: 'Người sửa chữa',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Người sửa chữa' />,
-    enableHiding: true
-  },
-  {
-    accessorKey: 'eqp_mtn_status',
+    accessorKey: 'opera_manual_status',
     id: 'Trạng thái',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
       const router = useRouter()
-      const equipmentMaintenance = row.original
-      const handleUpdateStatus = async (eqp_mtn_status: 'pending' | ' in_progress' | ' done' | ' rejected') => {
-        const res = await updateStatusEquipmentMaintenance({
-          eqp_mtn_id: equipmentMaintenance.eqp_mtn_id,
-          eqp_mtn_status: eqp_mtn_status
+      const operationManual = row.original
+      const handleUpdateStatus = async () => {
+        const res = await updateStatusOperationManual({
+          opera_manual_id: operationManual.opera_manual_id ? operationManual.opera_manual_id : '',
+          opera_manual_status: operationManual.opera_manual_status === 'active' ? 'archived' : 'active'
         })
         if (res.statusCode === 201) {
           toast({
@@ -144,24 +103,14 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
           })
         }
       }
-      return (
-        <Select
-          value={equipmentMaintenance.eqp_mtn_status}
-          onValueChange={(value: 'pending' | ' in_progress' | ' done' | ' rejected') => handleUpdateStatus(value)}
-        >
-          <SelectTrigger className='w-1/2' >
-            <SelectValue placeholder='Trạng thái' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Trạng thái</SelectLabel>
-              <SelectItem value='pending'>Chờ xử lý</SelectItem>
-              <SelectItem value='in_progress'>Đang xử lý</SelectItem>
-              <SelectItem value='done'>Đã hoàn thành</SelectItem>
-              <SelectItem value='rejected'>Đã từ chối</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+      return operationManual.opera_manual_status === 'active' ? (
+        <Button variant={'outline'} onClick={handleUpdateStatus}>
+          Hoạt động
+        </Button>
+      ) : (
+        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+          Vô hiệu hóa
+        </Button>
       )
     }
   },
@@ -169,10 +118,10 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
     accessorKey: 'Actions',
     id: 'Actions',
     cell: ({ row }) => {
-      const equipmentMaintenance = row.original
+      const operationManual = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
-        return <DeleteOrRestore inforEquipmentMaintenance={equipmentMaintenance} path={pathname} />
+        return <DeleteOrRestore inforOperationManual={operationManual} path={pathname} />
       }
       return (
         <DropdownMenu>
@@ -186,11 +135,11 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/equipment-maintenance/${equipmentMaintenance.eqp_mtn_id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/operation-manual/${operationManual.opera_manual_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>
-              <DeleteOrRestore inforEquipmentMaintenance={equipmentMaintenance} path='delete' />
+              <DeleteOrRestore inforOperationManual={operationManual} path='delete' />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

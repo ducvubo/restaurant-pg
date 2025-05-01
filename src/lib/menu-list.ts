@@ -289,7 +289,17 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               label: 'Quản lý bảo trì thiết bị',
               active: pathname === '/dashboard/equipment-maintenance'
             },
-
+            {
+              href: '/dashboard/operation-manual',
+              label: 'Quản lý tài liệu vận hành',
+              active: pathname === '/dashboard/operation-manual'
+            },
+            //operational-costs
+            {
+              href: '/dashboard/operational-costs',
+              label: 'Quản lý chi phí vận hành',
+              active: pathname === '/dashboard/operational-costs'
+            },
           ]
         }
       ]
