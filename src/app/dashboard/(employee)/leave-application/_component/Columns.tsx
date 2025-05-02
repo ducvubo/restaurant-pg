@@ -24,6 +24,8 @@ import { RootState } from '@/app/redux/store'
 import { useSelector } from 'react-redux'
 import { approveLeaveApplication, cancelLeaveApplication, deleteLeaveApplicationWithEmployee, rejectLeaveApplication, sendLeaveApplication } from '../leave-application.api'
 import { ILeaveApplication } from '../leave-application.interface'
+import { findOneEmployee } from '../../employees/employees.api'
+import EmployeeNameCell from './EmployeeNameCell'
 
 const getTextStatus = (status: string) => {
   switch (status) {
@@ -43,6 +45,16 @@ const getTextStatus = (status: string) => {
 }
 
 export const columns: ColumnDef<ILeaveApplication>[] = [
+  {
+    accessorKey: 'employeeId',
+    id: 'Nhân viên',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Nhân viên' />,
+    cell: ({ row }) => {
+      const employeeId = row.original.employeeId
+      return <EmployeeNameCell employeeId={employeeId} />
+    },
+    enableHiding: true
+  },
   {
     accessorKey: 'leaveType',
     id: 'Loại đơn',

@@ -51,6 +51,17 @@ export const columns: ColumnDef<IArticle>[] = [
     accessorKey: 'atlType',
     id: 'Loại',
     header: () => <div className='font-semibold'>Loại</div>,
+    // atlType: 'DEFAULT' | 'VIDEO' | 'IMAGE'
+    cell: ({ row }) => {
+      const article = row.original
+      return (
+        <div className='flex items-center gap-2'>
+          {article.atlType === 'DEFAULT' && <span>Mặc định</span>}
+          {article.atlType === 'VIDEO' && <span>Video</span>}
+          {article.atlType === 'IMAGE' && <span>Ảnh</span>}
+        </div>
+      )
+    },
     enableHiding: true
   },
   // {

@@ -45,6 +45,7 @@ export const findOneEmployee = async ({ _id }: { _id: string }) => {
       cache: 'no-store'
     }
   })
+  console.log("🚀 ~ findOneEmployee ~ res:", res)
   return res
 }
 

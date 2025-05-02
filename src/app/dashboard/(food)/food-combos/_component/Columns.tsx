@@ -59,6 +59,16 @@ export const columns: ColumnDef<IFoodComboRes>[] = [
     enableHiding: true
   },
   {
+    accessorKey: 'fcb_open_time',
+    // id: 'Giá',
+    header: () => <div className='font-semibold'>Giờ bán</div>,
+    cell: ({ row }) => {
+      const food = row.original
+      return `${food.fcb_open_time} - ${food.fcb_close_time}`
+    },
+    enableHiding: true
+  },
+  {
     accessorKey: 'fcb_note',
     // id: 'Ghi chú',
     header: () => <div className='font-semibold'>Ghi chú</div>,

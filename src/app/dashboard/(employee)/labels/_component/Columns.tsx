@@ -30,6 +30,19 @@ export const columns: ColumnDef<ILabel>[] = [
     accessorKey: 'lb_color',
     id: 'Màu sắc',
     header: () => <div className='font-semibold'>Màu sắc</div>,
+    // #522121
+    cell: ({ row }) => {
+      const label = row.original
+      return (
+        <div className='flex items-center gap-2'>
+          <div
+            className='h-4 w-4 rounded-full border border-gray-300'
+            style={{ backgroundColor: label.lb_color }}
+          ></div>
+          <span>{label.lb_color}</span>
+        </div>
+      )
+    },
     enableHiding: true
   },
   {
