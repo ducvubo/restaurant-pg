@@ -496,6 +496,7 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
 export default function OrderFoodPage() {
   const today = new Date();
   const defaultToDate = new Date(today.setHours(0, 0, 0, 0));
+  defaultToDate.setDate(defaultToDate.getDate() - 70);
   const defaultFromDate = new Date(defaultToDate);
   defaultFromDate.setDate(defaultFromDate.getDate() + 70);
   const [toDate, setToDate] = useState<Date>(defaultToDate);

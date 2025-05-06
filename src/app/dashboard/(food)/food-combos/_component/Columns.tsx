@@ -50,7 +50,7 @@ export const columns: ColumnDef<IFoodComboRes>[] = [
   },
   {
     accessorKey: 'fcb_price',
-    // id: 'Giá',
+    id: 'Giá',
     header: () => <div className='font-semibold'>Giá</div>,
     cell: ({ row }) => {
       const food = row.original
@@ -165,7 +165,7 @@ export const columns: ColumnDef<IFoodComboRes>[] = [
   },
   {
     accessorKey: 'fcb_status',
-    // id: 'Trạng thái',
+    id: 'Trạng thái',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {

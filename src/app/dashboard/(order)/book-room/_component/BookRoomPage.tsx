@@ -415,7 +415,7 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
         <div className="flex justify-between items-start">
           <div className="w-2/3 flex flex-col">
             <div className="flex gap-2 items-center">
-              <CardTitle>{bookRoom.bkr_email} - {bookRoom.bkr_phone || 'Không có'}</CardTitle>
+              <CardTitle>{bookRoom.bkr_ame}: {bookRoom.bkr_email} - {bookRoom.bkr_phone || 'Không có'}</CardTitle>
               <CardDescription>({formatVietnameseDate(new Date(bookRoom.bkr_created_at!))})</CardDescription>
             </div>
             <div className="flex flex-col gap-1">
@@ -792,6 +792,7 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
 export default function BookRoomPage() {
   const today = new Date()
   const defaultToDate = new Date(today.setHours(0, 0, 0, 0))
+  defaultToDate.setDate(defaultToDate.getDate() - 70)
   const defaultFromDate = new Date(defaultToDate)
   defaultFromDate.setDate(defaultFromDate.getDate() + 70)
   const [toDate, setToDate] = useState<Date>(defaultToDate)

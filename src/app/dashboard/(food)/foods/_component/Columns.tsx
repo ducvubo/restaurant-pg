@@ -59,6 +59,16 @@ export const columns: ColumnDef<IFood>[] = [
     enableHiding: true
   },
   {
+    accessorKey: 'food_open_time',
+    // id: 'Giá',
+    header: () => <div className='font-semibold'>Giờ bán</div>,
+    cell: ({ row }) => {
+      const food = row.original
+      return `${food.food_open_time} - ${food.food_close_time}`
+    },
+    enableHiding: true
+  },
+  {
     accessorKey: 'food_note',
     id: 'Ghi chú',
     header: () => <div className='font-semibold'>Ghi chú</div>,
