@@ -184,7 +184,14 @@ export const getRecentComboOrders = async (data: IGetStatsDto) => {
   return res;
 };
 
-
+export const getOrderStatusDistributionFoodCombo = async (data: IGetStatsDto) => {
+  const res: IBackendRes<any> = await sendRequest({
+    url: `${process.env.URL_SERVER_ORDER}/order-food-combo/status-distribution`,
+    method: 'GET',
+    queryParams: data,
+  });
+  return res;
+};
 
 
 export const getTotalStockValue = async (data: IGetStatsDto) => {

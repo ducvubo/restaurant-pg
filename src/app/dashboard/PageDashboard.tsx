@@ -17,8 +17,17 @@ import {
 } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import {
-  DollarSign,
-  Users,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Input } from '@/components/ui/input';
+import { format, parse } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { vi } from 'date-fns/locale';
+import {
   Utensils,
   BookOpen,
   Package,
@@ -32,27 +41,20 @@ import {
   getCustomerDistribution,
   getTotalRevenue,
   getRevenueTrends,
-  getTopDishes,
   getRecentOrders,
   getTotalRevenueFood,
   getRevenueTrendsFood,
-  getTopFoods,
   getRecentOrdersFood,
   getOrderStatusDistributionFood,
   getTotalComboRevenue,
   getComboRevenueTrends,
-  getTopCombos,
   getRecentComboOrders,
   getTotalStockValue,
-  getStockInTrends,
-  getStockOutTrends,
   getLowStockIngredients,
-  getTopIngredients,
   getRecentStockTransactions,
-  getStockByCategory,
+  getOrderStatusDistributionFoodCombo,
 } from './dashboard.api';
 
-// Constants
 const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFCE56', '#36A2EB'];
 const blogPerformance = [
   { title: 'Top món ăn mùa hè', views: 1200, likes: 150 },
@@ -60,25 +62,17 @@ const blogPerformance = [
   { title: 'Chuyện nhà hàng', views: 600, likes: 70 },
 ];
 
-// Utility function
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 
 export default function PageDashboard() {
-  // State declarations (unchanged for brevity)
   const [totalReservations, setTotalReservations] = useState<number>(0);
   const [reservationTrends, setReservationTrends] = useState<
     { date: string; reservations: number }[]
   >([]);
-  const [customerData, setCustomerData] = useState<
-    { type: string; value: number }[]
-  >([]);
   const [totalRevenueDish, setTotalRevenueDish] = useState<number>(0);
   const [revenueTrendsDish, setRevenueTrendsDish] = useState<
     { date: string; revenue: number }[]
-  >([]);
-  const [topDishes, setTopDishes] = useState<
-    { name: string; orders: number; revenue: number }[]
   >([]);
   const [recentOrdersDish, setRecentOrdersDish] = useState<
     { id: string; customer: string; total: number; status: string }[]
@@ -87,157 +81,133 @@ export default function PageDashboard() {
   const [revenueTrendsFood, setRevenueTrendsFood] = useState<
     { date: string; revenue: number }[]
   >([]);
-  const [topFoods, setTopFoods] = useState<
-    { name: string; orders: number; revenue: number }[]
-  >([]);
   const [recentOrdersFood, setRecentOrdersFood] = useState<
     { id: string; customer: string; total: number; status: string }[]
   >([]);
   const [orderStatusDistribution, setOrderStatusDistribution] = useState<
     { type: string; value: number }[]
   >([]);
+  const [orderStatusDistributionCombo, setOrderStatusDistributionCombo] = useState<
+    { type: string; value: number }[]
+  >([]);
   const [totalRevenueCombo, setTotalRevenueCombo] = useState<number>(0);
   const [revenueTrendsCombo, setRevenueTrendsCombo] = useState<
     { date: string; revenue: number }[]
-  >([]);
-  const [topCombos, setTopCombos] = useState<
-    { name: string; orders: number; revenue: number }[]
   >([]);
   const [recentOrdersCombo, setRecentOrdersCombo] = useState<
     { id: string; customer: string; total: number; status: string }[]
   >([]);
   const [totalStockValue, setTotalStockValue] = useState<number>(0);
-  const [stockInTrends, setStockInTrends] = useState<
-    { date: string; quantity: number; value: number }[]
-  >([]);
-  const [stockOutTrends, setStockOutTrends] = useState<
-    { date: string; quantity: number; value: number }[]
-  >([]);
   const [lowStockIngredients, setLowStockIngredients] = useState<
     { igd_name: string; stock: number; unit: string }[]
-  >([]);
-  const [topIngredients, setTopIngredients] = useState<
-    { igd_name: string; quantity: number; value: number }[]
   >([]);
   const [recentStockTransactions, setRecentStockTransactions] = useState<
     { id: string; code: string; ingredient: string; quantity: number; date: string; type: 'in' | 'out' }[]
   >([]);
-  const [stockByCategory, setStockByCategory] = useState<
-    { category: string; stock: number; value: number }[]
-  >([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  const restaurantId = '123';
-  const queryParams = {
-    restaurantId,
+  const [queryParams, setQueryParams] = useState<{
+    startDate: string;
+    endDate: string;
+  }>({
     startDate: '2024-01-01',
     endDate: '2026-04-12',
-  };
-
+  });
+  // const queryParams = {
+  //   startDate: '2024-01-01',
+  //   endDate: '2026-04-12',
+  // };
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch data (unchanged for brevity, same API calls)
-        const totalRes = await getTotalReservations(queryParams);
-        if (totalRes.statusCode === 200 && totalRes.data) {
+
+        const promises = [
+          getTotalReservations(queryParams),
+          getReservationTrends(queryParams),
+          getTotalRevenue(queryParams),
+          getRevenueTrends(queryParams),
+          getRecentOrders(queryParams),
+          getTotalRevenueFood(queryParams),
+          getRevenueTrendsFood(queryParams),
+          getRecentOrdersFood(queryParams),
+          getOrderStatusDistributionFood(queryParams),
+          getTotalComboRevenue(queryParams),
+          getComboRevenueTrends(queryParams),
+          getRecentComboOrders(queryParams),
+          getOrderStatusDistributionFoodCombo(queryParams),
+          getTotalStockValue(queryParams),
+          getLowStockIngredients({ ...queryParams, threshold: 10 }),
+          getRecentStockTransactions(queryParams)
+        ];
+
+        const [
+          totalRes,
+          trendsRes,
+          totalRevenueDishRes,
+          revenueTrendsDishRes,
+          recentOrdersDishRes,
+          totalRevenueFoodRes,
+          revenueTrendsFoodRes,
+          recentOrdersFoodRes,
+          statusDistributionRes,
+          totalRevenueComboRes,
+          revenueTrendsComboRes,
+          recentOrdersComboRes,
+          statusDistributionResCombo,
+          totalStockRes,
+          lowStockRes,
+          recentStockRes
+        ] = await Promise.all(promises);
+
+        if (totalRes.statusCode === 200 && totalRes.data)
           setTotalReservations(totalRes.data.totalReservations);
-        }
-        const trendsRes = await getReservationTrends(queryParams);
-        if (trendsRes.statusCode === 200 && trendsRes.data) {
+
+        if (trendsRes.statusCode === 200 && trendsRes.data)
           setReservationTrends(trendsRes.data);
-        }
-        const customerRes = await getCustomerDistribution(queryParams);
-        if (customerRes.statusCode === 200 && customerRes.data) {
-          setCustomerData([
-            { type: 'Khách mới', value: customerRes.data.newCustomers },
-            { type: 'Khách quen', value: customerRes.data.returningCustomers },
-          ]);
-        }
-        const totalRevenueDishRes = await getTotalRevenue(queryParams);
-        if (totalRevenueDishRes.statusCode === 200 && totalRevenueDishRes.data) {
+
+        if (totalRevenueDishRes.statusCode === 200 && totalRevenueDishRes.data)
           setTotalRevenueDish(totalRevenueDishRes.data.totalRevenue);
-        }
-        const revenueTrendsDishRes = await getRevenueTrends(queryParams);
-        if (revenueTrendsDishRes.statusCode === 200 && revenueTrendsDishRes.data) {
+
+        if (revenueTrendsDishRes.statusCode === 200 && revenueTrendsDishRes.data)
           setRevenueTrendsDish(revenueTrendsDishRes.data);
-        }
-        const topDishesRes = await getTopDishes(queryParams);
-        if (topDishesRes.statusCode === 200 && topDishesRes.data) {
-          setTopDishes(topDishesRes.data);
-        }
-        const recentOrdersDishRes = await getRecentOrders(queryParams);
-        if (recentOrdersDishRes.statusCode === 200 && recentOrdersDishRes.data) {
+
+        if (recentOrdersDishRes.statusCode === 200 && recentOrdersDishRes.data)
           setRecentOrdersDish(recentOrdersDishRes.data);
-        }
-        const totalRevenueFoodRes = await getTotalRevenueFood(queryParams);
-        if (totalRevenueFoodRes.statusCode === 200 && totalRevenueFoodRes.data) {
+
+        if (totalRevenueFoodRes.statusCode === 200 && totalRevenueFoodRes.data)
           setTotalRevenueFood(totalRevenueFoodRes.data.totalRevenue);
-        }
-        const revenueTrendsFoodRes = await getRevenueTrendsFood(queryParams);
-        if (revenueTrendsFoodRes.statusCode === 200 && revenueTrendsFoodRes.data) {
+
+        if (revenueTrendsFoodRes.statusCode === 200 && revenueTrendsFoodRes.data)
           setRevenueTrendsFood(revenueTrendsFoodRes.data);
-        }
-        const topFoodsRes = await getTopFoods(queryParams);
-        if (topFoodsRes.statusCode === 200 && topFoodsRes.data) {
-          setTopFoods(topFoodsRes.data);
-        }
-        const recentOrdersFoodRes = await getRecentOrdersFood(queryParams);
-        if (recentOrdersFoodRes.statusCode === 200 && recentOrdersFoodRes.data) {
+
+        if (recentOrdersFoodRes.statusCode === 200 && recentOrdersFoodRes.data)
           setRecentOrdersFood(recentOrdersFoodRes.data);
-        }
-        const statusDistributionRes = await getOrderStatusDistributionFood(queryParams);
-        if (statusDistributionRes.statusCode === 200 && statusDistributionRes.data) {
+
+        if (statusDistributionRes.statusCode === 200 && statusDistributionRes.data)
           setOrderStatusDistribution(statusDistributionRes.data);
-        }
-        const totalRevenueComboRes = await getTotalComboRevenue(queryParams);
-        if (totalRevenueComboRes.statusCode === 200 && totalRevenueComboRes.data) {
+
+        if (totalRevenueComboRes.statusCode === 200 && totalRevenueComboRes.data)
           setTotalRevenueCombo(totalRevenueComboRes.data.totalComboRevenue);
-        }
-        const revenueTrendsComboRes = await getComboRevenueTrends(queryParams);
-        if (revenueTrendsComboRes.statusCode === 200 && revenueTrendsComboRes.data) {
+
+        if (revenueTrendsComboRes.statusCode === 200 && revenueTrendsComboRes.data)
           setRevenueTrendsCombo(revenueTrendsComboRes.data);
-        }
-        const topCombosRes = await getTopCombos(queryParams);
-        if (topCombosRes.statusCode === 200 && topCombosRes.data) {
-          setTopCombos(topCombosRes.data);
-        }
-        const recentOrdersComboRes = await getRecentComboOrders(queryParams);
-        if (recentOrdersComboRes.statusCode === 200 && recentOrdersComboRes.data) {
+
+        if (recentOrdersComboRes.statusCode === 200 && recentOrdersComboRes.data)
           setRecentOrdersCombo(recentOrdersComboRes.data);
-        }
-        const totalStockRes = await getTotalStockValue(queryParams);
-        if (totalStockRes.statusCode === 200 && totalStockRes.data) {
+
+        if (statusDistributionResCombo.statusCode === 200 && statusDistributionResCombo.data)
+          setOrderStatusDistributionCombo(statusDistributionResCombo.data);
+
+        if (totalStockRes.statusCode === 200 && totalStockRes.data)
           setTotalStockValue(totalStockRes.data.totalStockValue);
-        }
-        const stockInTrendsRes = await getStockInTrends(queryParams);
-        if (stockInTrendsRes.statusCode === 200 && stockInTrendsRes.data) {
-          setStockInTrends(stockInTrendsRes.data);
-        }
-        const stockOutTrendsRes = await getStockOutTrends(queryParams);
-        if (stockOutTrendsRes.statusCode === 200 && stockOutTrendsRes.data) {
-          setStockOutTrends(stockOutTrendsRes.data);
-        }
-        const lowStockRes = await getLowStockIngredients({
-          ...queryParams,
-          threshold: 10,
-        });
-        if (lowStockRes.statusCode === 200 && lowStockRes.data) {
+
+        if (lowStockRes.statusCode === 200 && lowStockRes.data)
           setLowStockIngredients(lowStockRes.data);
-        }
-        const topIngredientsRes = await getTopIngredients(queryParams);
-        if (topIngredientsRes.statusCode === 200 && topIngredientsRes.data) {
-          setTopIngredients(topIngredientsRes.data);
-        }
-        const recentStockRes = await getRecentStockTransactions(queryParams);
-        if (recentStockRes.statusCode === 200 && recentStockRes.data) {
+
+        if (recentStockRes.statusCode === 200 && recentStockRes.data)
           setRecentStockTransactions(recentStockRes.data);
-        }
-        const stockByCategoryRes = await getStockByCategory(queryParams);
-        if (stockByCategoryRes.statusCode === 200 && stockByCategoryRes.data) {
-          setStockByCategory(stockByCategoryRes.data);
-        }
+
         setError(null);
       } catch (err: any) {
         setError(err.message || 'Đã xảy ra lỗi khi tải dữ liệu');
@@ -245,16 +215,27 @@ export default function PageDashboard() {
         setLoading(false);
       }
     };
-    fetchData();
-  }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-base ">Đang tải...</p>
-      </div>
-    );
-  }
+    fetchData();
+  }, [queryParams]);
+
+  const handleDateChange = (field: 'startDate' | 'endDate', date: Date | undefined) => {
+    if (date) {
+      setQueryParams((prev) => ({
+        ...prev,
+        [field]: format(date, 'yyyy-MM-dd'),
+      }));
+    }
+  };
+
+
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center min-h-screen">
+  //       <p className="text-base ">Đang tải...</p>
+  //     </div>
+  //   );
+  // }
 
   if (error) {
     return (
@@ -266,10 +247,63 @@ export default function PageDashboard() {
 
   return (
     <div className="p-4 space-y-4 min-h-screen">
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+        <div className="flex flex-col">
+          <label className="text-sm font-medium mb-1">Từ ngày</label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-[240px] justify-start text-left font-normal"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {queryParams.startDate
+                  ? format(parse(queryParams.startDate, 'yyyy-MM-dd', new Date()), 'PPP', { locale: vi })
+                  : 'Chọn ngày'}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={parse(queryParams.startDate, 'yyyy-MM-dd', new Date())}
+                onSelect={(date) => handleDateChange('startDate', date)}
+                locale={vi}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div className="flex flex-col">
+          <label className="text-sm font-medium mb-1">Đến ngày</label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-[240px] justify-start text-left font-normal"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {queryParams.endDate
+                  ? format(parse(queryParams.endDate, 'yyyy-MM-dd', new Date()), 'PPP', { locale: vi })
+                  : 'Chọn ngày'}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={parse(queryParams.endDate, 'yyyy-MM-dd', new Date())}
+                onSelect={(date) => handleDateChange('endDate', date)}
+                locale={vi}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {[
           {
-            title: 'Doanh Thu Món',
+            title: 'Doanh Thu Tại Bàn',
             value: formatCurrency(totalRevenueDish),
             change: '+20%',
             icon: Utensils,
@@ -288,13 +322,6 @@ export default function PageDashboard() {
             change: '+15%',
             icon: Pizza,
             color: 'text-red-600',
-          },
-          {
-            title: 'Khách Hàng',
-            value: customerData.reduce((sum, item) => sum + item.value, 0).toString(),
-            change: '+15%',
-            icon: Users,
-            color: 'text-blue-600',
           },
           {
             title: 'Đặt Bàn',
@@ -335,9 +362,7 @@ export default function PageDashboard() {
         ))}
       </div>
 
-      {/* Charts Section */}
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-        {/* Dish Revenue */}
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-indigo-600">
@@ -351,7 +376,7 @@ export default function PageDashboard() {
                 <YAxis
                   tickFormatter={(value) => formatCurrency(value)}
                   stroke="#6B7280"
-                  fontSize={12}
+                  fontSize={10}
                 />
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Line
@@ -366,30 +391,6 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Top Dishes */}
-        <Card className=" shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-green-600">
-              Top Món Ăn
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={topDishes}>
-                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
-                <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
-                  stroke="#6B7280"
-                  fontSize={12}
-                />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Bar dataKey="revenue" fill="#10B981" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Food Revenue */}
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-purple-600">
@@ -403,7 +404,7 @@ export default function PageDashboard() {
                 <YAxis
                   tickFormatter={(value) => formatCurrency(value)}
                   stroke="#6B7280"
-                  fontSize={12}
+                  fontSize={10}
                 />
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Line
@@ -418,30 +419,6 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Top Foods */}
-        <Card className=" shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-amber-600">
-              Top Món Online
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={topFoods}>
-                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
-                <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
-                  stroke="#6B7280"
-                  fontSize={12}
-                />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Bar dataKey="revenue" fill="#F59E0B" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Combo Revenue */}
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-pink-600">
@@ -455,7 +432,7 @@ export default function PageDashboard() {
                 <YAxis
                   tickFormatter={(value) => formatCurrency(value)}
                   stroke="#6B7280"
-                  fontSize={12}
+                  fontSize={10}
                 />
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Line
@@ -469,47 +446,22 @@ export default function PageDashboard() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-
-        {/* Top Combos */}
         <Card className=" shadow-md">
           <CardHeader>
-            <CardTitle className="text-base font-medium text-red-600">
-              Top Combo
+            <CardTitle className="text-base font-medium text-teal-600">
+              Đặt Bàn
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={topCombos}>
-                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
-                <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
-                  stroke="#6B7280"
-                  fontSize={12}
-                />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Bar dataKey="revenue" fill="#EF4444" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Stock In Trends */}
-        <Card className=" shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-green-600">
-              Nhập Kho
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={stockInTrends}>
+              <LineChart data={reservationTrends}>
                 <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
                 <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
+                <Tooltip formatter={(value: number) => `${value} bàn`} />
                 <Line
                   type="monotone"
-                  dataKey="quantity"
-                  stroke="#10B981"
+                  dataKey="reservations"
+                  stroke="#14B8A6"
                   strokeWidth={2}
                   dot={false}
                 />
@@ -518,32 +470,6 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Stock Out Trends */}
-        <Card className=" shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-red-600">
-              Xuất Kho
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={stockOutTrends}>
-                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
-                <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
-                <Line
-                  type="monotone"
-                  dataKey="quantity"
-                  stroke="#EF4444"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Low Stock Ingredients */}
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-yellow-600">
@@ -553,7 +479,7 @@ export default function PageDashboard() {
           <CardContent>
             <div className="space-y-2">
               {lowStockIngredients.length ? (
-                lowStockIngredients.slice(0, 5).map((item) => (
+                lowStockIngredients.slice(0, 8).map((item) => (
                   <div
                     key={item.igd_name}
                     className="flex justify-between border-b py-1 text-sm"
@@ -571,26 +497,6 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Top Ingredients */}
-        <Card className=" shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-blue-600">
-              Nguyên Liệu Phổ Biến
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={topIngredients}>
-                <XAxis dataKey="igd_name" stroke="#6B7280" fontSize={12} />
-                <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
-                <Bar dataKey="quantity" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Recent Stock Transactions */}
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium ">
@@ -626,42 +532,7 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Stock by Category */}
-        <Card className=" shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-purple-600">
-              Tồn Kho Theo Loại
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={stockByCategory}
-                  dataKey="stock"
-                  nameKey="category"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                >
-                  {stockByCategory.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {stockByCategory.map((entry) => (
-                <Badge key={entry.category} variant="outline">
-                  {entry.category}: {entry.stock}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Order Status Distribution */}
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-orange-600">
@@ -696,33 +567,32 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Customer Distribution */}
         <Card className=" shadow-md">
           <CardHeader>
-            <CardTitle className="text-base font-medium text-cyan-600">
-              Loại Khách Hàng
+            <CardTitle className="text-base font-medium text-orange-600">
+              Trạng Thái Đơn Combo
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie
-                  data={customerData}
+                  data={orderStatusDistributionCombo}
                   dataKey="value"
                   nameKey="type"
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
                 >
-                  {customerData.map((_, index) => (
+                  {orderStatusDistributionCombo.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: number) => `${value} khách`} />
+                <Tooltip formatter={(value: number) => `${value} đơn`} />
               </PieChart>
             </ResponsiveContainer>
             <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {customerData.map((entry) => (
+              {orderStatusDistributionCombo.map((entry) => (
                 <Badge key={entry.type} variant="outline">
                   {entry.type}: {entry.value}
                 </Badge>
@@ -731,36 +601,12 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Reservation Trends */}
-        <Card className=" shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-teal-600">
-              Đặt Bàn
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={reservationTrends}>
-                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
-                <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip formatter={(value: number) => `${value} bàn`} />
-                <Line
-                  type="monotone"
-                  dataKey="reservations"
-                  stroke="#14B8A6"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
 
-        {/* Recent Dish Orders */}
+
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium ">
-              Đơn Món Gần Đây
+              Đơn Tại Bàn Gần Đây
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -795,7 +641,6 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Recent Food Orders */}
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium ">
@@ -826,7 +671,6 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Recent Combo Orders */}
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium ">
@@ -865,7 +709,6 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Blog Performance */}
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-orange-600">
