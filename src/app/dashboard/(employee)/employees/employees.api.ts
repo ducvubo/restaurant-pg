@@ -9,7 +9,6 @@ export const createEmployee = async (payload: Omit<IEmployee, 'epl_status' | '_i
     method: 'POST',
     body: payload
   })
-  console.log('🚀 ~ createEmployee ~ res:', res)
   return res
 }
 
@@ -45,7 +44,6 @@ export const findOneEmployee = async ({ _id }: { _id: string }) => {
       cache: 'no-store'
     }
   })
-  console.log("🚀 ~ findOneEmployee ~ res:", res)
   return res
 }
 
@@ -86,11 +84,3 @@ export const updateStatus = async ({ _id, epl_status }: { _id: string; epl_statu
   return res
 }
 
-export const saveSystem = async () => {
-  const res: IBackendRes<any> = await sendRequest({
-    url: `${process.env.URL_SERVER_USER}/system-parameter/save`,
-    method: 'POST',
-  })
-  console.log("🚀 ~ saveSystem ~ res:", res)
-  return res
-}

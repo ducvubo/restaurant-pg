@@ -19,7 +19,7 @@ import { DataTableViewOptions } from '@/components/ColumnToggle'
 import { DataTablePagination } from '@/components/PaginationTable'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { saveSystem } from '../employees.api'
+import VerifyFace from './VerifyFace'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -76,6 +76,7 @@ export function PageEmployees<TData, TValue>({ columns, meta, data }: DataTableP
         <Button variant={'outline'}>
           <Link href={'/dashboard/employees/add'}>Thêm</Link>
         </Button>
+        <VerifyFace />
         {
           pathname === 'recycle' ? (
             <Button variant={'outline'}>
@@ -87,9 +88,6 @@ export function PageEmployees<TData, TValue>({ columns, meta, data }: DataTableP
             </Button>
           )
         }
-        <Button onClick={async () => {
-          await saveSystem()
-        }}>Test</Button>
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>

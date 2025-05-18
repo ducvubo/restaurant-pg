@@ -12,4 +12,5 @@ export interface IEmployee {
   epl_gender: 'Khác' | 'Nam' | 'Nữ'
   epl_address: string
   epl_status: string
+  epl_face_id: boolean
 }

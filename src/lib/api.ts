@@ -100,22 +100,6 @@ export const sendRequest = async <T>(props: IRequest) => {
       return res.json() as T //generic
     } else {
       return res.json().then(async function (json: any) {
-        // if (res.status === 401 && json?.code === -10) {
-        //   return {
-        //     statusCode: res.status,
-        //     message: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục sử dụng.',
-        //     error: json?.error ?? '',
-        //     code: json?.code
-        //   } as T
-        // }
-        // if (res.status === 403) {
-        //   return {
-        //     statusCode: res.status,
-        //     message: 'Bạn không có quyền truy cập vào trang này, vui lòng liên hệ quản trị viên để được hỗ trợ',
-        //     error: json?.error ?? '',
-        //     code: -11
-        //   } as T
-        // }
         return {
           statusCode: res.status,
           message: json?.message ?? '',
@@ -128,12 +112,10 @@ export const sendRequest = async <T>(props: IRequest) => {
 }
 
 export const sendRequestFile = async <T>(props: IRequest) => {
-  //type
   let { url, method, body, queryParams = {}, useCredentials = false, headers = {}, nextOption = {} } = props
 
   const options: any = {
     method: method,
-    // by default setting the content-type to be json type
     headers: new Headers({ ...headers }),
     body: body ? body : null,
     ...nextOption

@@ -39,7 +39,7 @@ type Group = {
 export function getMenuListRestaurant(pathname: string): Group[] {
   return [
     {
-      groupLabel: 'Đơn hàng',
+      groupLabel: 'Quản lý',
       menus: [
         {
           href: '/dashboard/order',
@@ -79,11 +79,6 @@ export function getMenuListRestaurant(pathname: string): Group[] {
             },
           ]
         },
-      ]
-    },
-    {
-      groupLabel: 'Quản lý',
-      menus: [
         {
           active: pathname.includes('/dashboard/ticket-guest'),
           href: '/dashboard/ticket-guest',
@@ -300,6 +295,24 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               label: 'Quản lý chi phí vận hành',
               active: pathname === '/dashboard/operational-costs'
             },
+          ]
+        },
+        {
+          active: pathname.includes('/dashboard/policy'),
+          href: '/dashboard/policy',
+          icon: Settings,
+          label: "Phân quyền",
+          submenus: [
+            {
+              active: pathname === "/dashboard/policy",
+              href: "/dashboard/policy",
+              label: "Quyền chức năng"
+            },
+            {
+              active: pathname === "/dashboard/assign-policy",
+              href: "/dashboard/assign-policy",
+              label: "Phân quyền"
+            }
           ]
         }
       ]

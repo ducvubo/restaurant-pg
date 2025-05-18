@@ -14,7 +14,6 @@ export const getTotalReservations = async (data: IGetStatsDto) => {
     method: 'GET',
     queryParams: data
   })
-  console.log("🚀 ~ getTotalReservations ~ res:", res)
   return res
 }
 

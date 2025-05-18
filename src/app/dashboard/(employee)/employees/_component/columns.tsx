@@ -20,6 +20,7 @@ import { updateStatus } from '../employees.api'
 import { useLoading } from '@/context/LoadingContext'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
+import RegisterFace from './RegisterFace'
 export const columns: ColumnDef<IEmployee>[] = [
   {
     accessorKey: 'epl_email',
@@ -32,6 +33,20 @@ export const columns: ColumnDef<IEmployee>[] = [
     id: 'Tên',
     header: () => <div>Tên</div>,
     enableHiding: true
+  },
+  {
+    accessorKey: 'epl_face_id',
+    id: 'Khuôn mặt',
+    header: () => <div>Khuôn mặt</div>,
+    enableHiding: true,
+    cell: ({ row }) => {
+      const employee = row.original
+      return employee.epl_face_id ? (
+        <div >Đã đăng ký</div>
+      ) : (
+        <div>Chưa đăng ký</div>
+      )
+    }
   },
   {
     accessorKey: 'epl_phone',
@@ -152,6 +167,9 @@ export const columns: ColumnDef<IEmployee>[] = [
             </Link>
             <DropdownMenuItem asChild>
               <DeleteOrRestore inforEmployee={employees} path='delete' />
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <RegisterFace inforEmployee={employees} />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

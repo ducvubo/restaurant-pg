@@ -32,10 +32,17 @@ export default function RefreshToken() {
     let intervalId: NodeJS.Timeout
 
     const connectSocketWithCookie = async () => {
-      const access_token = await getCookie('access_token_rtr')
-      const refresh_token = await getCookie('refresh_token_rtr')
-      const refresh_token_epl = await getCookie('refresh_token_epl')
-      const access_token_epl = await getCookie('access_token_epl')
+      // const access_token = await getCookie('access_token_rtr')
+      // const refresh_token = await getCookie('refresh_token_rtr')
+      // const refresh_token_epl = await getCookie('refresh_token_epl')
+      // const access_token_epl = await getCookie('access_token_epl')
+      const [access_token, refresh_token, refresh_token_epl, access_token_epl] = await Promise.all([
+        getCookie('access_token_rtr'),
+        getCookie('refresh_token_rtr'),
+        getCookie('refresh_token_epl'),
+        getCookie('access_token_epl')
+      ]);
+
 
       if (!access_token && !refresh_token && !refresh_token_epl && !access_token_epl) return
 
@@ -83,7 +90,6 @@ export default function RefreshToken() {
       }
 
       function onDisconnect() {
-        // console.log('Disconnected')
       }
 
       function loginGuestTable(data: { guest_name: string; tbl_name: string }) {
