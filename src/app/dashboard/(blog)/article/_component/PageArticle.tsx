@@ -20,6 +20,9 @@ import { DataTablePagination } from '@/components/PaginationTable'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import ListAddArticle from './ListAddArticle'
+import { autoGenArticleDefault } from '../article.api'
+import { toast } from '@/hooks/use-toast'
+import { el } from 'date-fns/locale'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -66,6 +69,32 @@ export function PageArticle<TData, TValue>({ columns, meta, data }: DataTablePro
     }
   }
 
+  const handleAutoGenArticle = async () => {
+    try {
+      const res = await autoGenArticleDefault()
+      if (res.message === 'Workflow was started') {
+        toast({
+          title: 'Thành công',
+          description: 'Kích hoạt tự động tạo bài viết thành công, vui lòng đợi trong giây lát',
+          variant: 'default'
+        })
+      } else {
+        toast({
+          title: 'Thất bại',
+          description: 'Kích hoạt tự động tạo bài viết thất bại, vui lòng thử lại sau',
+          variant: 'destructive'
+        })
+      }
+    } catch (error) {
+      console.log('🚀 ~ handleAutoGenArticle ~ error:', error)
+      toast({
+        title: 'Thất bại',
+        description: 'Kích hoạt tự động tạo bài viết thất bại, vui lòng thử lại sau',
+        variant: 'destructive'
+      })
+    }
+  }
+
   React.useEffect(() => {
     router.push(`/dashboard/article/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`)
   }, [pageIndex, pageSize, router])
@@ -74,6 +103,9 @@ export function PageArticle<TData, TValue>({ columns, meta, data }: DataTablePro
     <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex justify-end gap-2 items-center py-4'>
         <ListAddArticle />
+        <Button variant={'outline'} onClick={handleAutoGenArticle}>
+          Tạo bài viết tự động
+        </Button>
         {
           pathname === 'recycle' ? (
             <Button variant={'outline'}>

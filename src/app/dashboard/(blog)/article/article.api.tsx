@@ -28,8 +28,8 @@ export const createArticle = async (data: Partial<IArticle>, type: 'default' | '
     type === 'default'
       ? `${URL_SERVER_BLOG}/articles/add/default`
       : type === 'video'
-      ? `${URL_SERVER_BLOG}/articles/add/video`
-      : `${URL_SERVER_BLOG}/articles/add/image`
+        ? `${URL_SERVER_BLOG}/articles/add/video`
+        : `${URL_SERVER_BLOG}/articles/add/image`
 
   const res: IBackendRes<IArticle> = await sendRequest({
     url,
@@ -44,8 +44,8 @@ export const updateArticle = async (data: Partial<IArticle>, type: 'default' | '
     type === 'default'
       ? `${URL_SERVER_BLOG}/articles/update/default`
       : type === 'video'
-      ? `${URL_SERVER_BLOG}/articles/update/video`
-      : `${URL_SERVER_BLOG}/articles/update/image`
+        ? `${URL_SERVER_BLOG}/articles/update/video`
+        : `${URL_SERVER_BLOG}/articles/update/image`
 
   const res: IBackendRes<IArticle> = await sendRequest({
     url,
@@ -88,7 +88,6 @@ export const sendArticle = async (id: string) => {
     url: `${URL_SERVER_BLOG}/articles/send/${id}`,
     method: 'PATCH'
   })
-  console.log('🚀 ~ sendArticle ~ res:', res)
   return res
 }
 
@@ -171,4 +170,24 @@ export const findAllArticleName = async () => {
     method: 'GET'
   })
   return res
+}
+export const autoGenArticleDefault = async () => {
+  try {
+    const response = await fetch('https://n8n.taphoaictu.id.vn/webhook/7b96cf59-b7cb-48fc-b850-9ab7db76c24f', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("🚀 ~ autoGenArticleDefault ~ result:", result)
+    return result;
+  } catch (error) {
+    console.error('Lỗi khi gửi đến n8n:', error);
+  }
 }
