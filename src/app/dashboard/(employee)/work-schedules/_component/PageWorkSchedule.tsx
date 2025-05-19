@@ -16,12 +16,13 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { deleteWorkSchedule, getListWorkSchedule } from '../work-schedule.api'
+import { deleteWorkSchedule, getAllEmployee, getListWorkSchedule } from '../work-schedule.api'
 import { IWorkSchedule } from '../work-schedule.interface'
 import { IWorkingShift } from '../../working-shifts/working-shift.interface'
 import { findOneEmployee } from '../../employees/employees.api'
 import { RootState } from '@/app/redux/store'
 import { useSelector } from 'react-redux'
+import { IEmployee } from '../../employees/employees.interface'
 
 interface IWorkScheduleMapping {
   date: string
@@ -45,7 +46,9 @@ export default function PageWorkSchedule() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteScheduleId, setDeleteScheduleId] = useState<string | null>(null)
   const [deleteScheduleDate, setDeleteScheduleDate] = useState<string | null>(null)
-
+  const [listEmployee, setListEmployee] = useState<
+    { id: string; name: string }[]
+  >([])
   const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant)
   const inforEmployee = useSelector((state: RootState) => state.inforEmployee)
 
@@ -60,18 +63,8 @@ export default function PageWorkSchedule() {
               item.listEmployeeId || []
             )
           )
-          const employeePromises = Array.from(allEmployeeIds).map(async (id) => {
-            if (!employeeCache.has(id)) {
-              const employeeRes = await findOneEmployee({ _id: id })
-              if (employeeRes.statusCode === 200 && employeeRes.data) {
-                return { id, name: employeeRes.data.epl_name }
-              }
-            }
-            return employeeCache.get(id)
-          })
-          const employeeResults = (await Promise.all(employeePromises)).filter(Boolean)
           const newCache = new Map(employeeCache)
-          employeeResults.forEach((emp) => emp && newCache.set(emp.id, emp))
+          listEmployee.forEach((emp) => emp && newCache.set(emp.id, emp))
           setEmployeeCache(newCache)
 
           res.data.forEach((item) => {
@@ -117,8 +110,10 @@ export default function PageWorkSchedule() {
     data: IWorkSchedule[],
     cache: Map<string, { id: string; name: string }>
   ) => {
+    console.log("🚀 ~ PageWorkSchedule ~ cache:", cache)
     const tempResult: any = {}
     data.forEach((item: IWorkSchedule & { listEmployeeId?: string[]; label?: { lb_name: string; lb_color: string } }) => {
+      console.log("🚀 ~ data.forEach ~ item:", item)
       const date = format(new Date(item.ws_date), 'dd/MM/yyyy')
       if (!tempResult[date]) {
         tempResult[date] = { ws_id: item.ws_id, workingShifts: [] }
@@ -150,9 +145,50 @@ export default function PageWorkSchedule() {
     return result
   }
 
+  const findListEmployee = async () => {
+    setIsLoading(true)
+    try {
+      const res: IBackendRes<IEmployee[]> = await getAllEmployee()
+      if (res.statusCode === 200 && res.data) {
+        const data = res.data.map((item) => ({
+          id: item._id,
+          name: item.epl_name
+        }))
+        setListEmployee(data)
+      } else if (res.code === -10) {
+        toast({
+          title: 'Thông báo',
+          description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+          variant: 'destructive'
+        })
+        await deleteCookiesAndRedirect()
+      } else {
+        toast({
+          title: 'Thông báo',
+          description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+          variant: 'destructive'
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      toast({
+        title: 'Lỗi',
+        description: 'Không thể tải danh sách nhân viên, vui lòng thử lại sau',
+        variant: 'destructive'
+      })
+    }
+    finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    findListEmployee()
+  }, [])
+
   useEffect(() => {
     getListWorkScheduleByDate()
-  }, [startDate, endDate])
+  }, [startDate, endDate, listEmployee])
 
   const handleDeleteWorkSchedule = async (id: string) => {
     setIsLoading(true)

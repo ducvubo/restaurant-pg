@@ -13,20 +13,19 @@ import { Calendar } from '@/components/ui/calendar'
 import { CalendarIcon } from 'lucide-react'
 import { ILabel } from '../../labels/label.interface'
 import { IWorkingShift } from '../../working-shifts/working-shift.interface'
-import { createWorkSchedule, getAllEmployee, getAllLabel, getAllWorkingShift, updateWorkSchedule } from '../work-schedule.api'
+import { createWorkSchedule, getAllEmployee, getAllLabel, getAllWorkingShift, getListEmployeeByDate, updateWorkSchedule } from '../work-schedule.api'
 import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
-import { SerializedEditorState } from 'lexical'
-// import { Editor } from '@/components/blocks/editor-x/editor'
 import { useRouter } from 'next/navigation'
 import { MultiSelect } from '@/components/Multipleselect'
 import { IEmployee } from '../../employees/employees.interface'
 import EditorTiny from '@/components/EditorTiny'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/app/redux/store'
+import { format } from 'date-fns'
+import { vi } from 'date-fns/locale'
 interface IProps {
   id: string
   inforWorkSchedule?: IWorkSchedule
@@ -41,7 +40,6 @@ const FormSchema = z.object({
 })
 
 export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
-  console.log('🚀 ~ AddOrEdit ~ inforWorkSchedule:', inforWorkSchedule)
   const { setLoading } = useLoading()
   const router = useRouter()
   const [listLabel, setListLabel] = React.useState<ILabel[]>([])
@@ -56,6 +54,7 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
     }[]
   >([])
   const [selectedEmployee, setSelectedEmployee] = useState<string[]>(inforWorkSchedule?.listEmployeeId || [])
+  const [constListEmployee, setConstListEmployee] = useState<IEmployee[]>([])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -70,15 +69,57 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
           ? inforWorkSchedule.workingShift.wks_id
           : ''
         : '',
-      ws_date: inforWorkSchedule?.ws_date || new Date()
+      ws_date: inforWorkSchedule?.ws_date || undefined
     }
   })
+
+  const isDateSelected = !!form.watch('ws_date')
+
+  useEffect(() => {
+    const selectedDate = form.watch('ws_date')
+    if (selectedDate) {
+      const fetchEmployeeList = async () => {
+        try {
+          const res: IBackendRes<string[]> = await getListEmployeeByDate(selectedDate)
+          if (res.statusCode === 200 && res.data) {
+            const filteredEmployee = constListEmployee.filter((item) => !res.data?.includes(item._id))
+            const data = filteredEmployee.map((item: IEmployee) => ({
+              value: item._id,
+              label: item.epl_name
+            }))
+            setListEmployee(data)
+          } else if (res.code === -10) {
+            toast({
+              title: 'Thông báo',
+              description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+              variant: 'destructive'
+            })
+            await deleteCookiesAndRedirect()
+          } else {
+            toast({
+              title: 'Thông báo',
+              description: 'Không thể lấy danh sách nhân viên, vui lòng thử lại sau',
+              variant: 'destructive'
+            })
+          }
+        } catch (error) {
+          toast({
+            title: 'Thông báo',
+            description: 'Đã có lỗi xảy ra khi gọi API, vui lòng thử lại sau',
+            variant: 'destructive'
+          })
+        }
+      }
+      fetchEmployeeList()
+    }
+  }, [form.watch('ws_date')])
 
   useEffect(() => {
     findListLabel()
     findListWorkingShift()
     findListEmployee()
   }, [])
+
 
   useEffect(() => {
     if (inforEmployee._id) {
@@ -102,22 +143,6 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
         variant: 'destructive'
       })
       await deleteCookiesAndRedirect()
-    } else if (res.code === -10) {
-      setLoading(false)
-      toast({
-        title: 'Thông báo',
-        description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
-        variant: 'destructive'
-      })
-      await deleteCookiesAndRedirect()
-    } else if (res.code === -11) {
-      setLoading(false)
-
-      toast({
-        title: 'Thông báo',
-        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
-        variant: 'destructive'
-      })
     } else {
       setLoading(false)
       toast({
@@ -140,13 +165,6 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
         variant: 'destructive'
       })
       await deleteCookiesAndRedirect()
-    } else if (res.code === -11) {
-      setLoading(false)
-      toast({
-        title: 'Thông báo',
-        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
-        variant: 'destructive'
-      })
     } else {
       setLoading(false)
       toast({
@@ -164,6 +182,7 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
         value: item._id,
         label: item.epl_name
       }))
+      setConstListEmployee(res.data)
       setListEmployee(data)
     } else if (res.code === -10) {
       setLoading(false)
@@ -173,13 +192,6 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
         variant: 'destructive'
       })
       await deleteCookiesAndRedirect()
-    } else if (res.code === -11) {
-      setLoading(false)
-      toast({
-        title: 'Thông báo',
-        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
-        variant: 'destructive'
-      })
     } else {
       setLoading(false)
       toast({
@@ -212,7 +224,6 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
     }
 
     const res = id === 'add' ? await createWorkSchedule(payload) : await updateWorkSchedule({ ...payload, ws_id: id })
-    // const res = await createWorkSchedule(payload)
     if (res.statusCode === 201 || res.statusCode === 200) {
       setLoading(false)
       toast({
@@ -244,13 +255,12 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
       setLoading(false)
       toast({
         title: 'Thông báo',
-        description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
+        description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
         variant: 'destructive'
       })
       await deleteCookiesAndRedirect()
     } else if (res.code === -11) {
       setLoading(false)
-
       toast({
         title: 'Thông báo',
         description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
@@ -277,11 +287,48 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
+            name='ws_date'
+            render={({ field }) => (
+              <FormItem className='flex flex-col'>
+                <FormLabel>Ngày</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={'outline'}
+                        className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
+                      >
+                        {field.value ? format(field.value, 'dd/MM/yyyy', { locale: vi }) : <span>Chọn ngày</span>}
+                        <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-auto p-0' align='start'>
+                    <Calendar
+                      mode='single'
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) => date < new Date('1900-01-01')}
+                      initialFocus
+                      locale={vi} // Set calendar locale to Vietnamese
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name='wks_id'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Ca làm việc</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={!isDateSelected}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder='Chọn ca làm việc...' />
@@ -305,7 +352,11 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nhãn</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={!isDateSelected}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder='Chọn nhãn...' />
@@ -323,40 +374,6 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
               </FormItem>
             )}
           />
-
-          <FormField
-            control={form.control}
-            name='ws_date'
-            render={({ field }) => (
-              <FormItem className='flex flex-col'>
-                <FormLabel>Ngày</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={'outline'}
-                        className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
-                      >
-                        {field.value ? format(field.value, 'dd/MM/yyyy') : <span>Pick a date</span>}
-                        <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-auto p-0' align='start'>
-                    <Calendar
-                      mode='single'
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => date < new Date('1900-01-01')}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <div className='w-full'>
             <Label>Nhân viên</Label>
             <MultiSelect
@@ -367,14 +384,22 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
               variant='inverted'
               animation={2}
               maxCount={5}
+              disabled={!isDateSelected}
             />
           </div>
         </div>
 
         <div className='h-[390px]'>
-          <EditorTiny editorRef={refNote} height='390px' />
+          <EditorTiny
+            editorRef={refNote}
+            height='390px'
+          />
         </div>
-        <Button type='submit' className='!mt-5'>
+        <Button
+          type='submit'
+          className='!mt-5'
+          disabled={!isDateSelected}
+        >
           {id === 'add' ? 'Thêm mới' : 'Chỉnh sửa'}
         </Button>
       </form>

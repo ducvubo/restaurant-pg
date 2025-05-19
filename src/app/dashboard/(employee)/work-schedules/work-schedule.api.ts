@@ -81,3 +81,11 @@ export const deleteWorkSchedule = async (id: string) => {
   })
   return res
 }
+
+export const getListEmployeeByDate = async (selectedDate: Date) => {
+  const res: IBackendRes<string[]> = await sendRequest({
+    url: `${URL_SERVER_EMPLOYEE}/work-schedule/list-employee-by-date/${selectedDate}`,
+    method: 'GET',
+  })
+  return res
+}
