@@ -14,7 +14,8 @@ export const initialState: IEmployee = {
     image_cloud: '',
     image_custom: ''
   },
-  epl_status: ''
+  epl_status: '',
+  epl_face_id: false,
 }
 
 const inforEmployeeSlice = createSlice({
@@ -22,7 +23,7 @@ const inforEmployeeSlice = createSlice({
   initialState,
   reducers: {
     startAppEmployee: (state, action: PayloadAction<IEmployee>) => {
-      ;(state._id = action.payload._id),
+      ; (state._id = action.payload._id),
         (state.epl_restaurant_id = action.payload.epl_restaurant_id),
         (state.epl_name = action.payload.epl_name),
         (state.epl_email = action.payload.epl_email),

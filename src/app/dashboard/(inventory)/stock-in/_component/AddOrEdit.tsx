@@ -198,7 +198,8 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
         epl_avatar: {
           image_cloud: '',
           image_custom: ''
-        }
+        },
+        epl_face_id: false
       })
       setListEmployees(listEpl)
     }
