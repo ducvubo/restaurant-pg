@@ -20,7 +20,11 @@ import { updateStatus } from '../employees.api'
 import { useLoading } from '@/context/LoadingContext'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import RegisterFace from './RegisterFace'
+import dynamic from 'next/dynamic'
+// import RegisterFace from './RegisterFace'
+const RegisterFace = dynamic(() => import('./RegisterFace'), {
+  ssr: false,
+})
 export const columns: ColumnDef<IEmployee>[] = [
   {
     accessorKey: 'epl_email',

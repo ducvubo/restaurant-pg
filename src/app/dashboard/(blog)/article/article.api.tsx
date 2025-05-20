@@ -171,13 +171,16 @@ export const findAllArticleName = async () => {
   })
   return res
 }
-export const autoGenArticleDefault = async () => {
+export const autoGenArticleDefault = async ({ title }: { title: string }) => {
   try {
-    const response = await fetch('https://n8n.taphoaictu.id.vn/webhook/7b96cf59-b7cb-48fc-b850-9ab7db76c24f', {
+    const response = await fetch('https://n8n.taphoaictu.id.vn/webhook/6f663002-1d60-4385-89ec-02f1e24b02ea', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        title,
+      }),
     });
 
     if (!response.ok) {

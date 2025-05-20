@@ -19,7 +19,11 @@ import { DataTableViewOptions } from '@/components/ColumnToggle'
 import { DataTablePagination } from '@/components/PaginationTable'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import VerifyFace from './VerifyFace'
+// import VerifyFace from './VerifyFace'
+import dynamic from 'next/dynamic'
+const VerifyFace = dynamic(() => import('./VerifyFace'), {
+  ssr: false,
+})
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

@@ -1,12 +1,4 @@
 import { ContentLayout } from '@/components/admin-panel/content-layout'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator
-} from '@/components/ui/breadcrumb'
 import React, { Suspense } from 'react'
 import LoadingServer from '@/components/LoadingServer'
 import AddOrEdit from '../_component/AddOrEdit'
