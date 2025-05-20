@@ -201,6 +201,7 @@ import Link from 'next/link'
 import ListAddArticle from './ListAddArticle'
 import { autoGenArticleDefault } from '../article.api'
 import { toast } from '@/hooks/use-toast'
+import { useLoading } from '@/context/LoadingContext'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -215,6 +216,7 @@ interface DataTableProps<TData, TValue> {
 
 export function PageArticle<TData, TValue>({ columns, meta, data }: DataTableProps<TData, TValue>) {
   const router = useRouter()
+  const { setLoading } = useLoading()
   const pathname = usePathname().split('/').pop()
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -250,16 +252,8 @@ export function PageArticle<TData, TValue>({ columns, meta, data }: DataTablePro
   }
 
   const handleAutoGenArticle = async () => {
-    if (!articleTitle.trim()) {
-      toast({
-        title: 'Lỗi',
-        description: 'Vui lòng nhập tiêu đề bài viết',
-        variant: 'destructive'
-      })
-      return
-    }
-
     try {
+      setLoading(true) // Start loading
       const res = await autoGenArticleDefault({ title: articleTitle }) // Pass title to API
       console.log('test', res);
       if (res.message === 'Workflow was started') {
@@ -284,6 +278,8 @@ export function PageArticle<TData, TValue>({ columns, meta, data }: DataTablePro
         description: 'Kích hoạt tự động tạo bài viết thất bại, vui lòng thử lại sau',
         variant: 'destructive'
       })
+    } finally {
+      setLoading(false) // Stop loading
     }
   }
 
