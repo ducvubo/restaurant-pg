@@ -357,7 +357,7 @@ export default function PageDashboard() {
               <div className={`text-xl font-semibold ${metric.color}`}>
                 {metric.value}
               </div>
-              <p className="text-xs ">{metric.change}</p>
+              {/* <p className="text-xs ">{metric.change}</p> */}
             </CardContent>
           </Card>
         ))}
