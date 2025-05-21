@@ -398,7 +398,7 @@ export const columns: ColumnDef<IArticle>[] = [
             <Link href={`/dashboard/article/${article.atlId}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
-            {(article.atlStatus === 'DRAFT' || article.atlStatus === 'REJECTED') && (
+            {(article.atlStatus === 'DRAFT' || article.atlStatus === 'REJECTED' || article.atlStatus === 'UNPUBLISHED') && (
               <DropdownMenuItem asChild>
                 <DeleteOrRestore inforArticle={article} path='delete' />
               </DropdownMenuItem>

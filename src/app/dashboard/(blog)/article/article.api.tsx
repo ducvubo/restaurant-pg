@@ -145,6 +145,7 @@ export const deleteArticle = async ({ atlId }: { atlId: string }) => {
     url: `${URL_SERVER_BLOG}/articles/delete-draft/${atlId}`,
     method: 'DELETE'
   })
+  console.log("🚀 ~ deleteArticle ~ res:", res)
   return res
 }
 

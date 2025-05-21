@@ -10,5 +10,6 @@ export interface IWorkSchedule {
   workingShift: IWorkingShift
   ws_date: Date
   ws_note: string
+  ws_status: "T" | "F"
   listEmployeeId: string[]
 }

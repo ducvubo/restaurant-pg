@@ -16,13 +16,14 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { deleteWorkSchedule, getAllEmployee, getListWorkSchedule } from '../work-schedule.api'
+import { deleteWorkSchedule, getAllEmployee, getListWorkSchedule, updateStatusWorkSchedule } from '../work-schedule.api'
 import { IWorkSchedule } from '../work-schedule.interface'
 import { IWorkingShift } from '../../working-shifts/working-shift.interface'
 import { findOneEmployee } from '../../employees/employees.api'
 import { RootState } from '@/app/redux/store'
 import { useSelector } from 'react-redux'
 import { IEmployee } from '../../employees/employees.interface'
+import { useLoading } from '@/context/LoadingContext'
 
 interface IWorkScheduleMapping {
   date: string
@@ -30,10 +31,12 @@ interface IWorkScheduleMapping {
   workingShift: (IWorkingShift & {
     employeeData: { id: string; name: string }[]
     label: { lb_name: string; lb_color: string }
-  })[]
+  })[],
+  ws_status: "T" | "F"
 }
 
 export default function PageWorkSchedule() {
+  const { setLoading } = useLoading()
   const [startDate, setStartDate] = useState<Date>(
     new Date(new Date().setDate(new Date().getDate() - 50))
   )
@@ -41,9 +44,9 @@ export default function PageWorkSchedule() {
     new Date(new Date().setDate(new Date().getDate() + 50))
   )
   const [listWorkSchedule, setListWorkSchedule] = useState<IWorkScheduleMapping[]>([])
-  const [isLoading, setIsLoading] = useState(false)
   const [employeeCache, setEmployeeCache] = useState<Map<string, { id: string; name: string }>>(new Map())
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isUpdateStatusDialogOpen, setIsUpdateStatusDialogOpen] = useState(false)
   const [deleteScheduleId, setDeleteScheduleId] = useState<string | null>(null)
   const [deleteScheduleDate, setDeleteScheduleDate] = useState<string | null>(null)
   const [listEmployee, setListEmployee] = useState<
@@ -53,16 +56,11 @@ export default function PageWorkSchedule() {
   const inforEmployee = useSelector((state: RootState) => state.inforEmployee)
 
   const getListWorkScheduleByDate = async () => {
-    setIsLoading(true)
+    setLoading(true)
     try {
       const res: IBackendRes<IWorkSchedule[]> = await getListWorkSchedule(startDate, endDate)
       if (res.statusCode === 201 || res.statusCode === 200) {
         if (res.data) {
-          const allEmployeeIds = new Set(
-            res.data.flatMap((item: IWorkSchedule & { listEmployeeId?: string[] }) =>
-              item.listEmployeeId || []
-            )
-          )
           const newCache = new Map(employeeCache)
           listEmployee.forEach((emp) => emp && newCache.set(emp.id, emp))
           setEmployeeCache(newCache)
@@ -70,8 +68,11 @@ export default function PageWorkSchedule() {
           res.data.forEach((item) => {
             item.ws_date = new Date(new Date(item.ws_date).setHours(new Date(item.ws_date).getHours() + 7))
           })
-          const data = mapWorkingShifts(res.data, newCache)
-          setListWorkSchedule(data)
+          if (listEmployee.length > 0) {
+            const data = mapWorkingShifts(res.data, newCache)
+            setListWorkSchedule(data)
+          }
+
         }
       } else if (res.code === -10) {
         toast({
@@ -102,7 +103,7 @@ export default function PageWorkSchedule() {
         variant: 'destructive',
       })
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
@@ -110,14 +111,13 @@ export default function PageWorkSchedule() {
     data: IWorkSchedule[],
     cache: Map<string, { id: string; name: string }>
   ) => {
-    console.log("🚀 ~ PageWorkSchedule ~ cache:", cache)
     const tempResult: any = {}
     data.forEach((item: IWorkSchedule & { listEmployeeId?: string[]; label?: { lb_name: string; lb_color: string } }) => {
-      console.log("🚀 ~ data.forEach ~ item:", item)
       const date = format(new Date(item.ws_date), 'dd/MM/yyyy')
       if (!tempResult[date]) {
         tempResult[date] = { ws_id: item.ws_id, workingShifts: [] }
       }
+
       if (typeof item.workingShift === 'object') {
         const shift: IWorkingShift & { employeeData: { id: string; name: string }[]; label: { lb_name: string; lb_color: string } } = {
           wks_id: item.workingShift.wks_id,
@@ -127,7 +127,7 @@ export default function PageWorkSchedule() {
           wks_end_time: item.workingShift.wks_end_time,
           employeeData: (item.listEmployeeId || []).map((id) => ({
             id,
-            name: cache.get(id)?.name || 'Unknown',
+            name: cache.get(id)?.name || '',
           })),
           label: item.label || { lb_name: 'N/A', lb_color: '#e5e7eb' },
         }
@@ -139,6 +139,7 @@ export default function PageWorkSchedule() {
       date,
       workingShift: tempResult[date].workingShifts,
       ws_id: tempResult[date].ws_id,
+      ws_status: tempResult[date].ws_status,
     }))
 
     result.sort((a, b) => new Date(a.date.split('/').reverse().join('-')).getTime() - new Date(b.date.split('/').reverse().join('-')).getTime())
@@ -146,7 +147,7 @@ export default function PageWorkSchedule() {
   }
 
   const findListEmployee = async () => {
-    setIsLoading(true)
+    setLoading(true)
     try {
       const res: IBackendRes<IEmployee[]> = await getAllEmployee()
       if (res.statusCode === 200 && res.data) {
@@ -178,7 +179,7 @@ export default function PageWorkSchedule() {
       })
     }
     finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
@@ -191,7 +192,7 @@ export default function PageWorkSchedule() {
   }, [startDate, endDate, listEmployee])
 
   const handleDeleteWorkSchedule = async (id: string) => {
-    setIsLoading(true)
+    setLoading(true)
     try {
       const res: IBackendRes<IWorkSchedule> = await deleteWorkSchedule(id)
       if (res.statusCode === 201 || res.statusCode === 200) {
@@ -230,10 +231,54 @@ export default function PageWorkSchedule() {
         variant: 'destructive',
       })
     } finally {
-      setIsLoading(false)
+      setLoading(false)
       setIsDeleteDialogOpen(false)
       setDeleteScheduleId(null)
       setDeleteScheduleDate(null)
+    }
+  }
+
+  const handleUpdateStatus = async (id: string, status: string) => {
+    setLoading(true)
+    try {
+      const res: IBackendRes<IWorkSchedule> = await updateStatusWorkSchedule(id, status)
+      if (res.statusCode === 201 || res.statusCode === 200) {
+        toast({
+          title: 'Thông báo',
+          description: 'Cập nhật trạng thái lịch làm việc thành công',
+          variant: 'default',
+        })
+        getListWorkScheduleByDate()
+      } else if (res.code === -10) {
+        toast({
+          title: 'Thông báo',
+          description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+          variant: 'destructive',
+        })
+        await deleteCookiesAndRedirect()
+      } else if (res.code === -11) {
+        toast({
+          title: 'Thông báo',
+          description:
+            'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+          variant: 'destructive',
+        })
+      } else {
+        toast({
+          title: 'Thông báo',
+          description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+          variant: 'destructive',
+        })
+      }
+    } catch (e) {
+      console.error(e)
+      toast({
+        title: 'Lỗi',
+        description: 'Không thể cập nhật trạng thái lịch làm việc, vui lòng thử lại sau',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -241,6 +286,12 @@ export default function PageWorkSchedule() {
     setDeleteScheduleId(id)
     setDeleteScheduleDate(date)
     setIsDeleteDialogOpen(true)
+  }
+
+  const openUpdateStatusDialog = (id: string, status: string) => {
+    setDeleteScheduleId(id)
+    setDeleteScheduleDate(status)
+    setIsUpdateStatusDialogOpen(true)
   }
 
   return (
@@ -306,161 +357,179 @@ export default function PageWorkSchedule() {
       <Card className="w-full backdrop-blur-sm shadow-lg rounded-xl overflow-hidden">
         <CardContent className="p-0">
           <ScrollArea className="w-full" style={{ height: 'calc(100vh - 160px)' }}>
-            {isLoading ? (
-              <div className="flex justify-center items-center h-full">
-                <motion.div
-                  className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 1 }}
-                />
-              </div>
-            ) : (
-              <div className="flex gap-4 p-6">
-                <AnimatePresence>
-                  {listWorkSchedule.map((item: IWorkScheduleMapping, index: number) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                    >
-                      <Card className="w-80 bg-gradient-to-b to-gray-50 shadow-md hover:shadow-lg transition-shadow">
-                        <CardContent className="p-4">
-                          <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-bold text-lg">{item.date}</h3>
-                          </div>
-                          <ScrollArea className="h-[400px] pr-4">
-                            <div
-                              // href={`/dashboard/work-schedules/${item.ws_id}`}
-                              className={cn(
-                                'flex flex-col gap-2',
-                                inforEmployee._id ? 'pointer-events-none' : 'pointer-events-auto'
-                              )}
-                            // onClick={(e) => {
-                            //   if (inforEmployee._id) {
-                            //     e.preventDefault()
-                            //     toast({
-                            //       title: 'Thông báo',
-                            //       description: 'Bạn không có quyền truy cập vào trang này',
-                            //       variant: 'destructive',
-                            //     })
-                            //   }
-                            // }}
-                            >
-                              <div className="space-y-3">
-                                {item.workingShift.length > 0 ? (
-                                  item.workingShift.map((shift, shiftIndex: number) => (
-                                    <Card
-                                      key={shiftIndex}
-                                      className="p-3 transition-colors"
-                                      data-tooltip-id={`shift-tooltip-${shiftIndex}-${index}`}
-                                      data-tooltip-content={shift.wks_description || 'Không có ghi chú'}
-                                    >
-                                      <div className="flex justify-between items-center w-full">
-                                        <div className="w-full">
-                                          <div className="flex justify-between w-full">
-                                            <p className="font-semibold">{shift.wks_name}</p>
-                                            <DropdownMenu>
-                                              <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="sm">
-                                                  <MoreVertical size={16} className="cursor-pointer hover:text-gray-700" />
-                                                </Button>
-                                              </DropdownMenuTrigger>
-                                              <DropdownMenuContent>
-                                                <DropdownMenuItem asChild>
-                                                  <Link href={`/dashboard/work-schedules/${item.ws_id}`}>
-                                                    Chỉnh sửa
-                                                  </Link>
-                                                </DropdownMenuItem>
-                                                <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                                                  <DialogTrigger asChild>
-                                                    <DropdownMenuItem
-                                                      onSelect={(e) => e.preventDefault()}
-                                                      onClick={() => openDeleteDialog(item.ws_id, item.date)}
+            <div className="flex gap-4 p-6">
+              <AnimatePresence>
+                {listWorkSchedule.map((item: IWorkScheduleMapping, index: number) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                  >
+                    <Card className="w-80 bg-gradient-to-b to-gray-50 shadow-md hover:shadow-lg transition-shadow">
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="font-bold text-lg">{item.date}</h3>
+                        </div>
+                        <ScrollArea className="h-[400px]">
+                          <div
+                            className={cn(
+                              'flex flex-col gap-2',
+                              inforEmployee._id ? 'pointer-events-none' : 'pointer-events-auto'
+                            )}
+                          >
+                            <div className="space-y-3">
+                              {item.workingShift.length > 0 ? (
+                                item.workingShift.map((shift, shiftIndex: number) => (
+                                  <Card
+                                    key={shiftIndex}
+                                    className="p-3 transition-colors"
+                                  >
+                                    <div className="flex justify-between items-center w-full">
+                                      <div className="w-full">
+                                        <div className="flex justify-between w-full">
+                                          <div><span className='font-semibold'>{shift.wks_name}</span>: <span className='text-sm'>({item.ws_status === 'T' ? 'Đã kích hoạt' : 'Ngưng kích hoạt'})</span></div>
+                                          <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                              <Button variant="ghost" size="sm">
+                                                <MoreVertical size={16} className="cursor-pointer hover:text-gray-700" />
+                                              </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                              <DropdownMenuItem asChild>
+                                                <Link href={`/dashboard/work-schedules/${item.ws_id}`}>
+                                                  Chỉnh sửa
+                                                </Link>
+                                              </DropdownMenuItem>
+                                              <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                                                <DialogTrigger asChild>
+                                                  <DropdownMenuItem
+                                                    onSelect={(e) => e.preventDefault()}
+                                                    onClick={() => openDeleteDialog(item.ws_id, item.date)}
+                                                  >
+                                                    Xóa
+                                                  </DropdownMenuItem>
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                  <DialogHeader>
+                                                    <DialogTitle>Xác nhận xóa</DialogTitle>
+                                                    <DialogDescription>
+                                                      Bạn có chắc chắn muốn xóa lịch làm việc ngày {deleteScheduleDate}? Hành động này không thể hoàn tác.
+                                                    </DialogDescription>
+                                                  </DialogHeader>
+                                                  <DialogFooter>
+                                                    <Button
+                                                      variant="outline"
+                                                      onClick={() => setIsDeleteDialogOpen(false)}
+                                                    >
+                                                      Hủy
+                                                    </Button>
+                                                    <Button
+                                                      variant="destructive"
+                                                      onClick={() => deleteScheduleId && handleDeleteWorkSchedule(deleteScheduleId)}
                                                     >
                                                       Xóa
-                                                    </DropdownMenuItem>
-                                                  </DialogTrigger>
-                                                  <DialogContent>
-                                                    <DialogHeader>
-                                                      <DialogTitle>Xác nhận xóa</DialogTitle>
-                                                      <DialogDescription>
-                                                        Bạn có chắc chắn muốn xóa lịch làm việc ngày {deleteScheduleDate}? Hành động này không thể hoàn tác.
-                                                      </DialogDescription>
-                                                    </DialogHeader>
-                                                    <DialogFooter>
-                                                      <Button
-                                                        variant="outline"
-                                                        onClick={() => setIsDeleteDialogOpen(false)}
-                                                      >
-                                                        Hủy
-                                                      </Button>
-                                                      <Button
-                                                        variant="destructive"
-                                                        onClick={() => deleteScheduleId && handleDeleteWorkSchedule(deleteScheduleId)}
-                                                        disabled={isLoading}
-                                                      >
-                                                        Xóa
-                                                      </Button>
-                                                    </DialogFooter>
-                                                  </DialogContent>
-                                                </Dialog>
-                                              </DropdownMenuContent>
-                                            </DropdownMenu>
-                                          </div>
-                                          <p className="text-sm">
-                                            {shift.wks_start_time} - {shift.wks_end_time}
-                                          </p>
-                                          {shift.employeeData.length > 0 ? (
-                                            <p className="text-sm text-gray-600">
-                                              NV:{' '}
-                                              {shift.employeeData.map((e) => (
-                                                <span
-                                                  key={e.id}
-                                                  className={cn(
-                                                    'font-medium',
-                                                    inforEmployee.epl_name === e.name ? 'text-blue-700 font-semibold' : ''
-                                                  )}
-                                                >
-                                                  {e.name},{' '}
-                                                </span>
-                                              ))}
-                                            </p>
-                                          ) : (
-                                            <p className="text-sm text-gray-600">NV: N/A</p>
-                                          )}
-                                          <span
-                                            className="text-sm font-medium px-1 py-1 rounded-full text-white"
-                                            style={{ backgroundColor: shift.label.lb_color }}
-                                          >
-                                            {shift.label.lb_name}
-                                          </span>
+                                                    </Button>
+                                                  </DialogFooter>
+                                                </DialogContent>
+                                              </Dialog>
+                                              {/* <DropdownMenuItem
+                                                onClick={() => openUpdateStatusDialog(item.ws_id, shift.wks_id)}
+                                                className="text-red-500"
+                                              >
+                                                {shift.wks_status === 'T' ? 'Ngưng kích hoạt' : 'Kích hoạt'}
+                                              </DropdownMenuItem> */}
+                                              <Dialog open={isUpdateStatusDialogOpen} onOpenChange={setIsUpdateStatusDialogOpen}>
+                                                <DialogTrigger asChild>
+                                                  <DropdownMenuItem
+                                                    onSelect={(e) => e.preventDefault()}
+                                                    onClick={() => openUpdateStatusDialog(item.ws_id, shift.wks_id)}
+                                                  >
+                                                    {shift.wks_status === 'T' ? 'Ngưng kích hoạt' : 'Kích hoạt'}
+                                                  </DropdownMenuItem>
+
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                  <DialogHeader>
+                                                    <DialogTitle>Xác nhận cập nhật trạng thái</DialogTitle>
+                                                    <DialogDescription>
+                                                      Bạn có chắc chắn muốn {item.ws_status === 'T' ? 'ngưng kích hoạt' : 'kích hoạt'} lịch làm việc ngày {deleteScheduleDate}? Hành động này không thể hoàn tác.
+                                                    </DialogDescription>
+                                                  </DialogHeader>
+                                                  <DialogFooter>
+                                                    <Button
+                                                      variant="outline"
+                                                      onClick={() => setIsUpdateStatusDialogOpen(false)}
+                                                    >
+                                                      Hủy
+                                                    </Button>
+                                                    <Button
+                                                      variant="destructive"
+                                                      onClick={() => deleteScheduleId && handleUpdateStatus(deleteScheduleId, item.ws_status === 'T' ? 'F' : 'T')}
+                                                    >
+                                                      Cập nhật
+                                                    </Button>
+                                                  </DialogFooter>
+                                                </DialogContent>
+                                              </Dialog>
+                                            </DropdownMenuContent>
+                                          </DropdownMenu>
+
                                         </div>
+                                        <p className="text-sm">
+                                          {shift.wks_start_time} - {shift.wks_end_time}
+                                        </p>
+                                        {shift.employeeData.length > 0 ? (
+                                          <p className="text-sm text-gray-600">
+                                            NV:{' '}
+                                            {shift.employeeData.map((e, indexe) => (
+                                              <span
+                                                key={e.id}
+                                                className={cn(
+                                                  'font-medium',
+                                                  inforEmployee.epl_name === e.name ? 'text-blue-700 font-semibold' : ''
+                                                )}
+                                              >
+                                                {e.name}
+                                                {indexe < shift.employeeData.length - 1 ? ', ' : ''}
+                                              </span>
+                                            ))}
+                                          </p>
+                                        ) : (
+                                          <p className="text-sm text-gray-600">NV: Chưa phân công</p>
+                                        )}
+                                        <span
+                                          className="text-sm font-medium px-1 py-1 rounded-full text-white"
+                                          style={{ backgroundColor: shift.label.lb_color }}
+                                        >
+                                          {shift.label.lb_name}
+                                        </span>
                                       </div>
-                                      <Tooltip
-                                        id={`shift-tooltip-${shiftIndex}-${index}`}
-                                        style={{
-                                          borderRadius: '8px',
-                                          padding: '8px',
-                                          maxWidth: '200px',
-                                        }}
-                                      />
-                                    </Card>
-                                  ))
-                                ) : (
-                                  <p className="text-gray-500 italic">Không có ca làm việc</p>
-                                )}
-                              </div>
+                                    </div>
+                                    <Tooltip
+                                      id={`shift-tooltip-${shiftIndex}-${index}`}
+                                      style={{
+                                        borderRadius: '8px',
+                                        padding: '8px',
+                                        maxWidth: '200px',
+                                      }}
+                                    />
+                                  </Card>
+                                ))
+                              ) : (
+                                <p className="text-gray-500 italic">Không có ca làm việc</p>
+                              )}
                             </div>
-                          </ScrollArea>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            )}
+                          </div>
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+            {/* )} */}
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </CardContent>

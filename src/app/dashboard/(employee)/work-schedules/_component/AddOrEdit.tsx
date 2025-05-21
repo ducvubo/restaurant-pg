@@ -55,6 +55,7 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
   >([])
   const [selectedEmployee, setSelectedEmployee] = useState<string[]>(inforWorkSchedule?.listEmployeeId || [])
   const [constListEmployee, setConstListEmployee] = useState<IEmployee[]>([])
+  console.log("🚀 ~ AddOrEdit ~ constListEmployee:", constListEmployee)
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -80,9 +81,19 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
     if (selectedDate) {
       const fetchEmployeeList = async () => {
         try {
-          const res: IBackendRes<string[]> = await getListEmployeeByDate(selectedDate)
+          const res: IBackendRes<string[]> = await getListEmployeeByDate(new Date(selectedDate))
           if (res.statusCode === 200 && res.data) {
-            const filteredEmployee = constListEmployee.filter((item) => !res.data?.includes(item._id))
+            let filteredEmployee
+            if (id !== 'add') {
+              const listEmployeeByWorkSchedule = inforWorkSchedule?.listEmployeeId || [];
+              const filteredData = res.data.filter(
+                (id: string) => !listEmployeeByWorkSchedule.includes(id)
+              );
+              filteredEmployee = constListEmployee.filter((item) => !filteredData?.includes(item._id))
+            } else {
+              filteredEmployee = constListEmployee.filter((item) => !res.data?.includes(item._id))
+            }
+
             const data = filteredEmployee.map((item: IEmployee) => ({
               value: item._id,
               label: item.epl_name
@@ -112,7 +123,7 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
       }
       fetchEmployeeList()
     }
-  }, [form.watch('ws_date')])
+  }, [form.watch('ws_date'), id, inforWorkSchedule, constListEmployee])
 
   useEffect(() => {
     findListLabel()

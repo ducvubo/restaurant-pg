@@ -89,3 +89,11 @@ export const getListEmployeeByDate = async (selectedDate: Date) => {
   })
   return res
 }
+
+export const updateStatusWorkSchedule = async (id: string, status: string) => {
+  const res: IBackendRes<IWorkSchedule> = await sendRequest({
+    url: `${URL_SERVER_EMPLOYEE}/work-schedule/update-status/${id}/${status}`,
+    method: 'PATCH',
+  })
+  return res
+}

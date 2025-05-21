@@ -298,6 +298,7 @@ export default function PageDashboard() {
             </PopoverContent>
           </Popover>
         </div>
+        <Button className='mt-6' variant={'outline'}>Xuất báo cáo</Button>
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -305,42 +306,42 @@ export default function PageDashboard() {
           {
             title: 'Doanh Thu Tại Bàn',
             value: formatCurrency(totalRevenueDish),
-            change: '+20%',
+            // change: '+20%',
             icon: Utensils,
             color: 'text-green-600',
           },
           {
             title: 'Doanh Thu Online',
             value: formatCurrency(totalRevenueFood),
-            change: '+18%',
+            // change: '+18%',
             icon: ShoppingCart,
             color: 'text-yellow-600',
           },
           {
             title: 'Doanh Thu Combo',
             value: formatCurrency(totalRevenueCombo),
-            change: '+15%',
+            // change: '+15%',
             icon: Pizza,
             color: 'text-red-600',
           },
           {
             title: 'Đặt Bàn',
             value: totalReservations.toString(),
-            change: '+12%',
+            // change: '+12%',
             icon: Table,
             color: 'text-teal-600',
           },
           {
             title: 'Tồn Kho',
             value: formatCurrency(totalStockValue),
-            change: 'Cập nhật',
+            // change: 'Cập nhật',
             icon: Package,
             color: '',
           },
           {
             title: 'Lượt Xem Blog',
             value: '2600',
-            change: '+25%',
+            // change: '+25%',
             icon: BookOpen,
             color: 'text-purple-600',
           },
