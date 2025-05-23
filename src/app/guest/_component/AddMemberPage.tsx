@@ -60,12 +60,12 @@ export default function AddMemberPage() {
   const url = `${process.env.NEXT_PUBLIC_URL_CLIENT}/guest/table/add-member?token=${token}`
 
   return (
-    <div>
-      <h1>Thêm thành viên</h1>
-      <QRCodeSVG value={url} />
-      <Link target='_blank' href={`/guest/table/add-member?token=${token}`} className='w-40 h-auto'>
-        {url}
+    <div className='flex flex-col items-center justify-center'>
+      <h1 className='mb-5'>Thêm thành viên</h1>
+      <Link target='_blank' href={`/guest/table/add-member?token=${token}`} className='w-auto h-auto'>
+        <QRCodeSVG value={url} className='w-80' />
       </Link>
+      <span className='mt-3'>Thành viên quét QR để gọi món </span>
     </div>
   )
 }

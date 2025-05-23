@@ -1,4 +1,3 @@
-// components/admin-panel/Navbar.tsx
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
@@ -47,29 +46,25 @@ export function Navbar({ title }: NavbarProps) {
   const [hasMore, setHasMore] = useState(true)
   const limit = 10
   const notificationContainerRef = useRef<HTMLDivElement>(null)
-
-  // Fetch initial notifications and counts
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        // Fetch notification count
-        const countRes = await getCountNotification()
-        if (countRes.data && countRes.statusCode === 200) {
-          dispatch(
-            updateNotificationCounts({
-              totalNoti: countRes.data.totalNoti,
-              unreadNoti: countRes.data.unreadNoti,
-            })
-          )
-        }
-
-        // Fetch first page of notifications
-        await loadMoreNotifications()
-      } catch (error) {
-        console.error('Lỗi khi tải thông báo ban đầu:', error)
+  const fetchInitialData = async () => {
+    try {
+      const countRes = await getCountNotification()
+      if (countRes.data && countRes.statusCode === 200) {
+        dispatch(
+          updateNotificationCounts({
+            totalNoti: countRes.data.totalNoti,
+            unreadNoti: countRes.data.unreadNoti,
+          })
+        )
       }
-    }
 
+      // Fetch first page of notifications
+      await loadMoreNotifications()
+    } catch (error) {
+      console.error('Lỗi khi tải thông báo ban đầu:', error)
+    }
+  }
+  useEffect(() => {
     fetchInitialData()
   }, [dispatch])
 
@@ -115,7 +110,6 @@ export function Navbar({ title }: NavbarProps) {
 
       const { scrollTop, scrollHeight, clientHeight } = notificationContainerRef.current
       const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100
-      console.log('Scroll debug:', { scrollTop, clientHeight, scrollHeight, isNearBottom })
 
       if (isNearBottom) {
         loadMoreNotifications()
@@ -134,16 +128,17 @@ export function Navbar({ title }: NavbarProps) {
     readOneNotification(noti_id)
       .then((res) => {
         if (res.statusCode === 200) {
-          getCountNotification().then((countRes) => {
-            if (countRes.data && countRes.statusCode === 200) {
-              dispatch(
-                updateNotificationCounts({
-                  totalNoti: countRes.data.totalNoti,
-                  unreadNoti: countRes.data.unreadNoti,
-                })
-              )
-            }
-          })
+          // getCountNotification().then((countRes) => {
+          //   if (countRes.data && countRes.statusCode === 200) {
+          //     dispatch(
+          //       updateNotificationCounts({
+          //         totalNoti: countRes.data.totalNoti,
+          //         unreadNoti: countRes.data.unreadNoti,
+          //       })
+          //     )
+          //   }
+          // })
+          fetchInitialData() // Tải lại thông báo sau khi đánh dấu đã đọc
         }
       })
       .catch((error) => {
@@ -156,16 +151,17 @@ export function Navbar({ title }: NavbarProps) {
     readAllNotification()
       .then((res) => {
         if (res.statusCode === 200) {
-          getCountNotification().then((countRes) => {
-            if (countRes.data && countRes.statusCode === 200) {
-              dispatch(
-                updateNotificationCounts({
-                  totalNoti: countRes.data.totalNoti,
-                  unreadNoti: countRes.data.unreadNoti,
-                })
-              )
-            }
-          })
+          // getCountNotification().then((countRes) => {
+          //   if (countRes.data && countRes.statusCode === 200) {
+          //     dispatch(
+          //       updateNotificationCounts({
+          //         totalNoti: countRes.data.totalNoti,
+          //         unreadNoti: countRes.data.unreadNoti,
+          //       })
+          //     )
+          //   }
+          // })
+          fetchInitialData() // Tải lại thông báo sau khi đánh dấu tất cả đã đọc
         }
       })
       .catch((error) => {

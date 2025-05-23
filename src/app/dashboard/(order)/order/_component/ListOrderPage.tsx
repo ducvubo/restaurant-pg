@@ -106,6 +106,10 @@ export default function ListOrderPage() {
       newDate.setMinutes(59) // Đặt phút là 59
       newDate.setSeconds(0) // Đặt giây là 0
       setFromDate(newDate)
+      //gán lên url
+      const url = new URL(window.location.href)
+      url.searchParams.set('fromDate', newDate.toISOString())
+      window.history.pushState({}, '', url)
     }
   }
 
@@ -116,6 +120,10 @@ export default function ListOrderPage() {
       newDate.setMinutes(0)
       newDate.setSeconds(0)
       setToDate(newDate)
+      //gán lên url
+      const url = new URL(window.location.href)
+      url.searchParams.set('toDate', newDate.toISOString())
+      window.history.pushState({}, '', url)
     }
   }
 
@@ -131,7 +139,6 @@ export default function ListOrderPage() {
       od_dish_smr_status: status
     })
     if (res.statusCode === 200 && res.data && res.data.result) {
-      console.log('🚀 ~ findListOrder ~ res.data:', res.data)
       // setLoading(false)
       setcountStatus(res.data?.meta.statusCount)
       setlistOrder(res.data.result)
@@ -186,6 +193,27 @@ export default function ListOrderPage() {
       debouncedFindListOrder.cancel()
     }
   }, [searchParam])
+
+  // Lấy giá trị từ URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const fromDateParam = urlParams.get('fromDate')
+    const toDateParam = urlParams.get('toDate')
+
+    if (fromDateParam) {
+      const parsedFromDate = new Date(fromDateParam)
+      if (!isNaN(parsedFromDate.getTime())) {
+        setFromDate(parsedFromDate)
+      }
+    }
+
+    if (toDateParam) {
+      const parsedToDate = new Date(toDateParam)
+      if (!isNaN(parsedToDate.getTime())) {
+        setToDate(parsedToDate)
+      }
+    }
+  }, [])
 
   const handleUpdateStatus = async ({
     _id,
@@ -344,7 +372,7 @@ export default function ListOrderPage() {
           <Input placeholder='Tên khách' className='w-32' onChange={(e) => setNameGuest(e.target.value)} />
           <Input placeholder='Tên bàn' className='w-32' onChange={(e) => setTableName(e.target.value)} />
 
-          <Select onValueChange={(value: any) => setStatus(value)}>
+          <Select onValueChange={(value: any) => setStatus(value)} >
             <SelectTrigger className='w-[153px]'>
               <SelectValue placeholder='Trạng thái' />
             </SelectTrigger>
@@ -382,6 +410,12 @@ export default function ListOrderPage() {
 
         <div className='flex flex-col gap-3 mt-2 mb-2'>
           {listOrder?.map((order_summary: IOrderRestaurant, index1) => {
+            // chuyển item or_dish có  od_dish_status = 'guest_cancel' xuống cuối
+            const guestCancel = order_summary.or_dish.filter((item) => item.od_dish_status === 'guest_cancel')
+            order_summary.or_dish = order_summary.or_dish.filter((item) => item.od_dish_status !== 'guest_cancel')
+            order_summary.or_dish = [...order_summary.or_dish, ...guestCancel]
+
+            // order_summary.or_dish.sort((a, b) => 
             return (
               <Card className='w-full' key={index1}>
                 <CardHeader>
@@ -469,7 +503,7 @@ export default function ListOrderPage() {
                                   })
                                 }
                               >
-                                <SelectTrigger className='w-[140px]'>
+                                <SelectTrigger className='w-[140px]' disabled={order_summary.od_dish_smr_status !== 'ordering'}>
                                   <SelectValue placeholder='Đang nấu' />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -483,29 +517,6 @@ export default function ListOrderPage() {
                                 </SelectContent>
                               </Select>
                             )}
-                            {/* <Select
-                              value={order_summary?.or_dish[0]?.od_dish_status}
-                              onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
-                                handleUpdateStatus({
-                                  _id: order_summary?.or_dish[0]?._id,
-                                  od_dish_status: value,
-                                  od_dish_summary_id: order_summary._id
-                                })
-                              }
-                            >
-                              <SelectTrigger className='w-[140px]'>
-                                <SelectValue placeholder='Đang nấu' />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectLabel>Chọn trạng thái</SelectLabel>
-                                  <SelectItem value='pending'>Chờ xử lý</SelectItem>
-                                  <SelectItem value='processing'>Đang nấu</SelectItem>
-                                  <SelectItem value='delivered'>Đã phục vụ</SelectItem>
-                                  <SelectItem value='refuse'>Từ chối</SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select> */}
                           </div>
 
                           <div className='flex flex-col'>
@@ -571,7 +582,7 @@ export default function ListOrderPage() {
                                       })
                                     }
                                   >
-                                    <SelectTrigger className='w-[140px]'>
+                                    <SelectTrigger className='w-[140px]' disabled={order_summary.od_dish_smr_status !== 'ordering'}>
                                       <SelectValue placeholder='Đang nấu' />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -585,30 +596,6 @@ export default function ListOrderPage() {
                                     </SelectContent>
                                   </Select>
                                 )}
-
-                                {/* <Select
-                                  value={order_dish_item.od_dish_status}
-                                  onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
-                                    handleUpdateStatus({
-                                      _id: order_dish_item._id,
-                                      od_dish_status: value,
-                                      od_dish_summary_id: order_summary._id
-                                    })
-                                  }
-                                >
-                                  <SelectTrigger className='w-[140px]'>
-                                    <SelectValue placeholder='Đang nấu' />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectGroup>
-                                      <SelectLabel>Chọn trạng thái</SelectLabel>
-                                      <SelectItem value='pending'>Chờ xử lý</SelectItem>
-                                      <SelectItem value='processing'>Đang nấu</SelectItem>
-                                      <SelectItem value='delivered'>Đã phục vụ</SelectItem>
-                                      <SelectItem value='refuse'>Từ chối</SelectItem>
-                                    </SelectGroup>
-                                  </SelectContent>
-                                </Select> */}
                               </div>
                               <div className='flex flex-col'>
                                 <span>{formatDateMongo(order_dish_item.createdAt)}</span>

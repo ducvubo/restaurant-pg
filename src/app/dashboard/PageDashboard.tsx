@@ -229,14 +229,6 @@ export default function PageDashboard() {
   };
 
 
-  // if (loading) {
-  //   return (
-  //     <div className="flex items-center justify-center min-h-screen">
-  //       <p className="text-base ">Đang tải...</p>
-  //     </div>
-  //   );
-  // }
-
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -246,7 +238,7 @@ export default function PageDashboard() {
   }
 
   return (
-    <div className="p-4 space-y-4 min-h-screen">
+    <div className="space-y-4 min-h-screen">
       <div className="flex flex-col sm:flex-row gap-4 mb-4">
         <div className="flex flex-col">
           <label className="text-sm font-medium mb-1">Từ ngày</label>

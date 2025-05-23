@@ -14,7 +14,6 @@ import {
 import Link from 'next/link'
 import { DataTableColumnHeader } from '@/components/ColumnHeader'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useLoading } from '@/context/LoadingContext'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { ITable } from '../table.interface'
@@ -30,6 +29,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import jsPDF from 'jspdf'
+import { RobotoMediumnormal } from '@/app/fonts/RobotoMediumnormal'
 export const columns: ColumnDef<ITable>[] = [
   {
     accessorKey: 'tbl_name',
@@ -106,13 +107,61 @@ export const columns: ColumnDef<ITable>[] = [
           })
         }
       }
+
+      const handleDownloadPDF = () => {
+        const qrCodeElement = document.getElementById(`qr-code-${table._id}`);
+        const svgElement = qrCodeElement?.querySelector('svg');
+
+        if (svgElement) {
+          const svgData = new XMLSerializer().serializeToString(svgElement);
+          const img = new Image();
+          img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
+
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx?.drawImage(img, 0, 0);
+
+            const imgData = canvas.toDataURL('image/png');
+            console.log('imgData', imgData);
+
+            const doc = new jsPDF();
+
+            // Thêm font
+            doc.addFileToVFS("Roboto-Medium.ttf", RobotoMediumnormal);
+            doc.addFont("Roboto-Medium.ttf", "Roboto-Medium", "normal");
+            doc.setFont("Roboto-Medium", "normal");
+            doc.setFontSize(25);
+            doc.addImage('/images/logo.png', 'PNG', 30, 10, 50, 25);
+            doc.text(`Quét QR để gọi món`, 90, 25);
+            doc.addImage(imgData, 'PNG', 55, 40, 100, 100);
+            doc.setFontSize(12);
+            doc.text("Địa chỉ: Số nhà 16, Thị Trấn Đồi Ngô, Lục Nam, Bắc Giang", 40, 157);
+            doc.text("SĐT: 0392344455", 40, 164);
+            doc.text("Email: vminhduc8@gmail.com", 40, 171);
+            doc.setFontSize(14);
+            doc.text("Chúc quý khách ngon miệng", 40, 178);
+            doc.setFontSize(10);
+            doc.text("Nếu có bất kỳ vấn đề hay chưa hài lòng nào, xin vui lòng liên hệ ngay với chúng tôi để được hỗ trợ.", 40, 185);
+            doc.save(`table-qr.pdf`);
+          };
+        } else {
+          alert("Không tìm thấy SVG QR code!");
+        }
+      };
+
       return (
-        <div className='w-40'>
-          <QRCodeSVG value={url} />
+        <div className='w-40' id={`qr-code-${table._id}`}>
+
           <Link target='_blank' href={`/guest/table/${table.tbl_restaurant_id}?token=${table.tbl_token}`}>
-            <span className='inline-block break-all whitespace-normal break-words max-w-full'>{url}</span>
+            <QRCodeSVG value={url} />
           </Link>
-          <Button onClick={handleUpdateToken}>Đổi mã QR</Button>
+          <div className='flex gap-2 mt-2'>
+            <Button onClick={handleUpdateToken}>Đổi mã QR</Button>
+            <Button onClick={handleDownloadPDF}>Tải xuống</Button>
+          </div>
         </div>
       )
     },

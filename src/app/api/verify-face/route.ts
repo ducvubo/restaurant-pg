@@ -71,7 +71,6 @@ export const POST = async (req: Request) => {
     );
 
     const result = await response.json();
-    console.log("🚀 ~ POST ~ result:", result)
     return new Response(JSON.stringify(result), {
       status: result.statusCode || response.status,
     });

@@ -16,8 +16,12 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/redux/store'
 
 export function UserNav() {
+  const inforEmployee = useSelector((state: RootState) => state.inforEmployee)
+  const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant)
   const logOut = async () => {
     await deleteCookiesAndRedirect()
   }
@@ -30,8 +34,12 @@ export function UserNav() {
             <DropdownMenuTrigger asChild>
               <Button variant='outline' className='relative h-8 w-8 rounded-full'>
                 <Avatar className='h-8 w-8'>
-                  <AvatarImage src='#' alt='Avatar' />
-                  <AvatarFallback className='bg-transparent'>JD</AvatarFallback>
+                  <AvatarImage src={
+                    inforRestaurant.restaurant_email
+                      ? inforRestaurant.restaurant_banner.image_cloud
+                      : inforEmployee.epl_avatar?.image_cloud
+                  } alt='Avatar' />
+                  <AvatarFallback className='bg-transparent' >JD</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -43,8 +51,16 @@ export function UserNav() {
       <DropdownMenuContent className='w-56' align='end' forceMount>
         <DropdownMenuLabel className='font-normal'>
           <div className='flex flex-col space-y-1'>
-            <p className='text-sm font-medium leading-none'>John Doe</p>
-            <p className='text-xs leading-none text-muted-foreground'>johndoe@example.com</p>
+            <p className='text-sm font-medium leading-none'>{
+              inforRestaurant.restaurant_email
+                ? inforRestaurant.restaurant_name
+                : inforEmployee.epl_name
+            }</p>
+            <p className='text-xs leading-none text-muted-foreground'>{
+              inforRestaurant.restaurant_email
+                ? inforRestaurant.restaurant_email
+                : inforEmployee.epl_email
+            }</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -65,7 +81,7 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuItem className='hover:cursor-pointer' onClick={logOut}>
           <LogOut className='w-4 h-4 mr-3 text-muted-foreground' />
-          Sign out
+          Đăng xuất
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

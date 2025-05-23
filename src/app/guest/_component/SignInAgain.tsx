@@ -18,7 +18,7 @@ export default function SignInAgain() {
       setCookie()
     } else {
       setLoading(true)
-      router.push('/')
+      router.push('https://pato.taphoaictu.id.vn')
     }
     return () => {
       setLoading(false)

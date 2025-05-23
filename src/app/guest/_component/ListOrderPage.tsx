@@ -94,12 +94,12 @@ export default function ListOrderPage() {
   return (
     <div className='flex justify-center items-center'>
       <div className='border-none rounded-none'>
-        <CardHeader className='flex justify-center items-center'>
+        <CardHeader className='flex justify-center items-center !p-0 mb-2'>
           <CardTitle className='font-bold text-2xl'>
             <span className='mr-2'>🍕</span>Danh sách đơn hàng
           </CardTitle>
         </CardHeader>
-        <div className='flex flex-col justify-between gap-3'>
+        <div className='flex flex-col justify-between gap-3 m-3'>
           {orderSummary?.or_dish?.map((item: any, index) => (
             <div key={index} className='flex gap-4'>
               <Image

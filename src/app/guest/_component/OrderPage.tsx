@@ -70,7 +70,7 @@ export default function OrderPage() {
       setLoading(false)
       toast({
         title: 'Thành công',
-        description: 'Đặt hàng thành công',
+        description: 'Gọi món thành công',
         variant: 'default'
       })
       router.push('/guest/list-order')
@@ -112,9 +112,9 @@ export default function OrderPage() {
   return (
     <div className='flex justify-center items-center mx-1'>
       <div className='border-none rounded-none'>
-        <CardHeader className='flex justify-center items-center'>
+        <CardHeader className='flex justify-center items-center !p-0 mb-2'>
           <CardTitle className='font-bold text-2xl'>
-            <span className='mr-2'>🍕</span>Menu quán
+            <span className='mr-2'>🍕</span>Thực đơn
           </CardTitle>
         </CardHeader>
         <div className='flex flex-col justify-between gap-3'>

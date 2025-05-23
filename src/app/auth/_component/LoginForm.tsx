@@ -24,6 +24,7 @@ import { IEmployee } from '@/app/dashboard/(employee)/employees/employees.interf
 import { endAppEmployee, startAppEmployee } from '../InforEmployee.slice'
 import { Card, CardContent } from '@/components/ui/card'
 import { Loader2 } from 'lucide-react' // Thêm icon loading từ lucide-react
+import Image from 'next/image'
 
 const FormSchema = z.object({
   email: z
@@ -178,11 +179,14 @@ export function LoginForm() {
   }
 
   return (
-    <Card>
-      <CardContent>
-        <Form {...form}>
-          <div className='flex justify-center items-center min-h-screen'>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='w-full max-w-lg space-y-6'>
+    <div className="min-h-screen flex items-center justify-center bg-cover bg-center"
+      style={{ backgroundImage: "url('/images/logo-login.jpg')" }}>
+      <Card className='p-2 w-96'>
+        <CardContent>
+          <Image src={'/images/logo.png'} alt='logo' width={200} height={200} className='mx-auto mb-2' />
+          <h1 className='text-center font-bold text-2xl'>Hệ thống quản lý nhà hàng</h1>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='w-full'>
               <FormField
                 control={form.control}
                 name='email'
@@ -210,7 +214,7 @@ export function LoginForm() {
                 )}
               />
 
-              <RadioGroup value={type} onValueChange={(value: 'restaurant' | 'employee') => setType(value)}>
+              <RadioGroup className='py-3' value={type} onValueChange={(value: 'restaurant' | 'employee') => setType(value)}>
                 <div className='flex items-center space-x-2'>
                   <RadioGroupItem value='restaurant' id='r2' />
                   <Label htmlFor='r1'>Nhà hàng</Label>
@@ -221,7 +225,7 @@ export function LoginForm() {
                 </div>
               </RadioGroup>
 
-              <Button type='submit' className='btn-primary' disabled={isLoading}>
+              <Button type='submit' className='btn-primary w-full' disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader2 className='mr-2 h-4 w-4 animate-spin' />
@@ -232,9 +236,9 @@ export function LoginForm() {
                 )}
               </Button>
             </form>
-          </div>
-        </Form>
-      </CardContent>
-    </Card>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

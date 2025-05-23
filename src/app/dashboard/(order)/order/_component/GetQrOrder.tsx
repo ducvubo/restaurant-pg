@@ -96,8 +96,8 @@ export default function GetQrOrder({ order_summary }: Props) {
             className='-ml-28 mr-[110px] w-32'
             disabled={
               order_summary.od_dish_smr_status === 'paid' ||
-              order_summary.od_dish_smr_status === 'refuse' ||
-              order_summary.od_dish_smr_guest_id.guest_name === 'Nhân viên order'
+                order_summary.od_dish_smr_status === 'refuse' ||
+                order_summary.od_dish_smr_guest_id.guest_name === 'Nhân viên order'
                 ? true
                 : false
             }
@@ -110,12 +110,11 @@ export default function GetQrOrder({ order_summary }: Props) {
             <DialogTitle>Tạo Qr Order</DialogTitle>
             <DialogDescription>Quét mã qr để đăng nhập lại và tiếp tục order</DialogDescription>
           </DialogHeader>
-          <div className='flex flex-col justify-between gap-3'>
+          <div className='flex flex-col justify-center items-center gap-3'>
             {token && (
               <>
-                <QRCodeSVG value={url} />
                 <Link target='_blank' href={`/guest/sign-in-again/${token}`}>
-                  <span className='inline-block break-all whitespace-normal break-words max-w-full'>{url}</span>
+                  <QRCodeSVG value={url} />
                 </Link>
               </>
             )}

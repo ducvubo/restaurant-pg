@@ -88,23 +88,29 @@ export function MemberLogin() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-2/3 space-y-6'>
-        <FormField
-          control={form.control}
-          name='guest_name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tên</FormLabel>
-              <FormControl>
-                <Input placeholder='Tên....' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type='submit'>Submit</Button>
-      </form>
-    </Form>
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center"
+      style={{ backgroundImage: "url('/images/bg-guest.jpg')" }
+      }
+    >
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md space-y-6 bg-white/80 backdrop-blur-md p-4 rounded-xl shadow-xl mx-5">
+          <FormField
+            control={form.control}
+            name='guest_name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên</FormLabel>
+                <FormControl>
+                  <Input placeholder='Vui lòng nhập tên để vào bàn' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type='submit'>Vào bàn</Button>
+        </form>
+      </Form>
+    </div>
   )
 }
