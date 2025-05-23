@@ -141,6 +141,10 @@ export const columns: ColumnDef<ITicketGuestRestaurant>[] = [
     accessorKey: 'createdAt',
     id: 'Ngày tạo',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Ngày tạo' />,
+    cell: ({ row }) => {
+      const ticket = row.original
+      return <span>{ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString('vi-VN') : ''}</span>
+    },
     enableHiding: true
   },
   {

@@ -47,13 +47,20 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
     accessorKey: 'eqp_mtn_date_fixed',
     id: 'Ngày sửa chữa',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Ngày sửa chữa' />,
+    cell: ({ row }) => {
+      const equipmentMaintenance = row.original
+      return <span>{equipmentMaintenance.eqp_mtn_date_fixed ? new Date(equipmentMaintenance.eqp_mtn_date_fixed).toLocaleDateString('vi-VN') : ''}</span>
+    },
     enableHiding: true
   },
   {
     accessorKey: 'eqp_mtn_date_reported',
     id: 'Ngày hoàn thành',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Ngày hoàn thành' />,
-
+    cell: ({ row }) => {
+      const equipmentMaintenance = row.original
+      return <span>{equipmentMaintenance.eqp_mtn_date_reported ? new Date(equipmentMaintenance.eqp_mtn_date_reported).toLocaleDateString('vi-VN') : ''}</span>
+    },
     enableHiding: true
   },
   {
@@ -149,7 +156,7 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
           value={equipmentMaintenance.eqp_mtn_status}
           onValueChange={(value: 'pending' | ' in_progress' | ' done' | ' rejected') => handleUpdateStatus(value)}
         >
-          <SelectTrigger className='w-1/2' >
+          <SelectTrigger className='w-36' >
             <SelectValue placeholder='Trạng thái' />
           </SelectTrigger>
           <SelectContent>

@@ -42,6 +42,10 @@ export const columns: ColumnDef<IOperationalCosts>[] = [
     accessorKey: 'opera_cost_date',
     id: 'Ngày chi phí',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Ngày chi phí' />,
+    cell: ({ row }) => {
+      const OperationalCosts = row.original
+      return <span>{OperationalCosts.opera_cost_date ? new Date(OperationalCosts.opera_cost_date).toLocaleDateString('vi-VN') : ''}</span>
+    },
     enableHiding: true
   },
   {
@@ -113,7 +117,7 @@ export const columns: ColumnDef<IOperationalCosts>[] = [
           value={OperationalCosts.opera_cost_status}
           onValueChange={(value: 'pending' | 'paid' | 'canceled') => handleUpdateStatus(value)}
         >
-          <SelectTrigger className='w-1/2' >
+          <SelectTrigger className='w-36' >
             <SelectValue placeholder='Trạng thái' />
           </SelectTrigger>
           <SelectContent>
