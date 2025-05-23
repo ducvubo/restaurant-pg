@@ -145,7 +145,7 @@ export const columns: ColumnDef<ITable>[] = [
             doc.text("Chúc quý khách ngon miệng", 40, 178);
             doc.setFontSize(10);
             doc.text("Nếu có bất kỳ vấn đề hay chưa hài lòng nào, xin vui lòng liên hệ ngay với chúng tôi để được hỗ trợ.", 40, 185);
-            doc.save(`table-qr.pdf`);
+            doc.save(`qr-code-${table.tbl_name}.pdf`);
           };
         } else {
           alert("Không tìm thấy SVG QR code!");

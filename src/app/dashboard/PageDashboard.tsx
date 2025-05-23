@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { format, parse } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Loader2 } from 'lucide-react';
 import { vi } from 'date-fns/locale';
 import {
   Utensils,
@@ -54,6 +54,9 @@ import {
   getRecentStockTransactions,
   getOrderStatusDistributionFoodCombo,
 } from './dashboard.api';
+import { exportReportData } from './ExportReportData';
+import * as XLSX from 'xlsx';
+
 
 const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFCE56', '#36A2EB'];
 const blogPerformance = [
@@ -66,6 +69,7 @@ const formatCurrency = (value: number) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 
 export default function PageDashboard() {
+  const [loadingExport, setLoadingExport] = useState(false);
   const [totalReservations, setTotalReservations] = useState<number>(0);
   const [reservationTrends, setReservationTrends] = useState<
     { date: string; reservations: number }[]
@@ -228,6 +232,229 @@ export default function PageDashboard() {
     }
   };
 
+  const handleExportReport = async () => {
+    try {
+      setLoadingExport(true);
+      const data = await exportReportData();
+
+      // Prepare data for Excel
+      const workbook = XLSX.utils.book_new();
+
+      // Define common cell style
+      const cellStyle = {
+        font: { name: 'Times New Roman', sz: 13 },
+        alignment: { horizontal: 'left', vertical: 'center' },
+        border: {
+          top: { style: 'thin' },
+          bottom: { style: 'thin' },
+          left: { style: 'thin' },
+          right: { style: 'thin' },
+        },
+      };
+
+      // Define header cell style
+      const headerStyle = {
+        font: { name: 'Times New Roman', sz: 13, bold: true },
+        alignment: { horizontal: 'center', vertical: 'center' },
+        fill: { fgColor: { rgb: 'D3D3D3' } }, // Light gray background for headers
+        border: {
+          top: { style: 'thin' },
+          bottom: { style: 'thin' },
+          left: { style: 'thin' },
+          right: { style: 'thin' },
+        },
+      };
+
+      // Helper function to apply styles to a sheet
+      const applyStylesToSheet = (sheet: any, colCount: number, rowCount: number) => {
+        for (let row = 0; row < rowCount; row++) {
+          for (let col = 0; col < colCount; col++) {
+            const cellRef = XLSX.utils.encode_cell({ r: row, c: col });
+            if (!sheet[cellRef]) sheet[cellRef] = {};
+            sheet[cellRef].s = row === 0 ? headerStyle : cellStyle;
+          }
+        }
+      };
+
+      // Sheet 1: Summary
+      const summaryData = [
+        ['Metric', 'Value'],
+        ['Doanh Thu Tại Bàn', formatCurrency(data.totalRevenue)],
+        ['Doanh Thu Online', formatCurrency(data.totalRevenueFood)],
+        ['Doanh Thu Combo', formatCurrency(data.totalRevenueCombo)],
+        ['Tổng Đặt Bàn', data.totalReservations],
+        ['Giá Trị Tồn Kho', formatCurrency(data.totalStockValue)],
+      ];
+      const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+      applyStylesToSheet(summarySheet, 2, summaryData.length);
+      XLSX.utils.book_append_sheet(workbook, summarySheet, 'Tổng quan');
+
+      // Sheet 2: Reservation Trends
+      const reservationTrendsData = [
+        ['Ngày', 'Số Bàn Đặt'],
+        ...data.reservationTrends.map((item: any) => [item.date, item.reservations]),
+      ];
+      const reservationSheet = XLSX.utils.aoa_to_sheet(reservationTrendsData);
+      applyStylesToSheet(reservationSheet, 2, reservationTrendsData.length);
+      XLSX.utils.book_append_sheet(workbook, reservationSheet, 'Xu Hướng Đặt Bàn');
+
+      // Sheet 3: Revenue Trends (Dish)
+      const revenueTrendsDishData = [
+        ['Ngày', 'Doanh Thu'],
+        ...data.revenueTrends.map((item: any) => [item.date, item.revenue]),
+      ];
+      const revenueDishSheet = XLSX.utils.aoa_to_sheet(revenueTrendsDishData);
+      applyStylesToSheet(revenueDishSheet, 2, revenueTrendsDishData.length);
+      XLSX.utils.book_append_sheet(workbook, revenueDishSheet, 'Doanh Thu Tại Bàn');
+
+      // Sheet 4: Revenue Trends (Food)
+      const revenueTrendsFoodData = [
+        ['Ngày', 'Doanh Thu'],
+        ...data.revenueTrendsFood.map((item: any) => [item.date, item.revenue]),
+      ];
+      const revenueFoodSheet = XLSX.utils.aoa_to_sheet(revenueTrendsFoodData);
+      applyStylesToSheet(revenueFoodSheet, 2, revenueTrendsFoodData.length);
+      XLSX.utils.book_append_sheet(workbook, revenueFoodSheet, 'Doanh Thu Online');
+
+      // Sheet 5: Revenue Trends (Combo)
+      const revenueTrendsComboData = [
+        ['Ngày', 'Doanh Thu'],
+        ...data.comboRevenueTrends.map((item: any) => [item.date, item.revenue]),
+      ];
+      const revenueComboSheet = XLSX.utils.aoa_to_sheet(revenueTrendsComboData);
+      applyStylesToSheet(revenueComboSheet, 2, revenueTrendsComboData.length);
+      XLSX.utils.book_append_sheet(workbook, revenueComboSheet, 'Doanh Thu Combo');
+
+      // Sheet 6: Recent Orders (Dish)
+      const recentOrdersDishData = [
+        ['ID', 'Khách Hàng', 'Tổng Tiền', 'Trạng Thái'],
+        ...data.recentOrders.map((item: any) => [
+          item.id,
+          item.customer,
+          item.total,
+          item.status,
+        ]),
+      ];
+      const ordersDishSheet = XLSX.utils.aoa_to_sheet(recentOrdersDishData);
+      applyStylesToSheet(ordersDishSheet, 4, recentOrdersDishData.length);
+      XLSX.utils.book_append_sheet(workbook, ordersDishSheet, 'Đơn Tại Bàn');
+
+      // Sheet 7: Recent Orders (Food)
+      const recentOrdersFoodData = [
+        ['ID', 'Khách Hàng', 'Tổng Tiền', 'Trạng Thái'],
+        ...data.recentOrdersFood.map((item: any) => [
+          item.id,
+          item.customer,
+          item.total,
+          item.status,
+        ]),
+      ];
+      const ordersFoodSheet = XLSX.utils.aoa_to_sheet(recentOrdersFoodData);
+      applyStylesToSheet(ordersFoodSheet, 4, recentOrdersFoodData.length);
+      XLSX.utils.book_append_sheet(workbook, ordersFoodSheet, 'Đơn Online');
+
+      // Sheet 8: Recent Orders (Combo)
+      const recentOrdersComboData = [
+        ['ID', 'Khách Hàng', 'Tổng Tiền', 'Trạng Thái'],
+        ...data.recentComboOrders.map((item: any) => [
+          item.id,
+          item.customer,
+          item.total,
+          item.status,
+        ]),
+      ];
+      const ordersComboSheet = XLSX.utils.aoa_to_sheet(recentOrdersComboData);
+      applyStylesToSheet(ordersComboSheet, 4, recentOrdersComboData.length);
+      XLSX.utils.book_append_sheet(workbook, ordersComboSheet, 'Đơn Combo');
+
+      // Sheet 9: Order Status Distribution (Food)
+      const orderStatusData = [
+        ['Trạng Thái', 'Số Lượng'],
+        ...data.orderStatusDistribution.map((item: any) => [item.type, item.value]),
+      ];
+      const statusSheet = XLSX.utils.aoa_to_sheet(orderStatusData);
+      applyStylesToSheet(statusSheet, 2, orderStatusData.length);
+      XLSX.utils.book_append_sheet(workbook, statusSheet, 'Trạng Thái Đơn Online');
+
+      // Sheet 10: Order Status Distribution (Combo)
+      const orderStatusComboData = [
+        ['Trạng Thái', 'Số Lượng'],
+        ...data.orderStatusDistributionCombo.map((item: any) => [item.type, item.value]),
+      ];
+      const statusComboSheet = XLSX.utils.aoa_to_sheet(orderStatusComboData);
+      applyStylesToSheet(statusComboSheet, 2, orderStatusComboData.length);
+      XLSX.utils.book_append_sheet(workbook, statusComboSheet, 'Trạng Thái Đơn Combo');
+
+      // Sheet 11: Low Stock Ingredients
+      const lowStockData = [
+        ['Nguyên Liệu', 'Số Lượng', 'Đơn Vị'],
+        ...data.lowStockIngredients.map((item: any) => [
+          item.igd_name,
+          item.stock,
+          item.unit,
+        ]),
+      ];
+      const lowStockSheet = XLSX.utils.aoa_to_sheet(lowStockData);
+      applyStylesToSheet(lowStockSheet, 3, lowStockData.length);
+      XLSX.utils.book_append_sheet(workbook, lowStockSheet, 'Nguyên Liệu Sắp Hết');
+
+      // Sheet 12: Recent Stock Transactions
+      const stockTransactionsData = [
+        ['ID', 'Mã', 'Nguyên Liệu', 'Số Lượng', 'Ngày', 'Loại'],
+        ...data.recentStockTransactions.map((item: any) => [
+          item.id,
+          item.code,
+          item.ingredient,
+          item.quantity,
+          item.date,
+          item.type === 'in' ? 'Nhập' : 'Xuất',
+        ]),
+      ];
+      const stockSheet = XLSX.utils.aoa_to_sheet(stockTransactionsData);
+      applyStylesToSheet(stockSheet, 6, stockTransactionsData.length);
+      XLSX.utils.book_append_sheet(workbook, stockSheet, 'Giao Dịch Kho');
+
+      // Auto-size columns for better readability
+      const sheets = [
+        summarySheet,
+        reservationSheet,
+        revenueDishSheet,
+        revenueFoodSheet,
+        revenueComboSheet,
+        ordersDishSheet,
+        ordersFoodSheet,
+        ordersComboSheet,
+        statusSheet,
+        statusComboSheet,
+        lowStockSheet,
+        stockSheet,
+      ];
+      sheets.forEach((sheet) => {
+        const colWidths = [];
+        for (let col = 0; col < 10; col++) {
+          let maxWidth = 10; // Minimum width
+          for (let row = 0; row < 100; row++) {
+            const cellRef = XLSX.utils.encode_cell({ r: row, c: col });
+            if (sheet[cellRef] && sheet[cellRef].v) {
+              const cellValue = sheet[cellRef].v.toString();
+              maxWidth = Math.max(maxWidth, cellValue.length * 1.2); // Estimate width
+            }
+          }
+          colWidths.push({ wch: maxWidth });
+        }
+        sheet['!cols'] = colWidths;
+      });
+
+      // Generate and download the Excel file
+      const fileName = `BaoCao_5Thang_${format(new Date(), 'yyyyMMdd')}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+    } catch (error: any) {
+      setError(error.message || 'Lỗi khi xuất báo cáo');
+    } finally {
+      setLoadingExport(false);
+    }
+  };
+
 
   if (error) {
     return (
@@ -290,7 +517,17 @@ export default function PageDashboard() {
             </PopoverContent>
           </Popover>
         </div>
-        <Button className='mt-6' variant={'outline'}>Xuất báo cáo</Button>
+        <Button className='mt-6' variant={'outline'} onClick={handleExportReport} disabled={loadingExport}>
+          {loadingExport ? (
+            <>
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              Đang xuất báo cáo...
+            </>
+          ) : (
+            'Xuất báo cáo'
+          )}
+
+        </Button>
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
