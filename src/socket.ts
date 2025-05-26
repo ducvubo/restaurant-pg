@@ -8,6 +8,9 @@ export const connectSocket = (token: string, type: string, refresh_token = '') =
   }
 
   socket = io(process.env.NEXT_PUBLIC_URLAPI_ENDPOINT, {
+    path: '/socket.io', // Đảm bảo khớp với đường dẫn trong Nginx
+    transports: ['websocket'], // Buộc sử dụng WebSocket để tránh polling
+    withCredentials: true,
     auth: {
       authorization: 'Bearer ' + token,
       refresh_token: 'Bearer ' + refresh_token,
