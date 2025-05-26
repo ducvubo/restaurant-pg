@@ -40,7 +40,9 @@ export default function RefreshTokenPage() {
         socket.on('add_member', addMember)
         socket.on('order_dish_new_guest', (data: null) => {
           const currentPath = window.location.pathname
-          router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
+          if (currentPath.startsWith('/guest/list-order')) {
+            router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
+          }
           toast({
             title: 'Thông báo',
             description: 'Bàn của bạn vừa được gọi món mới',
