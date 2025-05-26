@@ -1,7 +1,7 @@
 export interface IEmployee {
   _id: string
   restaurant_id: string
-  epl_avatar?: {
+  epl_avatar: {
     image_cloud: string
     image_custom: string
   }

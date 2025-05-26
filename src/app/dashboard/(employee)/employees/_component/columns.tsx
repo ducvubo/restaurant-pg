@@ -21,21 +21,43 @@ import { useLoading } from '@/context/LoadingContext'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
 // import RegisterFace from './RegisterFace'
 const RegisterFace = dynamic(() => import('./RegisterFace'), {
   ssr: false,
 })
 export const columns: ColumnDef<IEmployee>[] = [
   {
-    accessorKey: 'epl_email',
-    id: 'Email',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Email' />,
-    enableHiding: true
-  },
-  {
     accessorKey: 'epl_name',
     id: 'Tên',
     header: () => <div>Tên</div>,
+    enableHiding: true
+  },
+  //avatar
+  {
+    accessorKey: 'epl_avatar',
+    id: 'Avatar',
+    header: () => <div>Avatar</div>,
+    cell: ({ row }) => {
+      const employee = row.original
+      return (
+        <div className='flex items-center space-x-2'>
+          <Image
+            src={employee.epl_avatar?.image_cloud}
+            alt={employee.epl_name}
+            width={40}
+            height={40}
+            className='h-10 w-10 rounded-full object-cover'
+          />
+        </div>
+      )
+    },
+    enableHiding: true
+  },
+  {
+    accessorKey: 'epl_email',
+    id: 'Email',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Email' />,
     enableHiding: true
   },
   {

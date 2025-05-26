@@ -51,7 +51,7 @@ export const columns: ColumnDef<IRoom>[] = [
   },
   {
     accessorKey: 'room_fix_ame',
-    id: 'Tên',
+    id: 'Tiện ích có sẵn',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Tiện ích có sẵn' />,
     enableHiding: true
   },

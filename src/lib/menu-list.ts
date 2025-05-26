@@ -94,6 +94,11 @@ export function getMenuListRestaurant(pathname: string): Group[] {
               active: pathname === '/dashboard/connect',
               href: '/dashboard/connect',
               label: 'Tin nhắn khách hàng'
+            },
+            {
+              active: pathname === '/dashboard/chat-bot',
+              href: '/dashboard/chat-bot',
+              label: 'Chat bot khách hàng'
             }
           ]
         },
