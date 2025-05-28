@@ -121,6 +121,11 @@ export default function AddOrEdit({ id, inforDish }: Props) {
     }
   }, [dishPrice, saleType, saleValue])
 
+  useEffect(() => {
+    form.setValue('dish_sale.sale_type', 'fixed')
+    form.setValue('dish_sale.sale_value', 0)
+  }, [isSaleEnabled])
+
   const uploadImage = async (formData: FormData, type: string) => {
     setLoading_upload_image(true)
     try {

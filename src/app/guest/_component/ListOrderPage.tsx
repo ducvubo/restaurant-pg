@@ -2,7 +2,7 @@
 import { RootState } from '@/app/redux/store'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { cancelOrder, getListOrder } from '../guest.api'
+import { cancelOrder, getListOrder, GetRestaurantById } from '../guest.api'
 import { CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
 import { Label } from '@/components/ui/label'
@@ -13,6 +13,8 @@ import { useLoading } from '@/context/LoadingContext'
 import { deleteCookiesAndRedirect, deleteCookiesAndRedirectGuest } from '@/app/actions/action'
 import { toast } from '@/hooks/use-toast'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 
 export default function ListOrderPage() {
   const { setLoading } = useLoading()
@@ -20,7 +22,10 @@ export default function ListOrderPage() {
   const a = useSearchParams().get('a')
   const inforGuest = useSelector((state: RootState) => state.inforGuest)
   const [orderSummary, setOrderSummary] = useState<IOrderDishGuest>()
+  const [restaurant, setRestaurant] = useState<any>()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
+  console.log("🚀 ~ ListOrderPage ~ restaurant:", restaurant)
   const findListOrder = async () => {
     setLoading(true)
     const res: IBackendRes<IOrderDishGuest> = await getListOrder()
@@ -38,12 +43,20 @@ export default function ListOrderPage() {
     }
   }
 
+  const getInforRestaurant = async () => {
+    const res: IBackendRes<any> = await GetRestaurantById('677aac262fc0d1491a5ca032')
+    if (res.statusCode === 200 && res.data) {
+      setLoading(false)
+      setRestaurant(res.data)
+    }
+  }
+
   useEffect(() => {
     findListOrder()
+    getInforRestaurant()
   }, [a])
 
   function calculateOrderSummary(orderSummary1: any) {
-    console.log('🚀 ~ calculateOrderSummary ~ orderSummary1:', orderSummary1)
     let totalQuantity = 0
     let totalPrice = 0
 
@@ -155,13 +168,49 @@ export default function ListOrderPage() {
             {orderSummary?.od_dish_smr_status === 'refuse' &&
               'Đơn hàng của bạn bị từ chối order bạn không được order tiếp'}
             {orderSummary?.od_dish_smr_status === 'ordering' && (
-              <>
-                Đơn của bạn chưa thanh toán: {totalQuantity} món với giá:
-                <span className='italic font-bold'>{totalPrice?.toLocaleString()} đ</span>
-              </>
+              <div className='flex flex-col p-2'>
+                <div>
+                  Đơn của bạn chưa thanh toán: {totalQuantity} món với giá:
+                  <span className='italic font-bold'>{totalPrice?.toLocaleString()} đ</span>
+                </div>
+
+                <Button onClick={() => setIsDialogOpen(true)}>Thanh toán</Button>
+              </div>
             )}
           </span>
         </div>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="text-center">Xác nhận thanh toán</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center gap-4 py-4">
+              <Image
+                src={`https://qr.sepay.vn/img?acc=${restaurant?.restaurant_bank.account_number}&bank=${restaurant?.restaurant_bank.bank}&amount=${totalPrice}&des=ORDERDISH ${orderSummary?._id}`}
+                width={150}
+                height={150}
+                alt="QR Code Thanh toán"
+                className="object-contain"
+              />
+              <p className="text-center text-sm">
+                Bạn đang thanh toán cho đơn hàng gồm <span className="font-bold">{totalQuantity}</span> món với tổng giá trị{' '}
+                <span className="font-bold">{totalPrice?.toLocaleString()} đ</span>.
+                Vui lòng quét mã QR để hoàn tất thanh toán (Lưu ý: Không sửa nội dung giao dịch).
+              </p>
+              <p>
+                <p>Tên tài khoản: {restaurant?.restaurant_bank.account_name} </p>
+                <p>Số tài khoản: {restaurant?.restaurant_bank.account_number}</p>
+                <p> Nội dung giao dịch: <span className="font-bold">ORDERDISH {orderSummary?._id}</span></p>
+
+              </p>
+            </div>
+            <DialogFooter className="flex justify-center gap-4">
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                Hủy
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )

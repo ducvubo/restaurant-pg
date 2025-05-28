@@ -246,6 +246,111 @@ export default function AddOrEdit({ id, inforFoodCombo }: Props) {
     }
   }, [inforFoodCombo, id])
 
+
+  const getRandomInt = (min: number, max: number): number => {
+    return Math.floor(Math.random() * (max - min + 1)) + min
+  }
+
+  const sampleNames = [
+    'Combo cơm nhà ấm cúng',
+    'Combo đặc sản vùng cao',
+    'Combo đêm khuya no say',
+    'Combo món nước miền Tây',
+    'Combo truyền thống ba miền',
+    'Combo hải sản đại dương',
+    'Combo nướng thơm lừng',
+    'Combo chay ngày rằm',
+    'Combo trưa văn phòng nhanh gọn',
+    'Combo lẩu nấm thanh đạm',
+    'Combo ăn xế nhẹ nhàng',
+    'Combo cơm phần ngon lạ',
+    'Combo mì Ý chuẩn vị',
+    'Combo Nhật Bản tinh tế',
+    'Combo Hàn Quốc cay nồng',
+    'Combo Thái Lan đậm đà',
+    'Combo cho bé yêu',
+    'Combo nhẹ bụng không dầu mỡ',
+    'Combo ăn kiêng lành mạnh',
+    'Combo healthy giàu đạm',
+    'Combo salad xanh mát',
+    'Combo dimsum truyền thống',
+    'Combo ăn sáng đủ chất',
+    'Combo tối muộn tiện lợi',
+    'Combo đặc biệt sinh nhật',
+    'Combo lẩu chua cay',
+    'Combo xiên que đường phố',
+    'Combo ăn chơi cuối tuần',
+    'Combo cho cặp đôi',
+    'Combo buffet mini tại gia'
+  ]
+
+
+  const sampleNotes = [
+    'Combo cân bằng dưỡng chất cho cả ngày năng động.',
+    'Món ngon chuẩn vị quê hương, gợi nhớ bữa cơm nhà.',
+    'Thực đơn nhẹ nhàng phù hợp cho mọi lứa tuổi.',
+    'Phù hợp cho những ai yêu thích hải sản tươi sống.',
+    'Mỗi món là một trải nghiệm vị giác độc đáo.',
+    'Combo cho người bận rộn, tiết kiệm thời gian.',
+    'Đậm đà bản sắc ẩm thực Việt Nam.',
+    'Ngon miệng, đẹp mắt, dễ ăn cho trẻ nhỏ.',
+    'Combo được thiết kế riêng cho người tập gym.',
+    'Thích hợp cho ngày chay thanh tịnh.',
+    'Combo giúp giải nhiệt cơ thể ngày nắng nóng.',
+    'Nguyên liệu tự nhiên, tốt cho hệ tiêu hoá.',
+    'Dành riêng cho những tín đồ món Á.',
+    'Phù hợp với khẩu vị người miền Trung.',
+    'Vị cay đặc trưng, kích thích vị giác mạnh mẽ.',
+    'Bữa ăn lý tưởng cho ngày se lạnh.',
+    'Combo ngập tràn rau củ tươi ngon.',
+    'Thực đơn đa dạng, không gây ngán.',
+    'Được nhiều khách hàng yêu thích và tin chọn.',
+    'Dành cho tín đồ thích món lạ và mới mẻ.',
+    'Giá cả hợp lý, chất lượng vượt trội.',
+    'Thức ăn được chuẩn bị kỹ càng, an toàn vệ sinh.',
+    'Món ăn vừa miệng, không quá mặn hay nhạt.',
+    'Combo lý tưởng để thưởng thức cùng bạn bè.',
+    'Tăng cường năng lượng cho cả buổi chiều.',
+    'Lựa chọn hoàn hảo cho bữa tối nhẹ nhàng.',
+    'Combo “gọi là mê” với món tủ của quán.',
+    'Dành riêng cho người muốn ăn no mà không tăng cân.',
+    'Thực đơn giúp bổ sung vitamin tự nhiên.',
+    'Tuyệt vời khi dùng kèm với nước ép trái cây.'
+  ]
+
+
+  const imageDefault = {
+    image_cloud: '/api/view-image?file=z6421112010455_6b4f24e676211cf8fd442b7e472a343f.png&bucket=default',
+    image_custom: '/api/view-image?file=z6421112010455_6b4f24e676211cf8fd442b7e472a343f.png&bucket=default'
+  }
+
+  const createRandomCombo = (foods: IFood[], index: number) => {
+    const numberOfItems = getRandomInt(2, 5)
+    const shuffled = [...foods].sort(() => 0.5 - Math.random())
+    const selectedFoods = shuffled.slice(0, numberOfItems)
+
+    return {
+      fcb_name: sampleNames[index] || `Combo đặc biệt ${index + 1}`,
+      fcb_price: getRandomInt(50000, 300000),
+      fcb_note: sampleNotes[getRandomInt(0, sampleNotes.length - 1)],
+      fcb_sort: index + 1,
+      fcb_image: JSON.stringify(imageDefault),
+      image: imageDefault,
+      food_items: selectedFoods.map((food) => ({
+        food_id: food.food_id,
+        food_quantity: getRandomInt(1, 3)
+      }))
+    }
+  }
+
+  // Tạo danh sách 20 combo
+  const sampleCombos = Array.from({ length: 20 }, (_, index) =>
+    createRandomCombo(listFood, index)
+  )
+
+  console.log("sampleCombos", sampleCombos)
+
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setLoading(true)
 
@@ -281,55 +386,68 @@ export default function AddOrEdit({ id, inforFoodCombo }: Props) {
       food_items: data.food_items
     }
 
-    const res = id === 'add' ? await createFoodCombo(payload) : await updateFoodCombo({ ...payload, fcb_id: id })
-    if (res.statusCode === 201 || res.statusCode === 200) {
-      setLoading(false)
-      toast({
-        title: 'Thành công',
-        description: id === 'add' ? 'Thêm combo mới thành công' : 'Chỉnh sửa thông tin combo thành công',
-        variant: 'default'
-      })
-      router.push('/dashboard/food-combos')
-      router.refresh()
-    } else if (res.statusCode === 400) {
-      setLoading(false)
-      if (Array.isArray(res.message)) {
-        res.message.map((item: string) => {
+    for (const item of sampleCombos) {
+      const payload = {
+        fcb_name: item.fcb_name,
+        fcb_price: item.fcb_price,
+        fcb_image: JSON.stringify(item.image),
+        fcb_note: item.fcb_note,
+        fcb_sort: item.fcb_sort,
+        fcb_description: refContent.current.getContent(),
+        fcb_open_time: `${fcb_open_time.hour.toString()}:${fcb_open_time.minute.toString()}:00`,
+        fcb_close_time: `${fcb_close_time.hour.toString()}:${fcb_close_time.minute.toString()}:00`,
+        food_items: item.food_items
+      }
+      const res = id === 'add' ? await createFoodCombo(payload) : await updateFoodCombo({ ...payload, fcb_id: id })
+      if (res.statusCode === 201 || res.statusCode === 200) {
+        setLoading(false)
+        toast({
+          title: 'Thành công',
+          description: id === 'add' ? 'Thêm combo mới thành công' : 'Chỉnh sửa thông tin combo thành công',
+          variant: 'default'
+        })
+        // router.push('/dashboard/food-combos')
+        // router.refresh()
+      } else if (res.statusCode === 400) {
+        setLoading(false)
+        if (Array.isArray(res.message)) {
+          res.message.map((item: string) => {
+            toast({
+              title: 'Thất bại',
+              description: item,
+              variant: 'destructive'
+            })
+          })
+        } else {
           toast({
             title: 'Thất bại',
-            description: item,
+            description: res.message,
             variant: 'destructive'
           })
+        }
+      } else if (res.code === -10) {
+        setLoading(false)
+        toast({
+          title: 'Thông báo',
+          description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
+          variant: 'destructive'
+        })
+        await deleteCookiesAndRedirect()
+      } else if (res.code === -11) {
+        setLoading(false)
+        toast({
+          title: 'Thông báo',
+          description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+          variant: 'destructive'
         })
       } else {
+        setLoading(false)
         toast({
-          title: 'Thất bại',
-          description: res.message,
+          title: 'Thông báo',
+          description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
           variant: 'destructive'
         })
       }
-    } else if (res.code === -10) {
-      setLoading(false)
-      toast({
-        title: 'Thông báo',
-        description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
-        variant: 'destructive'
-      })
-      await deleteCookiesAndRedirect()
-    } else if (res.code === -11) {
-      setLoading(false)
-      toast({
-        title: 'Thông báo',
-        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
-        variant: 'destructive'
-      })
-    } else {
-      setLoading(false)
-      toast({
-        title: 'Thông báo',
-        description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
-        variant: 'destructive'
-      })
     }
   }
 

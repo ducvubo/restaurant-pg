@@ -4,6 +4,7 @@ import { sendRequest } from '@/lib/api'
 import { cookies } from 'next/headers'
 import { IGuest, IOrderDishGuest } from './guest.interface'
 import { IDish } from '../dashboard/(food)/dishes/dishes.interface'
+import { IRestaurant } from '../auth/auth.interface'
 
 export const loginGuest = async (payload: {
   guest_name: string
@@ -267,4 +268,15 @@ export const setCookieRefreshTokenGuest = async (refreshToken: string) => {
   })
 
   return
+}
+
+export const GetRestaurantById = async (id: string) => {
+  const res: IBackendRes<IRestaurant> = await sendRequest({
+    url: `${process.env.URL_SERVER}/restaurants/get-restaurant-by-id/${id}`,
+    method: 'GET',
+    nextOption: {
+      cache: 'no-store'
+    }
+  })
+  return res
 }

@@ -38,7 +38,7 @@ async function Component({ searchParams }: PageProps) {
 
   return (
     <div>
-      <ContentLayout title='Danh sách đề xuất nội bộ'>
+      <ContentLayout title='Danh sách tài liệu vận hành'>
         <PageOperationManual data={data} columns={columns} meta={res.data.meta} />
       </ContentLayout>
     </div>

@@ -43,6 +43,7 @@ export default function RefreshTokenPage() {
           if (currentPath.startsWith('/guest/list-order')) {
             router.push(`${currentPath}?a=${Math.floor(Math.random() * 100000) + 1}`)
           }
+
           toast({
             title: 'Thông báo',
             description: 'Bàn của bạn vừa được gọi món mới',
@@ -115,6 +116,7 @@ export default function RefreshTokenPage() {
     // Hàm làm mới token và kết nối lại socket nếu thành công
     const refreshToken = async () => {
       const res = await getInforGuest()
+      console.log("🚀 ~ refreshToken ~ res:", res)
 
       if (res?.code === 0 && res.infor) {
         runAppGuest(res.infor)
@@ -129,7 +131,7 @@ export default function RefreshTokenPage() {
 
         // Kiểm tra nếu không phải là trang '/guest/table'
         if (res?.code !== 0 && !currentPath.startsWith('/guest/table')) {
-          router.push('https://pato.taphoaictu.id.vn')
+          // router.push('https://pato.taphoaictu.id.vn')
           if (socket) {
             socket.disconnect()
           }
