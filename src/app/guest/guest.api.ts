@@ -169,7 +169,6 @@ export const orderDish = async (payload: { od_dish_id: string; od_dish_quantity:
 }
 
 export const cancelOrder = async (payload: { od_dish_id: string }) => {
-  console.log('🚀 ~ cancelOrder ~ od_dish_id:', payload.od_dish_id)
   const res: IBackendRes<any> = await sendRequest({
     url: `${process.env.URL_SERVER}/order-dish/cancle-order`,
     method: 'PATCH',

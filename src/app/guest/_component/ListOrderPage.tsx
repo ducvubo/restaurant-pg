@@ -61,9 +61,9 @@ export default function ListOrderPage() {
     let totalPrice = 0
 
     orderSummary1?.or_dish
-      .filter((item: any) => item.od_dish_status !== 'guest_cancel')
+      // .filter((item: any) => item.od_dish_status !== 'guest_cancel')
       .forEach((dish: any) => {
-        if (dish.od_dish_status !== 'refuse') {
+        if (dish.od_dish_status === 'delivered') {
           totalQuantity += dish.od_dish_quantity
           const originalPrice = dish.od_dish_duplicate_id.dish_duplicate_price
           const sale = dish.od_dish_duplicate_id.dish_duplicate_sale
