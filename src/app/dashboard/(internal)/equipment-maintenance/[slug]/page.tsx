@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { IEquipmentMaintenance } from '../equipment-maintenance.interface'
 import { findEquipmentMaintenanceById, getAllEquipmentMaintenances } from '../equipment-maintenance.api'
 import { PageEquipmentMaintenance } from '../_component/PageEquipmentMaintenance'
+import ErrorPage from '@/components/ErrorPage'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -33,7 +34,7 @@ async function Component({ searchParams, params }: PageProps) {
       current: searchParams.page ? searchParams.page : '1',
       pageSize: searchParams.size ? searchParams.size : '10',
       type: 'recycle',
-      EqpMtnName: ''
+      EqpMtnName: searchParams.search ? searchParams.search : ''
     })
 
     if (res.code === -10) {

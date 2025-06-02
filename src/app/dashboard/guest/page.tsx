@@ -18,6 +18,7 @@ import LogoutPage from '@/app/logout/page'
 import { IGuest } from './guest.interface'
 import { getListGuest } from './guest.api'
 import { PageGuest } from './_component/ListGuestPage'
+import ErrorPage from '@/components/ErrorPage'
 interface PageProps {
   searchParams: { [key: string]: string }
 }

@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { IEquipmentMaintenance } from './equipment-maintenance.interface'
 import { getAllEquipmentMaintenances } from './equipment-maintenance.api'
 import { PageEquipmentMaintenance } from './_component/PageEquipmentMaintenance'
+import ErrorPage from '@/components/ErrorPage'
 
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -17,7 +18,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IEquipmentMaintenance>> = await getAllEquipmentMaintenances({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    EqpMtnName: '',
+    EqpMtnName: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 

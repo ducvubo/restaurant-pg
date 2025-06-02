@@ -19,6 +19,7 @@ import { DataTableViewOptions } from '@/components/ColumnToggle'
 import { DataTablePagination } from '@/components/PaginationTable'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { Input } from '@/components/ui/input'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -30,13 +31,19 @@ interface DataTableProps<TData, TValue> {
     totalItem: number
   }
 }
-
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
 export function PageChatBot<TData, TValue>({ columns, meta, data }: DataTableProps<TData, TValue>) {
   const router = useRouter()
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-
+  const [search, setSearch] = React.useState('')
   const table = useReactTable({
     data,
     columns,
@@ -68,9 +75,24 @@ export function PageChatBot<TData, TValue>({ columns, meta, data }: DataTablePro
     router.push(`/dashboard/chat-bot?page=${pageIndex}&size=${pageSize}`)
   }, [pageIndex, pageSize, router])
 
+  const debouncedSearch = React.useCallback(
+    debounce((value: string) => {
+      router.push(
+        `/dashboard/chat-bot?page=${pageIndex}&size=${pageSize}&search=${value}`
+      )
+    }, 300),
+    [pageIndex, pageSize, router]
+  )
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearch(value)
+    debouncedSearch(value)
+  }
   return (
     <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex justify-end gap-2 items-center py-4'>
+        <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
         <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border flex-1 overflow-hidden'>

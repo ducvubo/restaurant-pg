@@ -8,6 +8,7 @@ import { getAllPaginationMessageChatBot } from './chat-bot.api'
 import LogoutPage from '@/app/logout/page'
 import { PageChatBot } from './_component/PageChatBot'
 import { columns } from './_component/Columns'
+import ErrorPage from '@/components/ErrorPage'
 
 
 interface PageProps {
