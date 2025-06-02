@@ -44,12 +44,12 @@ export const isNumericString = (str: string) => {
 }
 
 export const calculateFinalPrice = (price: number, sale: { sale_type: string; sale_value: number } | undefined) => {
-  if (!sale) return price // Nếu không có khuyến mãi, trả về giá gốc
+  if (!sale) return price
   if (sale.sale_type === 'fixed') {
-    return Math.max(0, price - sale.sale_value) // Khuyến mãi cố định
+    return Math.max(0, price - sale.sale_value)
   }
   if (sale.sale_type === 'percentage') {
-    return Math.max(0, price - (price * sale.sale_value) / 100) // Khuyến mãi phần trăm
+    return Math.max(0, price - (price * sale.sale_value) / 100)
   }
   return price
 }
@@ -102,8 +102,7 @@ export const calculateTotalPrice = (data: any) => {
   let totalPrice = 0
 
   data.or_dish.forEach((dish: any) => {
-    // Loại trừ các món có trạng thái 'refuse'
-    if (dish.od_dish_status !== 'refuse' && dish.od_dish_status !== 'guest_cancel') {
+    if (dish.od_dish_status === 'delivered') {
       const price = dish.od_dish_duplicate_id.dish_duplicate_price
       const sale = dish.od_dish_duplicate_id.dish_duplicate_sale
       const quantity = dish.od_dish_quantity

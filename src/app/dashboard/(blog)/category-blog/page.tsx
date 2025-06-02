@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { getAllCategorys } from './category-blog.api'
 import { ICategory } from './category-blog.interface'
 import { PageCategory } from './_component/PageCategory'
+import ErrorPage from '@/components/ErrorPage'
 
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -17,7 +18,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<ICategory>> = await getAllCategorys({
     pageIndex: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    catName: '',
+    catName: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -29,9 +30,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = res.data.result.flat()

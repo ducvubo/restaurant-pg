@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { IMenuItems } from './menu-items.interface'
 import { getAllMenuItems } from './menu-items.api'
 import { PageMenuItems } from './_component/PageMenuItems'
+import ErrorPage from '@/components/ErrorPage'
 
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -17,7 +18,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IMenuItems>> = await getAllMenuItems({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    mitems_name: '',
+    mitems_name: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -29,9 +30,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = res.data.result.flat()

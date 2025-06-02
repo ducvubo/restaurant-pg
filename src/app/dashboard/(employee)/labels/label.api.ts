@@ -89,6 +89,5 @@ export const updateStatus = async ({ lb_id, lb_status }: { lb_id: string; lb_sta
       lb_status
     }
   })
-  console.log('🚀 ~ updateStatus ~ res:', res)
   return res
 }

@@ -19,6 +19,13 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
 
 export default function BookTablePage() {
   const [pageIndex, setPageIndex] = useState(1)
@@ -92,7 +99,14 @@ export default function BookTablePage() {
     findListLeaveApplication()
   }, [pageIndex, pageSize, inforEmployee, inforRestaurant, searchParam, statusFilter, typeSearch])
 
-  const statusOptions = [
+  const statusOptionsRestaurant = [
+    { value: 'ALL', label: 'Tất cả trạng thái' },
+    { value: 'PENDING', label: 'Chờ duyệt' },
+    { value: 'APPROVED', label: 'Đã duyệt' },
+    { value: 'REJECTED', label: 'Đã từ chối' },
+  ]
+
+  const statusOptionsEmployee = [
     { value: 'ALL', label: 'Tất cả trạng thái' },
     { value: 'DRAFT', label: 'Nháp' },
     { value: 'PENDING', label: 'Chờ duyệt' },
@@ -101,10 +115,14 @@ export default function BookTablePage() {
     { value: 'CANCELED', label: 'Đã hủy' },
   ]
 
+  const statusOptions = inforEmployee._id
+    ? statusOptionsEmployee
+    : statusOptionsRestaurant
+
   return (
-    <div className='w-full flex flex-col gap-4 mt-2'>
+    <div className='w-full flex flex-col gap-4'>
       <div className='w-full flex flex-wrap gap-4 items-end'>
-        <div className='flex gap-4'>
+        <div className="flex justify-end gap-2 items-center">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className='w-[180px]'>
               <SelectValue placeholder='Chọn trạng thái' />
@@ -117,13 +135,12 @@ export default function BookTablePage() {
               ))}
             </SelectContent>
           </Select>
-
-          {/* <Input
-            placeholder='Tìm kiếm type...'
+          <Input
+            placeholder='Tìm kiếm'
             value={typeSearch}
             onChange={(e) => setTypeSearch(e.target.value)}
             className='max-w-sm'
-          /> */}
+          />
         </div>
 
         {inforEmployee._id && (

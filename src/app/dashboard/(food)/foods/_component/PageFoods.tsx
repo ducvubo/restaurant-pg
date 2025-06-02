@@ -39,6 +39,14 @@ interface DataTableProps<TData, TValue> {
   };
 }
 
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
+
 export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps<TData, TValue>) {
   const { setLoading } = useLoading();
   const router = useRouter();
@@ -51,6 +59,7 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
   const [newFoods, setNewFoods] = React.useState<IFood[]>([]);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [errors, setErrors] = React.useState<{ [key: number]: { [key: string]: boolean } }>({});
+  const [search, setSearch] = React.useState('')
 
   // Function to get the list of existing foods
   const getExistingFoods = async () => {
@@ -310,9 +319,26 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
     router.push(`/dashboard/foods/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`);
   }, [pageIndex, pageSize, router, pathname]);
 
+  const debouncedSearch = React.useCallback(
+    debounce((value: string) => {
+      router.push(
+        `/dashboard/foods/${pathname === 'recycle' ? 'recycle' : ''
+        }?page=${pageIndex}&size=${pageSize}&search=${value}`
+      )
+    }, 300),
+    [pageIndex, pageSize, pathname, router]
+  )
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearch(value)
+    debouncedSearch(value)
+  }
+
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 7rem)' }}>
       <div className="flex justify-end gap-2 items-center py-4">
+        <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
         <Button variant={'outline'}>
           <Link href={'/dashboard/foods/add'}>Thêm</Link>
         </Button>

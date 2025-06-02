@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { IRoom } from './rooms.interface'
 import { getAllRoom } from './rooms.api'
 import { PageRoom } from './_component/PageRoom'
+import ErrorPage from '@/components/ErrorPage'
 
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -17,7 +18,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IRoom>> = await getAllRoom({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    room_name: '',
+    room_name: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -29,9 +30,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = res.data.result.flat()

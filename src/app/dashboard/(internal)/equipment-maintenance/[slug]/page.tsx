@@ -44,9 +44,7 @@ async function Component({ searchParams, params }: PageProps) {
     }
     if (!res || !res.data) {
       return (
-        <>
-          <div>Error fetching data</div>
-        </>
+        <ErrorPage />
       )
     }
     if (res.statusCode === 200) {
@@ -83,9 +81,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   return (

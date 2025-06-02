@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { getAllSpecialOffers } from './special-offer.api'
 import { ISpecialOffer } from './special-offer.interface'
 import { PageSpecialOffer } from './_component/PageSpecialOffer'
+import ErrorPage from '@/components/ErrorPage'
 
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -17,8 +18,8 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<ISpecialOffer>> = await getAllSpecialOffers({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    spo_title: '',
-    type: 'all'
+    type: 'all',
+    spo_title: searchParams.search ? searchParams.search : ''
   })
 
   if (res.code === -10) {
@@ -29,9 +30,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = res.data.result.flat()

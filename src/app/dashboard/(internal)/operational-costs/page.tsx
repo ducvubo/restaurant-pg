@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { IOperationalCosts } from './operational-costs.interface'
 import { getAllOperationalCostss } from './operational-costs.api'
 import { PageOperationalCosts } from './_component/PageOperationalCosts'
+import ErrorPage from '@/components/ErrorPage'
 
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -17,7 +18,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IOperationalCosts>> = await getAllOperationalCostss({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    OperaCostType: '',
+    OperaCostType: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -29,9 +30,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = (res.data.result ? res.data.result : []).flat()

@@ -52,7 +52,6 @@ export const updateArticle = async (data: Partial<IArticle>, type: 'default' | '
     method: 'PATCH',
     body: data
   })
-  console.log('🚀 ~ updateArticle ~ res:', res)
   return res
 }
 
@@ -145,7 +144,6 @@ export const deleteArticle = async ({ atlId }: { atlId: string }) => {
     url: `${URL_SERVER_BLOG}/articles/delete-draft/${atlId}`,
     method: 'DELETE'
   })
-  console.log("🚀 ~ deleteArticle ~ res:", res)
   return res
 }
 
@@ -189,7 +187,6 @@ export const autoGenArticleDefault = async ({ title }: { title: string }) => {
     }
 
     const result = await response.json();
-    console.log("🚀 ~ autoGenArticleDefault ~ result:", result)
     return result;
   } catch (error) {
     console.error('Lỗi khi gửi đến n8n:', error);

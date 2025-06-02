@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import { IFood } from '../food.interface'
+import ErrorPage from '@/components/ErrorPage'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -44,6 +45,7 @@ async function Component({ searchParams, params }: PageProps) {
     const res: IBackendRes<IModelPaginate<IFood>> = await getAllFoods({
       current: searchParams.page ? searchParams.page : '1',
       pageSize: searchParams.size ? searchParams.size : '10',
+      food_name: searchParams.search ? searchParams.search : '',
       type: 'recycle'
     })
 
@@ -55,9 +57,7 @@ async function Component({ searchParams, params }: PageProps) {
     }
     if (!res || !res.data) {
       return (
-        <>
-          <div>Error fetching data</div>
-        </>
+        <ErrorPage />
       )
     }
     if (res.statusCode === 200) {
@@ -66,7 +66,7 @@ async function Component({ searchParams, params }: PageProps) {
       return (
         <div>
           <ContentLayout title='Danh sách món ăn online đã xóa'>
-          
+
             <PageFoods data={data} columns={columns} meta={res.data.meta} />
           </ContentLayout>
         </div>
@@ -96,9 +96,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   return (

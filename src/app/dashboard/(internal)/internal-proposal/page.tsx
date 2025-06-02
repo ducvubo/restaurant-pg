@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { IInternalProposal } from './internal-proposal.interface'
 import { getAllInternalProposals } from './internal-proposal.api'
 import { PageInternalProposal } from './_component/PageInternalProposal'
+import ErrorPage from '@/components/ErrorPage'
 
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -17,7 +18,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IInternalProposal>> = await getAllInternalProposals({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    ItnProposalTitle: '',
+    ItnProposalTitle: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -29,9 +30,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = (res.data.result ? res.data.result : []).flat()

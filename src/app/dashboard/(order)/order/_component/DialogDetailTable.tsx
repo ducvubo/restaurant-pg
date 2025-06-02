@@ -257,7 +257,7 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                     {calculateFinalPrice(
                                       order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_price,
                                       order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_sale
-                                    )?.toLocaleString()}
+                                    )?.toLocaleString('vi-VN')}
                                     đ x {order_summary?.or_dish[0]?.od_dish_quantity}
                                   </Label>
                                   <Label className='italic'>
@@ -267,7 +267,9 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                         order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_price,
                                         order_summary?.or_dish[0]?.od_dish_duplicate_id.dish_duplicate_sale
                                       ) * order_summary?.or_dish[0]?.od_dish_quantity
-                                    )?.toLocaleString()}
+                                    )?.toLocaleString(
+                                      'vi-VN'
+                                    )}
                                     đ
                                   </Label>
                                 </div>
@@ -285,6 +287,7 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                   <Badge variant={'destructive'}> Khách hủy</Badge>
                                 ) : (
                                   <Select
+                                    disabled={order_summary.od_dish_smr_status !== 'ordering'}
                                     value={order_summary?.or_dish[0]?.od_dish_status}
                                     onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
                                       handleUpdateStatus({
@@ -343,7 +346,7 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                             order_dish_item.od_dish_duplicate_id.dish_duplicate_price,
                                             order_dish_item.od_dish_duplicate_id.dish_duplicate_sale
                                           ) * order_dish_item.od_dish_quantity
-                                        )?.toLocaleString()}
+                                        )?.toLocaleString('vi-VN')}
                                         đ
                                       </Label>
                                     </div>
@@ -362,6 +365,7 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                         <Badge variant={'destructive'}> Khách hủy</Badge>
                                       ) : (
                                         <Select
+                                          disabled={order_summary.od_dish_smr_status !== 'ordering'}
                                           value={order_dish_item.od_dish_status}
                                           onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
                                             handleUpdateStatus({
@@ -386,29 +390,6 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                         </Select>
                                       )
                                     }
-                                    {/* <Select
-                                      value={order_dish_item.od_dish_status}
-                                      onValueChange={(value: 'processing' | 'pending' | 'delivered' | 'refuse') =>
-                                        handleUpdateStatus({
-                                          _id: order_dish_item._id,
-                                          od_dish_status: value,
-                                          od_dish_summary_id: order_summary._id
-                                        })
-                                      }
-                                    >
-                                      <SelectTrigger className='w-[120px]'>
-                                        <SelectValue placeholder='Đang nấu' />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectGroup>
-                                          <SelectLabel>Chọn trạng thái</SelectLabel>
-                                          <SelectItem value='pending'>Chờ xử lý</SelectItem>
-                                          <SelectItem value='processing'>Đang nấu</SelectItem>
-                                          <SelectItem value='delivered'>Đã phục vụ</SelectItem>
-                                          <SelectItem value='refuse'>Từ chối</SelectItem>
-                                        </SelectGroup>
-                                      </SelectContent>
-                                    </Select> */}
                                   </div>
                                 </div>
                               </AccordionContent>
@@ -440,7 +421,6 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
         </div>
 
         <DialogFooter>
-          <Button type='submit'>Save changes</Button>
           <DialogFooter>
             <Button type='button' onClick={() => setSelectedTable(null)}>
               Đóng

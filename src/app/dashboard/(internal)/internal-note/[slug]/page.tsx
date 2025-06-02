@@ -17,6 +17,7 @@ import LogoutPage from '@/app/logout/page'
 import { IInternalNote } from '../internal-note.interface'
 import { findInternalNoteById, getAllInternalNotes } from '../internal-note.api'
 import { PageInternalNote } from '../_component/PageInternalNote'
+import ErrorPage from '@/components/ErrorPage'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -42,7 +43,7 @@ async function Component({ searchParams, params }: PageProps) {
       current: searchParams.page ? searchParams.page : '1',
       pageSize: searchParams.size ? searchParams.size : '10',
       type: 'recycle',
-      ItnNoteTitle: ''
+      ItnNoteTitle: searchParams.search ? searchParams.search : ''
     })
 
     if (res.code === -10) {
@@ -53,9 +54,7 @@ async function Component({ searchParams, params }: PageProps) {
     }
     if (!res || !res.data) {
       return (
-        <>
-          <div>Error fetching data</div>
-        </>
+        <ErrorPage />
       )
     }
     if (res.statusCode === 200) {
@@ -92,9 +91,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   return (

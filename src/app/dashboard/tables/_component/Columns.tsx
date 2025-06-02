@@ -35,7 +35,7 @@ export const columns: ColumnDef<ITable>[] = [
   {
     accessorKey: 'tbl_name',
     id: 'Tên bàn',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Email' />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Tên bàn' />,
     enableHiding: true
   },
   {

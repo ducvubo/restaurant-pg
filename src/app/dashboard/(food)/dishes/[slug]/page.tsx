@@ -18,6 +18,7 @@ import { findDishById, getAllDish } from '../dishes.api'
 import { PageDishes } from '../_component/PageDishes'
 import { columns } from '../_component/Columns'
 import LogoutPage from '@/app/logout/page'
+import ErrorPage from '@/components/ErrorPage'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -42,6 +43,7 @@ async function Component({ searchParams, params }: PageProps) {
     const res: IBackendRes<IModelPaginate<IDish>> = await getAllDish({
       current: searchParams.page ? searchParams.page : '1',
       pageSize: searchParams.size ? searchParams.size : '10',
+      dish_name: searchParams.search ? searchParams.search : '',
       type: 'recycle'
     })
 
@@ -53,9 +55,7 @@ async function Component({ searchParams, params }: PageProps) {
     }
     if (!res || !res.data) {
       return (
-        <>
-          <div>Error fetching data</div>
-        </>
+        <ErrorPage />
       )
     }
     if (res.statusCode === 200) {
@@ -93,9 +93,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   return (

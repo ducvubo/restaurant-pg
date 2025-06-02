@@ -19,6 +19,7 @@ import LogoutPage from '@/app/logout/page'
 import { IFood } from './food.interface'
 import { getAllFoods } from './food.api'
 import { Card } from '@/components/ui/card'
+import ErrorPage from '@/components/ErrorPage'
 interface PageProps {
   searchParams: { [key: string]: string }
 }
@@ -27,6 +28,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IFood>> = await getAllFoods({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
+    food_name: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -38,9 +40,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = res.data.result.flat()

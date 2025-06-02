@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic'
 import LogoutPage from '@/app/logout/page'
 import { IWorkSchedule } from '../work-schedule.interface'
 import { getWorkScheduleById } from '../work-schedule.api'
+import ErrorPage from '@/components/ErrorPage'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -49,9 +50,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   return (

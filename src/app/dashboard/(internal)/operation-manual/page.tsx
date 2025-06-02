@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { IOperationManual } from './operation-manual.interface'
 import { getAllOperationManuals } from './operation-manual.api'
 import { PageOperationManual } from './_component/PageOperationManual'
+import ErrorPage from '@/components/ErrorPage'
 
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -17,7 +18,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IOperationManual>> = await getAllOperationManuals({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    OperaManualTitle: '',
+    OperaManualTitle: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -29,9 +30,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = (res.data.result ? res.data.result : []).flat()

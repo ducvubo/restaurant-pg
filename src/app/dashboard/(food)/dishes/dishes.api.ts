@@ -15,10 +15,12 @@ export const createDish = async (payload: Omit<IDish, 'dish_status' | 'isDeleted
 export const getAllDish = async ({
   current,
   pageSize,
+  dish_name = '',
   type
 }: {
   current: string
   pageSize: string
+  dish_name?: string
   type: 'all' | 'recycle'
 }) => {
   const url = type === 'all' ? `${process.env.URL_SERVER}/dishes` : `${process.env.URL_SERVER}/dishes/recycle`
@@ -27,6 +29,7 @@ export const getAllDish = async ({
     method: 'GET',
     queryParams: {
       current,
+      dish_name,
       pageSize
     },
     nextOption: {

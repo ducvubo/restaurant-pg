@@ -6,6 +6,7 @@ import LogoutPage from '@/app/logout/page'
 import AddOrEdit from '../_component/AddOrEdit'
 import { getInforLeaveApplicationWithEmployee } from '../leave-application.api'
 import { ILeaveApplication } from '../leave-application.interface'
+import ErrorPage from '@/components/ErrorPage'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -47,9 +48,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   return (

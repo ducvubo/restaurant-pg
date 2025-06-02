@@ -19,6 +19,7 @@ import LogoutPage from '@/app/logout/page'
 import { getAllFoodCombos } from './food-combos.api'
 import { Card } from '@/components/ui/card'
 import { IFoodComboRes } from './food-combos.interface'
+import ErrorPage from '@/components/ErrorPage'
 interface PageProps {
   searchParams: { [key: string]: string }
 }
@@ -27,7 +28,8 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IFoodComboRes>> = await getAllFoodCombos({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    type: 'all'
+    type: 'all',
+    fcb_name: searchParams.search ? searchParams.search : ''
   })
 
   if (res.code === -10) {
@@ -38,9 +40,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = res.data.result.flat()

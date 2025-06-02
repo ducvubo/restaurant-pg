@@ -15,10 +15,12 @@ export const createEmployee = async (payload: Omit<IEmployee, 'epl_status' | '_i
 export const getAllEmployees = async ({
   current,
   pageSize,
+  epl_name = '',
   type
 }: {
   current: string
   pageSize: string
+  epl_name?: string
   type: 'all' | 'recycle'
 }) => {
   const url = type === 'all' ? `${process.env.URL_SERVER}/employees` : `${process.env.URL_SERVER}/employees/recycle`
@@ -27,6 +29,7 @@ export const getAllEmployees = async ({
     method: 'GET',
     queryParams: {
       current,
+      epl_name,
       pageSize
     },
     nextOption: {

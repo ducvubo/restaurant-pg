@@ -140,7 +140,7 @@ export default function ListTablePage() {
         <div className='mt-2 grid grid-cols-8 gap-3'>
           {listTable?.map((table, index) => {
             return (
-              <Card className='w-28 h-28 cursor-pointer' key={index} onClick={() => setSelectedTable(table)}>
+              <Card className='h-28 cursor-pointer' key={index} onClick={() => setSelectedTable(table)}>
                 <CardContent className='flex flex-col'>
                   <span className='my-1'>{table.tbl_name}</span>
                   <Separator orientation='horizontal' className='w-28 -ml-6' />

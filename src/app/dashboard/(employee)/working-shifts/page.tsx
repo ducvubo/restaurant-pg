@@ -7,6 +7,7 @@ import LogoutPage from '@/app/logout/page'
 import { IWorkingShift } from './working-shift.interface'
 import { getAllWorkingShifts } from './working-shift.api'
 import { PageWorkingShifts } from './_component/PageWorkingShifts'
+import ErrorPage from '@/components/ErrorPage'
 interface PageProps {
   searchParams: { [key: string]: string }
 }
@@ -15,6 +16,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IWorkingShift>> = await getAllWorkingShifts({
     pageIndex: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
+    wks_name: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -26,23 +28,21 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || res.statusCode !== 200) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   // const data = res.data.result.flat()
-if(res.data?.result){
-  return (
-    <div>
-      <ContentLayout title='Danh sách ca làm việc'>
-        <PageWorkingShifts data={res.data?.result} columns={columns} meta={res.data.meta} />
-      </ContentLayout>
-    </div>
-  )
-}
+  if (res.data?.result) {
+    return (
+      <div>
+        <ContentLayout title='Danh sách ca làm việc'>
+          <PageWorkingShifts data={res.data?.result} columns={columns} meta={res.data.meta} />
+        </ContentLayout>
+      </div>
+    )
+  }
 
-  
+
 }
 
 export default function Page(props: PageProps) {

@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { findIngredientById, getAllIngredients } from '../ingredient.api'
 import { IIngredient } from '../ingredient.interface'
 import { PageIngredient } from '../_component/PageIngredient'
+import ErrorPage from '@/components/ErrorPage'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -33,7 +34,7 @@ async function Component({ searchParams, params }: PageProps) {
       current: searchParams.page ? searchParams.page : '1',
       pageSize: searchParams.size ? searchParams.size : '10',
       type: 'recycle',
-      igd_name: ''
+      igd_name: searchParams.search ? searchParams.search : ''
     })
 
     if (res.code === -10) {
@@ -44,9 +45,7 @@ async function Component({ searchParams, params }: PageProps) {
     }
     if (!res || !res.data) {
       return (
-        <>
-          <div>Error fetching data</div>
-        </>
+        <ErrorPage />
       )
     }
     if (res.statusCode === 200) {
@@ -83,9 +82,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   return (

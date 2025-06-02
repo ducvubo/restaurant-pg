@@ -16,18 +16,22 @@ export const createTable = async (payload: any) => {
 export const getAllTables = async ({
   current,
   pageSize,
+  tbl_name = '',
   type
 }: {
   current: string
   pageSize: string
+  tbl_name?: string
   type: 'all' | 'recycle'
 }) => {
+  console.log("🚀 ~ tbl_name:", tbl_name)
   const url = type === 'all' ? `${process.env.URL_SERVER}/tables` : `${process.env.URL_SERVER}/tables/recycle`
   const res: IBackendRes<IModelPaginate<ITable>> = await sendRequest({
     url,
     method: 'GET',
     queryParams: {
       current,
+      tbl_name,
       pageSize
     },
     nextOption: {

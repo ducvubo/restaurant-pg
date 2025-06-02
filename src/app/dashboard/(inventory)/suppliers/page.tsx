@@ -4,10 +4,11 @@ import LoadingServer from '@/components/LoadingServer'
 import ToastServer from '@/components/ToastServer'
 import { ContentLayout } from '@/components/admin-panel/content-layout'
 import { columns } from './_component/Columns'
-import {  PageSupplier } from './_component/PageSupplier'
+import { PageSupplier } from './_component/PageSupplier'
 import LogoutPage from '@/app/logout/page'
 import { getAllSuppliers } from './supplier.api'
 import { ISupplier } from './supplier.interface'
+import ErrorPage from '@/components/ErrorPage'
 interface PageProps {
   searchParams: { [key: string]: string }
 }
@@ -16,7 +17,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<ISupplier>> = await getAllSuppliers({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    spli_name:'',
+    spli_name: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -28,9 +29,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = res.data.result.flat()

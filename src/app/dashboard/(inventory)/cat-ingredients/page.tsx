@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { getAllCatIngredients } from './cat-ingredient.api'
 import { ICatIngredient } from './cat-ingredient.interface'
 import { PageCatIngredient } from './_component/PageCatIngredient'
+import ErrorPage from '@/components/ErrorPage'
 
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -17,7 +18,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<ICatIngredient>> = await getAllCatIngredients({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    cat_igd_name:'',
+    cat_igd_name: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -29,9 +30,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = res.data.result.flat()

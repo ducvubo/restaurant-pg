@@ -19,11 +19,13 @@ export const createWorkingShift = async (payload: any) => {
 export const getAllWorkingShifts = async ({
   pageIndex,
   pageSize,
-  type
+  type,
+  wks_name = ''
 }: {
   pageIndex: string
   pageSize: string
-  type: 'all' | 'recycle'
+  type: 'all' | 'recycle',
+  wks_name?: string
 }) => {
   const url =
     type === 'all'
@@ -35,7 +37,7 @@ export const getAllWorkingShifts = async ({
     queryParams: {
       pageIndex,
       pageSize,
-      wks_name: ''
+      wks_name
     },
     nextOption: {
       cache: 'no-store'

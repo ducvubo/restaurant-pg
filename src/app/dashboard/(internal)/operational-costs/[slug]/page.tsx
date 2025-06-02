@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { IOperationalCosts } from '../operational-costs.interface'
 import { findOperationalCostsById, getAllOperationalCostss } from '../operational-costs.api'
 import { PageOperationalCosts } from '../_component/PageOperationalCosts'
+import ErrorPage from '@/components/ErrorPage'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -33,7 +34,7 @@ async function Component({ searchParams, params }: PageProps) {
       current: searchParams.page ? searchParams.page : '1',
       pageSize: searchParams.size ? searchParams.size : '10',
       type: 'recycle',
-      OperaCostType: ''
+      OperaCostType: searchParams.search ? searchParams.search : ''
     })
 
     if (res.code === -10) {
@@ -44,9 +45,7 @@ async function Component({ searchParams, params }: PageProps) {
     }
     if (!res || !res.data) {
       return (
-        <>
-          <div>Error fetching data</div>
-        </>
+        <ErrorPage />
       )
     }
     if (res.statusCode === 200) {
@@ -83,9 +82,7 @@ async function Component({ searchParams, params }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   return (

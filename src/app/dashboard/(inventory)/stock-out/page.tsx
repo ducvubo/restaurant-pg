@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { getAllStockOuts } from './stock-out.api'
 import { IStockOut } from './stock-out.interface'
 import { PageStockOut } from './_component/PageStockOut'
+import ErrorPage from '@/components/ErrorPage'
 
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -17,7 +18,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IStockOut>> = await getAllStockOuts({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    stko_code: '',
+    stko_code: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -29,9 +30,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = res.data.result.flat()

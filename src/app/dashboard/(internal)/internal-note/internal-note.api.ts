@@ -42,7 +42,6 @@ export const getAllInternalNotes = async ({
       cache: 'no-store'
     }
   })
-  console.log("🚀 ~ res:", res)
   return res
 }
 
@@ -72,7 +71,6 @@ export const deleteInternalNote = async ({ itn_note_id }: { itn_note_id: string 
     url: `${URL_SERVER_USER}/internal-note/${itn_note_id}`,
     method: 'DELETE'
   })
-  console.log("🚀 ~ deleteInternalNote ~ res:", res)
   return res
 }
 

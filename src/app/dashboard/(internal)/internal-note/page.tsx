@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { IInternalNote } from './internal-note.interface'
 import { getAllInternalNotes } from './internal-note.api'
 import { PageInternalNote } from './_component/PageInternalNote'
+import ErrorPage from '@/components/ErrorPage'
 
 interface PageProps {
   searchParams: { [key: string]: string }
@@ -17,7 +18,7 @@ async function Component({ searchParams }: PageProps) {
   const res: IBackendRes<IModelPaginate<IInternalNote>> = await getAllInternalNotes({
     current: searchParams.page ? searchParams.page : '1',
     pageSize: searchParams.size ? searchParams.size : '10',
-    ItnNoteTitle: '',
+    ItnNoteTitle: searchParams.search ? searchParams.search : '',
     type: 'all'
   })
 
@@ -29,9 +30,7 @@ async function Component({ searchParams }: PageProps) {
   }
   if (!res || !res.data) {
     return (
-      <>
-        <div>Error fetching data</div>
-      </>
+      <ErrorPage />
     )
   }
   const data = (res.data.result ? res.data.result : []).flat()

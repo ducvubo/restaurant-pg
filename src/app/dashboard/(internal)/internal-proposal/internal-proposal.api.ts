@@ -92,6 +92,5 @@ export const updateStatusInternalProposal = async (payload: {
     method: 'PATCH',
     body: payload
   })
-  console.log("🚀 ~ res:", res)
   return res
 }

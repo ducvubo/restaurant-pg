@@ -39,6 +39,13 @@ interface DataTableProps<TData, TValue> {
   };
 }
 
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
 export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProps<TData, TValue>) {
   const { setLoading } = useLoading();
   const router = useRouter();
@@ -51,7 +58,7 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
   const [newDishes, setNewDishes] = useState<any[]>([]); // Lưu danh sách món ăn mới
   const [isDialogOpen, setIsDialogOpen] = useState(false); // Trạng thái mở dialog
   const [errors, setErrors] = useState<{ [key: number]: { [key: string]: boolean } }>({}); // Lưu trạng thái lỗi của các trường
-
+  const [search, setSearch] = React.useState('')
   const getListDish = async () => {
     const res: IBackendRes<IDish[]> = await getAllDishRestaurant();
     if (res.statusCode === 200 && res.data) {
@@ -333,10 +340,25 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
   React.useEffect(() => {
     router.push(`/dashboard/dishes/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`);
   }, [pageIndex, pageSize, router, pathname]);
+  const debouncedSearch = React.useCallback(
+    debounce((value: string) => {
+      router.push(
+        `/dashboard/dishes/${pathname === 'recycle' ? 'recycle' : ''
+        }?page=${pageIndex}&size=${pageSize}&search=${value}`
+      )
+    }, 300),
+    [pageIndex, pageSize, pathname, router]
+  )
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearch(value)
+    debouncedSearch(value)
+  }
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 7rem)' }}>
       <div className="flex justify-end gap-2 items-center py-4">
+        <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
         <Button variant={'outline'}>
           <Link href={'/dashboard/dishes/add'}>Thêm</Link>
         </Button>

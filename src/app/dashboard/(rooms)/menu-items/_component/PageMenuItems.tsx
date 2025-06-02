@@ -38,7 +38,13 @@ interface DataTableProps<TData, TValue> {
     totalItem: number;
   };
 }
-
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
 export function PageMenuItems<TData, TValue>({ columns, data, meta }: DataTableProps<TData, TValue>) {
   const { setLoading } = useLoading();
   const router = useRouter();
@@ -52,7 +58,7 @@ export function PageMenuItems<TData, TValue>({ columns, data, meta }: DataTableP
   const [newMenuItems, setNewMenuItems] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: number]: { [key: string]: boolean } }>({});
-
+  const [search, setSearch] = React.useState('')
   // Lấy danh sách menu items
   const getListMenuItems = async () => {
     const res: IBackendRes<IMenuItems[]> = await getAllMenuItemsName();
@@ -323,9 +329,27 @@ export function PageMenuItems<TData, TValue>({ columns, data, meta }: DataTableP
     router.push(`/dashboard/menu-items/${pathname === 'recycle' ? 'recycle' : ''}?page=${pageIndex}&size=${pageSize}`);
   }, [pageIndex, pageSize, router, pathname]);
 
+  const debouncedSearch = React.useCallback(
+    debounce((value: string) => {
+      router.push(
+        `/dashboard/menu-items/${pathname === 'recycle' ? 'recycle' : ''
+        }?page=${pageIndex}&size=${pageSize}&search=${value}`
+      )
+    }, 300),
+    [pageIndex, pageSize, pathname, router]
+  )
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearch(value)
+    debouncedSearch(value)
+  }
+
+
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 7rem)' }}>
       <div className="flex justify-end gap-2 items-center py-4">
+        <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
         <Button variant={'outline'}>
           <Link href={'/dashboard/menu-items/add'}>Thêm</Link>
         </Button>
