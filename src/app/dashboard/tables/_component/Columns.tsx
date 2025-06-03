@@ -136,6 +136,8 @@ export const columns: ColumnDef<ITable>[] = [
             doc.setFontSize(25);
             doc.addImage('/images/logo.png', 'PNG', 30, 10, 50, 25);
             doc.text(`Quét QR để gọi món`, 90, 25);
+            doc.setFontSize(15);
+            doc.text(`Tên bàn: ${table.tbl_name}`, 85, 37);
             doc.addImage(imgData, 'PNG', 55, 40, 100, 100);
             doc.setFontSize(12);
             doc.text("Địa chỉ: Số nhà 16, Thị Trấn Đồi Ngô, Lục Nam, Bắc Giang", 40, 157);
@@ -155,7 +157,6 @@ export const columns: ColumnDef<ITable>[] = [
 
       return (
         <div className='w-40' id={`qr-code-${table._id}`}>
-
           <Link target='_blank' href={`/guest/table/${table.tbl_restaurant_id}?token=${table.tbl_token}`}>
             <QRCodeSVG value={url} />
           </Link>

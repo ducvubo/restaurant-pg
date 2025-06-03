@@ -114,6 +114,8 @@ export function PageMenuItems<TData, TValue>({ columns, data, meta }: DataTableP
         },
       });
 
+      setLoading(false);
+
       const result: IBackendRes<IMenuItems[]> = await response.json();
 
       if (result.statusCode === 201 && result.data) {
@@ -155,6 +157,7 @@ export function PageMenuItems<TData, TValue>({ columns, data, meta }: DataTableP
         });
       }
     } catch (error) {
+      setLoading(false);
       toast({
         title: 'Thất bại',
         description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',

@@ -99,6 +99,7 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
           accept: '*/*',
         },
       });
+      setLoading(false);
 
       const result: IBackendRes<IFood[]> = await response.json();
 
@@ -141,6 +142,7 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
         });
       }
     } catch (error) {
+      setLoading(false);
       toast({
         title: 'Thất bại',
         description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',

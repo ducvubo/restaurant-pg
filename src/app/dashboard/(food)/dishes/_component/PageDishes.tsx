@@ -111,7 +111,7 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
           accept: '*/*',
         },
       });
-
+      setLoading(false);
       const result: IBackendRes<IDish[]> = await response.json();
 
       if (result.statusCode === 201 && result.data) {
@@ -155,6 +155,7 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
         });
       }
     } catch (error) {
+      setLoading(false);
       toast({
         title: 'Thất bại',
         description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
