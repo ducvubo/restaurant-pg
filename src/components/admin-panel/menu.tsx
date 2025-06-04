@@ -121,17 +121,13 @@ export function Menu({ isOpen }: MenuProps) {
   const inforEmployee = useSelector((state: RootState) => state.inforEmployee);
   const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant);
   const poly_key = inforEmployee?.policy?.poly_key || [];
-  console.log('🚀 ~ Menu ~ inforEmployee:', inforEmployee);
-  console.log('🚀 ~ Menu ~ poly_key:', poly_key);
-  console.log('🚀 ~ Menu ~ pathname:', pathname);
-  console.log('🚀 ~ Menu ~ inforRestaurant._id:', inforRestaurant._id);
   const menuListEpl = getMenuListEmployee(pathname, poly_key);
   const menuList = inforRestaurant._id ? getMenuListRestaurant(pathname) : menuListEpl;
 
   if (menuList.length === 0) {
     return (
       <div className='p-4 text-center text-muted-foreground'>
-        No menu items available. Please check your permissions or contact an administrator.
+        Bạn chưa có quyền truy cập vào chức năng nào. Vui lòng liên hệ chủ nhà hàng để được cấp quyền.
       </div>
     );
   }

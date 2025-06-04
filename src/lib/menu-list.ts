@@ -418,10 +418,7 @@ const baseMenuList = (pathname: string): Group[] => {
 };
 
 export function getMenuListEmployee(pathname: string, poly_key: string[]): Group[] {
-  console.log('🚀 ~ getMenuListEmployee ~ pathname:', pathname);
-  console.log('🚀 ~ getMenuListEmployee ~ poly_key:', poly_key);
   if (poly_key.length === 0) {
-    console.warn('No permissions found in poly_key. Returning empty menu.');
     return [];
   }
 
@@ -431,11 +428,9 @@ export function getMenuListEmployee(pathname: string, poly_key: string[]): Group
         .map((menu: Menu) => {
           const filteredSubmenus = menu.submenus.filter((submenu: Submenu) => {
             const hasAccess = hasPermissionForPath(submenu.href, submenu.key, poly_key, permissions);
-            console.log(`🚀 ~ Checking submenu: ${submenu.href} (key: ${submenu.key}), hasAccess: ${hasAccess}`);
             return hasAccess;
           });
           const menuHasAccess = hasPermissionForPath(menu.href, menu.key, poly_key, permissions);
-          console.log(`🚀 ~ Checking menu: ${menu.href} (key: ${menu.key}), hasAccess: ${menuHasAccess}, submenus: ${filteredSubmenus.length}`);
           return {
             ...menu,
             submenus: filteredSubmenus,
@@ -448,24 +443,8 @@ export function getMenuListEmployee(pathname: string, poly_key: string[]): Group
       };
     })
     .filter((group: Group) => {
-      console.log(`🚀 ~ Group: ${group.groupLabel}, menus: ${group.menus.length}`);
       return group.menus.length > 0;
     });
-
-  console.log(
-    '🚀 ~ getMenuListEmployee ~ filteredMenuList:',
-    JSON.stringify(
-      filteredMenuList.map((group: Group) => ({
-        ...group,
-        menus: group.menus.map((menu: Menu) => ({
-          ...menu,
-          icon: undefined, // Skip icon in log
-        })),
-      })),
-      null,
-      2
-    )
-  );
   return filteredMenuList;
 }
 

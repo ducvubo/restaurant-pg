@@ -199,6 +199,16 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
           image_cloud: '',
           image_custom: ''
         },
+        epl_policy_id: '',
+        policy: {
+          poly_key: [],
+          poly_name: '',
+          _id: '',
+          isDeleted: false,
+          poly_description: '',
+          poly_res_id: '',
+          poly_status: 'enable',
+        },
         epl_face_id: false
       })
       setListEmployees(listEpl)
