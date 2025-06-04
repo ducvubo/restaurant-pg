@@ -49,7 +49,7 @@ export default function AddOrEdit({ id, inforPolicy }: Props) {
       const selectedKeys = inforPolicy.poly_key || []
       const newCheckedPermissions = new Set<string>(selectedKeys)
 
-      // Add module and function keys if their children are selected
+      // Add module and function keys if any child actions are selected
       permissions.forEach((module) => {
         const hasSelectedActions = module.functions.some((func) =>
           func.actions.some((action) => selectedKeys.includes(`${func.key}_${action.key}`))
@@ -82,19 +82,19 @@ export default function AddOrEdit({ id, inforPolicy }: Props) {
     )
   }
 
-  // Check if a function is checked (either its key is present or all actions are checked)
+  // Check if a function is checked (either its key is present or any action is checked)
   const isFunctionChecked = (func: ModuleFunction) => {
     return (
       checkedPermissions.has(func.key) ||
-      func.actions.every((action) => checkedPermissions.has(`${func.key}_${action.key}`))
+      func.actions.some((action) => checkedPermissions.has(`${func.key}_${action.key}`))
     )
   }
 
-  // Check if a module is checked (either its key is present or all functions are checked)
+  // Check if a module is checked (either its key is present or any function is checked)
   const isModuleChecked = (module: Module) => {
     return (
       checkedPermissions.has(module.key) ||
-      module.functions.every((func) => isFunctionChecked(func))
+      module.functions.some((func) => isFunctionChecked(func))
     )
   }
 
@@ -145,8 +145,8 @@ export default function AddOrEdit({ id, inforPolicy }: Props) {
         module.functions.some((f) => f.key === func.key)
       )
       if (parentModule) {
-        const allFunctionsChecked = parentModule.functions.every((f) => isFunctionChecked(f))
-        if (allFunctionsChecked) {
+        const anyFunctionChecked = parentModule.functions.some((f) => isFunctionChecked(f))
+        if (anyFunctionChecked) {
           newSet.add(parentModule.key)
         } else {
           newSet.delete(parentModule.key)
@@ -175,10 +175,10 @@ export default function AddOrEdit({ id, inforPolicy }: Props) {
       if (parentModule) {
         const parentFunction = parentModule.functions.find((func) => func.key === funcKey)
         if (parentFunction) {
-          const allActionsChecked = parentFunction.actions.every((action) =>
+          const anyActionChecked = parentFunction.actions.some((action) =>
             newSet.has(`${funcKey}_${action.key}`)
           )
-          if (allActionsChecked) {
+          if (anyActionChecked) {
             newSet.add(parentFunction.key)
           } else {
             newSet.delete(parentFunction.key)
@@ -186,8 +186,8 @@ export default function AddOrEdit({ id, inforPolicy }: Props) {
         }
 
         // Update parent module key
-        const allFunctionsChecked = parentModule.functions.every((func) => isFunctionChecked(func))
-        if (allFunctionsChecked) {
+        const anyFunctionChecked = parentModule.functions.some((func) => isFunctionChecked(func))
+        if (anyFunctionChecked) {
           newSet.add(parentModule.key)
         } else {
           newSet.delete(parentModule.key)
@@ -207,7 +207,6 @@ export default function AddOrEdit({ id, inforPolicy }: Props) {
       poly_key: selectedKeys,
     }
     console.log("🚀 ~ onSubmit ~ payload:", payload)
-
 
     const res = id === 'add' ? await createPolicy(payload) : await updatePolicy({ ...payload, _id: id })
 
