@@ -13,12 +13,12 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import AddOrEdit from '../_component/AddOrEdit'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { IDish } from '../dishes.interface'
-import { findDishById, getAllDish } from '../dishes.api'
-import { PageDishes } from '../_component/PageDishes'
 import { columns } from '../_component/Columns'
 import LogoutPage from '@/app/logout/page'
 import ErrorPage from '@/components/ErrorPage'
+import { IPolicy } from '../policy.interface'
+import { findPolicyById, getAllPolicy } from '../policy.api'
+import { PagePolicyes } from '../_component/PagePolicy'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -33,17 +33,17 @@ async function Component({ searchParams, params }: PageProps) {
   const id = params.slug
   if (id === 'add') {
     return (
-      <ContentLayout title='Thêm món ăn'>
+      <ContentLayout title='Thêm quyền chức năng'>
         <AddOrEdit id='add' />
       </ContentLayout>
     )
   }
 
   if (id === 'recycle') {
-    const res: IBackendRes<IModelPaginate<IDish>> = await getAllDish({
+    const res: IBackendRes<IModelPaginate<IPolicy>> = await getAllPolicy({
       current: searchParams.page ? searchParams.page : '1',
       pageSize: searchParams.size ? searchParams.size : '10',
-      dish_name: searchParams.search ? searchParams.search : '',
+      poly_name: searchParams.search ? searchParams.search : '',
       type: 'recycle'
     })
 
@@ -63,23 +63,23 @@ async function Component({ searchParams, params }: PageProps) {
 
       return (
         <div>
-          <ContentLayout title='Danh sách món ăn đã xóa'>
-            <PageDishes data={data} columns={columns} meta={res.data.meta} />
+          <ContentLayout title='Danh sách quyền chức năng đã xóa'>
+            <PagePolicyes data={data} columns={columns} meta={res.data.meta} />
           </ContentLayout>
         </div>
       )
     }
   }
 
-  const res: IBackendRes<IDish> = await findDishById({ _id: id })
+  const res: IBackendRes<IPolicy> = await findPolicyById({ _id: id })
 
   if (res.statusCode === 404) {
     return (
       <ToastServer
-        message='Không tìm thấy món ăn'
+        message='Không tìm thấy quyền chức năng'
         title='Lỗi'
         variant='destructive'
-        route='/dashboard/dishes?page=1&size=10'
+        route='/dashboard/policy?page=1&size=10'
       />
     )
   }
@@ -97,8 +97,8 @@ async function Component({ searchParams, params }: PageProps) {
     )
   }
   return (
-    <ContentLayout title='Chỉnh sửa thông tin món ăn'>
-      <AddOrEdit id={id} inforDish={res.data} />
+    <ContentLayout title='Chỉnh sửa thông tin quyền chức năng'>
+      <AddOrEdit id={id} inforPolicy={res.data} />
     </ContentLayout>
   )
 }

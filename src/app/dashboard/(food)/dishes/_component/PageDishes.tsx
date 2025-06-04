@@ -27,6 +27,7 @@ import { deleteCookiesAndRedirect } from '@/app/actions/action';
 import { useEffect, useState, ChangeEvent } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { TrashIcon } from '@radix-ui/react-icons';
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -114,7 +115,7 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
       setLoading(false);
       const result: IBackendRes<IDish[]> = await response.json();
 
-      if (result.statusCode === 201 && result.data) {
+      if (result.statusCode === 201 && result.data ) {
         const listDish = await getListDish();
         const newDishesArray: any[] = [];
         result.data.forEach((dish: IDish) => {
@@ -432,94 +433,184 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
       </div>
 
       {/* Dialog hiển thị danh sách món ăn mới */}
-      <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 w-[90vw] max-w-2xl max-h-[60vh] overflow-y-auto">
-            <Dialog.Title className="text-lg font-semibold mb-4">
-              Danh sách món ăn mới
-            </Dialog.Title>
-            <Dialog.Description className="text-sm text-gray-500 mb-4">
-              Các món ăn dưới đây được bóc tách từ ảnh menu và chưa có trong danh sách hiện tại. Bạn có thể chỉnh sửa hoặc xóa trước khi lưu.
-            </Dialog.Description>
+      {/* <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  rounded-lg p-6 w-[90vw] max-w-2xl max-h-[60vh] overflow-y-auto">
+          <Dialog.Title className="text-lg font-semibold mb-4">
+            Danh sách món ăn mới
+          </Dialog.Title>
+          <Dialog.Description className="text-sm mb-4">
+            Các món ăn dưới đây được bóc tách từ ảnh menu và chưa có trong danh sách hiện tại. Bạn có thể chỉnh sửa hoặc xóa trước khi lưu.
+          </Dialog.Description>
 
-            {/* Bảng hiển thị newDishes với khả năng chỉnh sửa và xóa */}
-            <div className="border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tên món</TableHead>
-                    <TableHead>Giá</TableHead>
-                    <TableHead>Mô tả ngắn</TableHead>
-                    <TableHead className="w-[50px]">Hành động</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {newDishes.length > 0 ? (
-                    newDishes.map((dish, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          <Input
-                            value={dish.dish_name}
-                            onChange={(e) =>
-                              handleInputChange(index, 'dish_name', e.target.value)
-                            }
-                            className={errors[index]?.dish_name ? 'border-red-500' : ''}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="number"
-                            value={dish.dish_price}
-                            onChange={(e) =>
-                              handleInputChange(index, 'dish_price', Number(e.target.value))
-                            }
-                            className={errors[index]?.dish_price ? 'border-red-500' : ''}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            value={dish.dish_short_description}
-                            onChange={(e) =>
-                              handleInputChange(index, 'dish_short_description', e.target.value)
-                            }
-                            className={errors[index]?.dish_short_description ? 'border-red-500' : ''}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteDish(index)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <TrashIcon className="w-4 h-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center">
-                        Không có món ăn mới
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Tên món</TableHead>
+                  <TableHead>Giá</TableHead>
+                  <TableHead>Mô tả ngắn</TableHead>
+                  <TableHead className="w-[50px]">Hành động</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {newDishes.length > 0 ? (
+                  newDishes.map((dish, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Input
+                          value={dish.dish_name}
+                          onChange={(e) =>
+                            handleInputChange(index, 'dish_name', e.target.value)
+                          }
+                          className={errors[index]?.dish_name ? 'border-red-500' : ''}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={dish.dish_price}
+                          onChange={(e) =>
+                            handleInputChange(index, 'dish_price', Number(e.target.value))
+                          }
+                          className={errors[index]?.dish_price ? 'border-red-500' : ''}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          value={dish.dish_short_description}
+                          onChange={(e) =>
+                            handleInputChange(index, 'dish_short_description', e.target.value)
+                          }
+                          className={errors[index]?.dish_short_description ? 'border-red-500' : ''}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteDish(index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center">
+                      Không có món ăn mới
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
-            <div className="flex justify-end gap-2 mt-4">
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Đóng
+            </Button>
+            <Button onClick={handleSubmit} disabled={newDishes.length === 0}>
+              Lưu danh sách
+            </Button>
+          </div>
+        </Dialog.Content>
+      </Dialog.Root> */}
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        {/* <AlertDialogOverlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" /> */}
+        <AlertDialogContent className="w-[90vw] max-w-2xl max-h-[60vh] overflow-y-auto rounded-lg p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-semibold">
+              Danh sách món ăn mới
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm">
+              Các món ăn dưới đây được bóc tách từ ảnh menu và chưa có trong danh sách hiện tại. Bạn có thể chỉnh sửa hoặc xóa trước khi lưu.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {/* Bảng hiển thị newDishes với khả năng chỉnh sửa và xóa */}
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Tên món</TableHead>
+                  <TableHead>Giá</TableHead>
+                  <TableHead>Mô tả ngắn</TableHead>
+                  <TableHead className="w-[50px]">Hành động</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {newDishes.length > 0 ? (
+                  newDishes.map((dish, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Input
+                          value={dish.dish_name}
+                          onChange={(e) =>
+                            handleInputChange(index, 'dish_name', e.target.value)
+                          }
+                          className={errors[index]?.dish_name ? 'border-red-500' : ''}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={dish.dish_price}
+                          onChange={(e) =>
+                            handleInputChange(index, 'dish_price', Number(e.target.value))
+                          }
+                          className={errors[index]?.dish_price ? 'border-red-500' : ''}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          value={dish.dish_short_description}
+                          onChange={(e) =>
+                            handleInputChange(index, 'dish_short_description', e.target.value)
+                          }
+                          className={errors[index]?.dish_short_description ? 'border-red-500' : ''}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteDish(index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center">
+                      Không có món ăn mới
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          <AlertDialogFooter className="mt-4">
+            <div className='flex gap-2 justify-end'>
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Đóng
               </Button>
+              {/* <AlertDialogAction asChild> */}
               <Button onClick={handleSubmit} disabled={newDishes.length === 0}>
                 Lưu danh sách
               </Button>
+              {/* </AlertDialogAction> */}
             </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }

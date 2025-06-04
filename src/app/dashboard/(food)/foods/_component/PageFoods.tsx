@@ -27,6 +27,7 @@ import { IFood } from '../food.interface';
 import { getListFood } from '../../food-combos/food-combos.api';
 import { deleteCookiesAndRedirect } from '@/app/actions/action';
 import { createFood } from '../food.api';
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -413,7 +414,7 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
       </div>
 
       {/* Dialog to display new food items */}
-      <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {/* <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50" />
           <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 w-[90vw] max-w-2xl max-h-[60vh] overflow-y-auto">
@@ -487,7 +488,88 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
             </div>
           </Dialog.Content>
         </Dialog.Portal>
-      </Dialog.Root>
+      </Dialog.Root> */}
+
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogContent className="w-[90vw] max-w-2xl max-h-[60vh] overflow-y-auto rounded-lg p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-semibold">
+              Danh sách món ăn mới
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm">
+              Các món ăn dưới đây được bóc tách từ ảnh và chưa có trong danh sách hiện tại. Bạn có thể chỉnh sửa hoặc xóa trước khi lưu.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Tên món</TableHead>
+                  <TableHead>Giá</TableHead>
+                  <TableHead>Mô tả</TableHead>
+                  <TableHead className="w-[50px]">Hành động</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {newFoods.length > 0 ? (
+                  newFoods.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Input
+                          value={item.food_name}
+                          onChange={(e) => handleInputChange(index, 'food_name', e.target.value)}
+                          className={errors[index]?.food_name ? 'border-red-500' : ''}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={item.food_price}
+                          onChange={(e) => handleInputChange(index, 'food_price', Number(e.target.value))}
+                          className={errors[index]?.food_price ? 'border-red-500' : ''}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          value={item.food_description}
+                          onChange={(e) => handleInputChange(index, 'food_description', e.target.value)}
+                          className={errors[index]?.food_description ? 'border-red-500' : ''}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteFood(index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center">
+                      Không có món ăn mới
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <AlertDialogFooter className="mt-4">
+            <div className='flex gap-2 justify-end'>
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                Đóng
+              </Button>
+              <Button onClick={handleSubmit} disabled={newFoods.length === 0}>
+                Lưu danh sách
+              </Button>
+            </div>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
