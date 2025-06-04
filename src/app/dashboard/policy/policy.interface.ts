@@ -21,7 +21,6 @@ export interface IPolicy {
   _id: string
   poly_res_id: string
   poly_name: string
-  dish_price: number
   poly_description: string
   poly_key: string[]
   isDeleted: boolean

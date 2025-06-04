@@ -1,3 +1,5 @@
+import { IPolicy } from "../../policy/policy.interface"
+
 export interface IEmployee {
   _id: string
   restaurant_id: string
@@ -12,5 +14,7 @@ export interface IEmployee {
   epl_gender: 'Khác' | 'Nam' | 'Nữ'
   epl_address: string
   epl_status: string
+  epl_policy_id: string
+  policy: IPolicy
   epl_face_id: boolean
 }

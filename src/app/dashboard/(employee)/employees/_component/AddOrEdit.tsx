@@ -18,6 +18,8 @@ import { createEmployee, updateEmployee } from '../employees.api'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { IEmployee } from '../employees.interface'
 import { isNumericString } from '@/app/utils'
+import { getPolicyAllName } from '@/app/dashboard/policy/policy.api'
+import { IPolicy } from '@/app/dashboard/policy/policy.interface'
 
 const FormSchema = z.object({
   epl_email: z
@@ -36,7 +38,8 @@ const FormSchema = z.object({
     message: 'Số điện thoại không hợp lệ'
   }),
   epl_gender: z.enum(['Khác', 'Nam', 'Nữ']),
-  epl_avatar: z.string().optional()
+  epl_avatar: z.string().optional(),
+  epl_policy_id: z.string().nonempty({ message: 'Vui lòng chọn quyền chức năng' }),
 })
 
 interface Props {
@@ -56,6 +59,7 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
     image_cloud: '',
     image_custom: ''
   })
+  const [listPolicies, setListPolicies] = useState<IPolicy[]>([])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -65,9 +69,47 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
       epl_name: '',
       epl_address: '',
       epl_phone: '',
-      epl_gender: 'Khác'
+      epl_gender: 'Khác',
+      epl_policy_id: ''
     }
   })
+
+  const getAllPolicy = async () => {
+    const res: IBackendRes<IPolicy[]> = await getPolicyAllName()
+    if (res.statusCode === 200 && res.data) {
+      setListPolicies(res.data)
+    } else if (res.code === -10) {
+      toast({
+        title: 'Thông báo',
+        description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+        variant: 'destructive'
+      })
+      await deleteCookiesAndRedirect()
+    } else if (res.code === -10) {
+      setLoading(false)
+      toast({
+        title: 'Thông báo',
+        description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
+        variant: 'destructive'
+      })
+      await deleteCookiesAndRedirect()
+    } else if (res.code === -11) {
+      setLoading(false)
+
+      toast({
+        title: 'Thông báo',
+        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+        variant: 'destructive'
+      })
+    } else {
+      setLoading(false)
+      toast({
+        title: 'Thông báo',
+        description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+        variant: 'destructive'
+      })
+    }
+  }
 
   // let epl_avatar = form.watch('epl_avatar')
 
@@ -128,6 +170,8 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
     }
   }
 
+
+
   useEffect(() => {
     const uploadAvatar = async () => {
       const formData_avatar = new FormData()
@@ -161,12 +205,17 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
         form.setValue('epl_address', inforEmployee.epl_address)
         form.setValue('epl_phone', inforEmployee.epl_phone)
         form.setValue('epl_gender', inforEmployee.epl_gender)
+        form.setValue('epl_policy_id', inforEmployee.epl_policy_id)
         if (inforEmployee && inforEmployee.epl_avatar) {
           setAvatar(inforEmployee.epl_avatar)
         }
       }
     }
   }, [inforEmployee, id])
+
+  useEffect(() => {
+    getAllPolicy()
+  }, [])
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     if (loading_upload_avatar) {
@@ -438,6 +487,30 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
                   <FormControl>
                     <Input placeholder="Địa chỉ..." {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='epl_policy_id'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quyền chức năng</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Chọn quyền chức năng...' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {listPolicies.map((policy) => (
+                        <SelectItem key={policy._id} value={policy._id}>
+                          {policy.poly_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

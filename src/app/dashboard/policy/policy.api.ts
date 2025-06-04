@@ -86,3 +86,14 @@ export const updateStatus = async ({ _id, poly_status }: { _id: string; poly_sta
   })
   return res
 }
+
+export const getPolicyAllName = async () => {
+  const res: IBackendRes<IPolicy[]> = await sendRequest({
+    url: `${process.env.URL_SERVER}/policy/all-name`,
+    method: 'GET',
+    nextOption: {
+      cache: 'no-store'
+    }
+  })
+  return res
+}

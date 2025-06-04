@@ -15,6 +15,16 @@ export const initialState: IEmployee = {
     image_custom: ''
   },
   epl_status: '',
+  epl_policy_id: '',
+  policy: {
+    _id: '',
+    poly_name: '',
+    poly_description: '',
+    poly_key: [''],
+    poly_res_id: '',
+    poly_status: 'enable',
+    isDeleted: false,
+  },
   epl_face_id: false,
 }
 
@@ -31,6 +41,7 @@ const inforEmployeeSlice = createSlice({
         (state.epl_gender = action.payload.epl_gender),
         (state.epl_address = action.payload.epl_address),
         (state.epl_avatar = action.payload.epl_avatar),
+        (state.policy = action.payload.policy),
         (state.restaurant_id = action.payload.epl_restaurant_id)
     },
     endAppEmployee: (state, action) => {
