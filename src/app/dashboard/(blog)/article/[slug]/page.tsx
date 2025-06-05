@@ -76,39 +76,40 @@ async function Component({ searchParams, params }: PageProps) {
       )
     }
   }
+  if (id === 'edit') {
+    const res: IBackendRes<IArticle> = await findArticleById({ atlId: searchParams.id })
 
-  const res: IBackendRes<IArticle> = await findArticleById({ atlId: id })
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy nhãn'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/category-blog?page=1&size=10'
+        />
+      )
+    }
 
-  if (res.statusCode === 404) {
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+
     return (
-      <ToastServer
-        message='Không tìm thấy nhãn'
-        title='Lỗi'
-        variant='destructive'
-        route='/dashboard/category-blog?page=1&size=10'
-      />
+      <ContentLayout title='Chỉnh sửa thông tin bài viết'>
+        {res.data.atlType === 'DEFAULT' && <AddArticleDefault id={searchParams.id} inforArticle={res.data} />}
+        {res.data.atlType === 'IMAGE' && <AddArticleImage id={searchParams.id} inforArticle={res.data} />}
+        {res.data.atlType === 'VIDEO' && <AddArticleVideo id={searchParams.id} inforArticle={res.data} />}
+      </ContentLayout>
     )
   }
-
-  if (res.code === -10) {
-    return <LogoutPage />
-  }
-  if (res.code === -11) {
-    return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
-  }
-  if (!res || !res.data) {
-    return (
-      <ErrorPage />
-    )
-  }
-
-  return (
-    <ContentLayout title='Chỉnh sửa thông tin bài viết'>
-      {res.data.atlType === 'DEFAULT' && <AddArticleDefault id={id} inforArticle={res.data} />}
-      {res.data.atlType === 'IMAGE' && <AddArticleImage id={id} inforArticle={res.data} />}
-      {res.data.atlType === 'VIDEO' && <AddArticleVideo id={id} inforArticle={res.data} />}
-    </ContentLayout>
-  )
 }
 
 export default function Page(props: PageProps) {

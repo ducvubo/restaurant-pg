@@ -123,7 +123,7 @@ export const columns: ColumnDef<ICatIngredient>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/cat-ingredients/${catIngredient.cat_igd_id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/cat-ingredients/edit?id=${catIngredient.cat_igd_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>

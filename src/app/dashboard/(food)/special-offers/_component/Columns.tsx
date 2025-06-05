@@ -127,7 +127,7 @@ export const columns: ColumnDef<ISpecialOffer>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/special-offers/${specialOffer.spo_id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/special-offers/edit?id=${specialOffer.spo_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>

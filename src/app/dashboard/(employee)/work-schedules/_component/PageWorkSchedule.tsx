@@ -398,7 +398,7 @@ export default function PageWorkSchedule() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
                                               <DropdownMenuItem asChild>
-                                                <Link href={`/dashboard/work-schedules/${item.ws_id}`}>
+                                                <Link href={`/dashboard/work-schedules/edit?id=${item.ws_id}`}>
                                                   Chỉnh sửa
                                                 </Link>
                                               </DropdownMenuItem>

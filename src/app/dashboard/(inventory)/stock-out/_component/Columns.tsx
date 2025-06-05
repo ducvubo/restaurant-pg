@@ -69,7 +69,7 @@ export const columns: ColumnDef<IStockOut>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/stock-out/${stockOut.stko_id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/stock-out/edit?id=${stockOut.stko_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>

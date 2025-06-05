@@ -1009,7 +1009,7 @@ export const columns: ColumnDef<ILeaveApplication>[] = [
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => router.push(`/dashboard/leave-application/${leaveApplication.leaveAppId}`)}
+                          onClick={() => router.push(`/dashboard/leave-application/edit?id=${leaveApplication.leaveAppId}`)}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>

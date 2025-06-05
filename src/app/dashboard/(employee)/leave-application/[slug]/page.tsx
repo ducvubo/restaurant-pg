@@ -26,36 +26,37 @@ async function Component({ searchParams, params }: PageProps) {
       </ContentLayout>
     )
   }
+  if (id === 'edit') {
+    let res: IBackendRes<ILeaveApplication> = await getInforLeaveApplicationWithEmployee(searchParams.id)
 
-  let res: IBackendRes<ILeaveApplication> = await getInforLeaveApplicationWithEmployee(id)
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy đơn xin nghỉ phép'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/leave-application?page=1&size=10'
+        />
+      )
+    }
 
-  if (res.statusCode === 404) {
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
     return (
-      <ToastServer
-        message='Không tìm thấy đơn xin nghỉ phép'
-        title='Lỗi'
-        variant='destructive'
-        route='/dashboard/leave-application?page=1&size=10'
-      />
+      <ContentLayout title='Chỉnh sửa thông tin đơn xin nghỉ phép'>
+        <AddOrEdit id={searchParams.id} inforLeaveApplication={res.data} />
+      </ContentLayout>
     )
   }
-
-  if (res.code === -10) {
-    return <LogoutPage />
-  }
-  if (res.code === -11) {
-    return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
-  }
-  if (!res || !res.data) {
-    return (
-      <ErrorPage />
-    )
-  }
-  return (
-    <ContentLayout title='Chỉnh sửa thông tin đơn xin nghỉ phép'>
-      <AddOrEdit id={id} inforLeaveApplication={res.data} />
-    </ContentLayout>
-  )
 }
 
 export default function Page(props: PageProps) {

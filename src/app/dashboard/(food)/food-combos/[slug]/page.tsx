@@ -73,37 +73,38 @@ async function Component({ searchParams, params }: PageProps) {
     }
   }
 
-  const res: IBackendRes<IFoodComboRes> = await findFoodComboById(id)
+  if (id === 'edit') {
+    const res: IBackendRes<IFoodComboRes> = await findFoodComboById(searchParams.id)
 
-  if (res.statusCode === 404) {
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy combo'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/food-combos?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+      // redirect('/login')
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
     return (
-      <ToastServer
-        message='Không tìm thấy combo'
-        title='Lỗi'
-        variant='destructive'
-        route='/dashboard/food-combos?page=1&size=10'
-      />
+      <ContentLayout title='Chỉnh sửa thông tin combo'>
+        <AddOrEdit id={searchParams.id} inforFoodCombo={res.data} />
+      </ContentLayout>
     )
   }
-
-  if (res.code === -10) {
-    return <LogoutPage />
-    // redirect('/login')
-  }
-  if (res.code === -11) {
-    return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
-  }
-  if (!res || !res.data) {
-    return (
-      <ErrorPage />
-    )
-  }
-  return (
-    <ContentLayout title='Chỉnh sửa thông tin combo'>
-      <AddOrEdit id={id} inforFoodCombo={res.data} />
-    </ContentLayout>
-  )
-  // }
 }
 
 export default function Page(props: PageProps) {

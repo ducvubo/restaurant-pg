@@ -139,7 +139,7 @@ export const columns: ColumnDef<IWorkingShift>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/working-shifts/${workingShift.wks_id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/working-shifts/edit?id=${workingShift.wks_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>

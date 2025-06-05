@@ -153,7 +153,7 @@ export const columns: ColumnDef<IOperationalCosts>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/operational-costs/${OperationalCosts.opera_cost_id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/operational-costs/edit?id=${OperationalCosts.opera_cost_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>

@@ -165,7 +165,7 @@ export const columns: ColumnDef<ITicketGuestRestaurant>[] = [
 
             <DropdownMenuSeparator />
             <DropdownMenuItem className='cursor-pointer'>
-              <Link href={`/dashboard/ticket-guest/${ticket.tkgr_id}`} className='cursor-pointer'> Xem chi tiết</Link>
+              <Link href={`/dashboard/ticket-guest/view?id=${ticket.tkgr_id}`} className='cursor-pointer'> Xem chi tiết</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

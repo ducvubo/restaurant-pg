@@ -135,7 +135,7 @@ export const columns: ColumnDef<ICategory>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/category-blog/${cat.catId}`} className='cursor-pointer'>
+            <Link href={`/dashboard/category-blog/edit?id=${cat.catId}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>

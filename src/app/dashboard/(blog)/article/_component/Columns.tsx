@@ -288,7 +288,7 @@ export const columns: ColumnDef<IArticle>[] = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/article/${article.atlId}`} className='cursor-pointer'>
+            <Link href={`/dashboard/article/edit?id=${article.atlId}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             {(article.atlStatus === 'DRAFT' || article.atlStatus === 'REJECTED' || article.atlStatus === 'UNPUBLISHED') && (

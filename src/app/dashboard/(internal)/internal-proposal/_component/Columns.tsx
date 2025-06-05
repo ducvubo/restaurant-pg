@@ -137,7 +137,7 @@ export const columns: ColumnDef<IInternalProposal>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/internal-proposal/${internalNote.itn_proposal_id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/internal-proposal/edit?id=${internalNote.itn_proposal_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>

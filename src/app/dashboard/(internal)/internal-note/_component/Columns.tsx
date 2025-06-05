@@ -56,7 +56,7 @@ export const columns: ColumnDef<IInternalNote>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/internal-note/${internalNote.itn_note_id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/internal-note/edit?id=${internalNote.itn_note_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>

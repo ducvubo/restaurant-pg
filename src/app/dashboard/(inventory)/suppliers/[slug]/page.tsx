@@ -69,36 +69,37 @@ async function Component({ searchParams, params }: PageProps) {
       )
     }
   }
+  if (id === 'edit') {
+    const res: IBackendRes<ISupplier> = await findSupplierById({ spli_id: searchParams.id })
 
-  const res: IBackendRes<ISupplier> = await findSupplierById({ spli_id: id })
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy nhà cung cấp'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/suppliers?page=1&size=10'
+        />
+      )
+    }
 
-  if (res.statusCode === 404) {
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
     return (
-      <ToastServer
-        message='Không tìm thấy nhà cung cấp'
-        title='Lỗi'
-        variant='destructive'
-        route='/dashboard/suppliers?page=1&size=10'
-      />
+      <ContentLayout title='Chỉnh sửa thông tin nhà cung cấp'>
+        <AddOrEdit id={searchParams.id} inforSupplier={res.data} />
+      </ContentLayout>
     )
   }
-
-  if (res.code === -10) {
-    return <LogoutPage />
-  }
-  if (res.code === -11) {
-    return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
-  }
-  if (!res || !res.data) {
-    return (
-      <ErrorPage />
-    )
-  }
-  return (
-    <ContentLayout title='Chỉnh sửa thông tin nhà cung cấp'>
-      <AddOrEdit id={id} inforSupplier={res.data} />
-    </ContentLayout>
-  )
 }
 
 export default function Page(props: PageProps) {

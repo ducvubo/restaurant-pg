@@ -198,68 +198,153 @@ export default function AddOrEdit({ id, inforPolicy }: Props) {
     })
   }
 
+  // async function onSubmit(data: z.infer<typeof FormSchema>) {
+  //   setLoading(true)
+  //   const selectedKeys = Array.from(checkedPermissions)
+  //   const payload: any = {
+  //     poly_name: data.poly_name,
+  //     poly_description: data.poly_description,
+  //     poly_key: selectedKeys,
+  //   }
+  //   console.log("🚀 ~ onSubmit ~ payload:", payload)
+
+  //   const res = id === 'add' ? await createPolicy(payload) : await updatePolicy({ ...payload, _id: id })
+
+  //   if (res.statusCode === 201 || res.statusCode === 200) {
+  //     setLoading(false)
+  //     toast({
+  //       title: 'Thành công',
+  //       description: id === 'add' ? 'Thêm quyền chức năng mới thành công' : 'Chỉnh sửa thông tin quyền chức năng thành công',
+  //       variant: 'default',
+  //     })
+  //     router.push('/dashboard/policy')
+  //     router.refresh()
+  //   } else if (res.statusCode === 400) {
+  //     setLoading(false)
+  //     if (Array.isArray(res.message)) {
+  //       res.message.map((item: string) => {
+  //         toast({
+  //           title: 'Thất bại',
+  //           description: item,
+  //           variant: 'destructive',
+  //         })
+  //       })
+  //     } else {
+  //       toast({
+  //         title: 'Thất bại',
+  //         description: res.message,
+  //         variant: 'destructive',
+  //       })
+  //     }
+  //   } else if (res.code === -10) {
+  //     setLoading(false)
+  //     toast({
+  //       title: 'Thông báo',
+  //       description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+  //       variant: 'destructive',
+  //     })
+  //     await deleteCookiesAndRedirect()
+  //   } else if (res.code === -11) {
+  //     setLoading(false)
+  //     toast({
+  //       title: 'Thông báo',
+  //       description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
+  //       variant: 'destructive',
+  //     })
+  //   } else {
+  //     setLoading(false)
+  //     toast({
+  //       title: 'Thông báo',
+  //       description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
+  //       variant: 'destructive',
+  //     })
+  //   }
+  //   setLoading(false)
+  // }
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    setLoading(true)
-    const selectedKeys = Array.from(checkedPermissions)
+    setLoading(true);
+    const selectedKeys: string[] = [];
+    const selectedPaths: string[] = [];
+
+    // Thu thập các key bằng forEach
+    checkedPermissions.forEach((key) => {
+      selectedKeys.push(key);
+    });
+
+    permissions.forEach((module) => {
+      module.functions.forEach((func) => {
+        func.actions.forEach((action) => {
+          const actionKey = `${func.key}_${action.key}`;
+          if (checkedPermissions.has(actionKey)) {
+            selectedPaths.push(...action.patchRequire);
+          }
+        });
+      });
+    });
+
+    const uniquePaths = Array.from(new Set(selectedPaths));
+
     const payload: any = {
       poly_name: data.poly_name,
       poly_description: data.poly_description,
       poly_key: selectedKeys,
-    }
-    console.log("🚀 ~ onSubmit ~ payload:", payload)
+      poly_path: uniquePaths, // Thêm danh sách paths vào payload
+    };
+    console.log("🚀 ~ onSubmit ~ payload:", payload);
 
-    const res = id === 'add' ? await createPolicy(payload) : await updatePolicy({ ...payload, _id: id })
+    const res = id === 'add' ? await createPolicy(payload) : await updatePolicy({ ...payload, _id: id });
 
     if (res.statusCode === 201 || res.statusCode === 200) {
-      setLoading(false)
+      setLoading(false);
       toast({
         title: 'Thành công',
         description: id === 'add' ? 'Thêm quyền chức năng mới thành công' : 'Chỉnh sửa thông tin quyền chức năng thành công',
         variant: 'default',
-      })
-      router.push('/dashboard/policy')
-      router.refresh()
+      });
+      router.push('/dashboard/policy');
+      router.refresh();
     } else if (res.statusCode === 400) {
-      setLoading(false)
+      setLoading(false);
       if (Array.isArray(res.message)) {
         res.message.map((item: string) => {
           toast({
             title: 'Thất bại',
             description: item,
             variant: 'destructive',
-          })
-        })
+          });
+        });
       } else {
         toast({
           title: 'Thất bại',
           description: res.message,
           variant: 'destructive',
-        })
+        });
       }
     } else if (res.code === -10) {
-      setLoading(false)
+      setLoading(false);
       toast({
         title: 'Thông báo',
         description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
         variant: 'destructive',
-      })
-      await deleteCookiesAndRedirect()
+      });
+      await deleteCookiesAndRedirect();
     } else if (res.code === -11) {
-      setLoading(false)
+      setLoading(false);
       toast({
         title: 'Thông báo',
         description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
         variant: 'destructive',
-      })
+      });
     } else {
-      setLoading(false)
+      setLoading(false);
       toast({
         title: 'Thông báo',
         description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
         variant: 'destructive',
-      })
+      });
     }
-    setLoading(false)
+    setLoading(false);
   }
 
   return (

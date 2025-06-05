@@ -126,7 +126,7 @@ export const columns: ColumnDef<IPolicy>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/policy/${poly._id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/policy/edit?id=${poly._id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>

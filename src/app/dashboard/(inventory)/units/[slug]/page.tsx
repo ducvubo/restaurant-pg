@@ -60,36 +60,37 @@ async function Component({ searchParams, params }: PageProps) {
       )
     }
   }
+  if (id === 'edit') {
+    const res: IBackendRes<IUnit> = await findUnitById({ unt_id: searchParams.id })
 
-  const res: IBackendRes<IUnit> = await findUnitById({ unt_id: id })
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy đơn vị đo'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/units?page=1&size=10'
+        />
+      )
+    }
 
-  if (res.statusCode === 404) {
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
     return (
-      <ToastServer
-        message='Không tìm thấy đơn vị đo'
-        title='Lỗi'
-        variant='destructive'
-        route='/dashboard/units?page=1&size=10'
-      />
+      <ContentLayout title='Chỉnh sửa thông tin đơn vị đo'>
+        <AddOrEdit id={searchParams.id} inforUnit={res.data} />
+      </ContentLayout>
     )
   }
-
-  if (res.code === -10) {
-    return <LogoutPage />
-  }
-  if (res.code === -11) {
-    return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
-  }
-  if (!res || !res.data) {
-    return (
-      <ErrorPage />
-    )
-  }
-  return (
-    <ContentLayout title='Chỉnh sửa thông tin đơn vị đo'>
-      <AddOrEdit id={id} inforUnit={res.data} />
-    </ContentLayout>
-  )
 }
 
 export default function Page(props: PageProps) {

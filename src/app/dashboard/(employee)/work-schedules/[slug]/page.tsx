@@ -27,37 +27,38 @@ async function Component({ searchParams, params }: PageProps) {
       </ContentLayout>
     )
   }
+  if (id === 'edit') {
+    const res: IBackendRes<IWorkSchedule> = await getWorkScheduleById({ id: searchParams.id })
 
-  const res: IBackendRes<IWorkSchedule> = await getWorkScheduleById({ id: id })
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy lịch làm việc'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/work-schedules'
+        />
+      )
+    }
 
-  if (res.statusCode === 404) {
+    if (res.code === -10) {
+      return <LogoutPage />
+      // redirect('/login')
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
     return (
-      <ToastServer
-        message='Không tìm thấy lịch làm việc'
-        title='Lỗi'
-        variant='destructive'
-        route='/dashboard/work-schedules'
-      />
+      <ContentLayout title='Chỉnh sửa thông tin lịch làm việc'>
+        <AddOrEdit id={searchParams.id} inforWorkSchedule={res.data} />
+      </ContentLayout>
     )
   }
-
-  if (res.code === -10) {
-    return <LogoutPage />
-    // redirect('/login')
-  }
-  if (res.code === -11) {
-    return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
-  }
-  if (!res || !res.data) {
-    return (
-      <ErrorPage />
-    )
-  }
-  return (
-    <ContentLayout title='Chỉnh sửa thông tin lịch làm việc'>
-      <AddOrEdit id={id} inforWorkSchedule={res.data} />
-    </ContentLayout>
-  )
 }
 
 export default function Page(props: PageProps) {

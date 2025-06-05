@@ -1,5 +1,5 @@
 'use client'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import { ITicketGuestRestaurant, ITicketGuestRestaurantReplice } from '../ticket-guest.interface'
 import { createTicketReplice, getInformationTicket, getTicketReplice, resolvedTicket } from '../ticket-guest.api'
@@ -16,6 +16,7 @@ import { formatDateMongo } from '@/app/utils'
 
 export default function PageDetailTicket() {
   const params = useParams()
+  const searchParams = useSearchParams()
   const [ticket, setTicket] = useState<ITicketGuestRestaurant>()
   const [ticketReply, setTicketReply] = useState<ITicketGuestRestaurantReplice[]>()
   const [isReplying, setIsReplying] = useState(false)
@@ -23,9 +24,13 @@ export default function PageDetailTicket() {
   const [isUploading, setIsUploading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false) // New loading state for submission
   const refContent = useRef<any>('')
+  const id = searchParams.get('id')
 
   const getTicket = async () => {
-    const res = await getInformationTicket(params.slug as string)
+    if (!id) {
+      return
+    }
+    const res = await getInformationTicket(id as string)
     if (res.statusCode === 200) {
       setTicket(res.data)
     } else if (res.code === -10) {
@@ -54,7 +59,10 @@ export default function PageDetailTicket() {
   }
 
   const getTicketReply = async () => {
-    const res = await getTicketReplice(params.slug as string)
+    if (!id) {
+      return
+    }
+    const res = await getTicketReplice(id as string)
     if (res.statusCode === 200) {
       setTicketReply(res.data)
     } else if (res.code === -10) {

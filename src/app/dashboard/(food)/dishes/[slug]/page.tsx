@@ -71,36 +71,38 @@ async function Component({ searchParams, params }: PageProps) {
     }
   }
 
-  const res: IBackendRes<IDish> = await findDishById({ _id: id })
+  if (id === 'edit') {
+    const res: IBackendRes<IDish> = await findDishById({ _id: searchParams.id })
 
-  if (res.statusCode === 404) {
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy món ăn'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/dishes?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+      // redirect('/login')
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
     return (
-      <ToastServer
-        message='Không tìm thấy món ăn'
-        title='Lỗi'
-        variant='destructive'
-        route='/dashboard/dishes?page=1&size=10'
-      />
+      <ContentLayout title='Chỉnh sửa thông tin món ăn'>
+        <AddOrEdit id={searchParams.id} inforDish={res.data} />
+      </ContentLayout>
     )
   }
-
-  if (res.code === -10) {
-    return <LogoutPage />
-    // redirect('/login')
-  }
-  if (res.code === -11) {
-    return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
-  }
-  if (!res || !res.data) {
-    return (
-      <ErrorPage />
-    )
-  }
-  return (
-    <ContentLayout title='Chỉnh sửa thông tin món ăn'>
-      <AddOrEdit id={id} inforDish={res.data} />
-    </ContentLayout>
-  )
 }
 
 export default function Page(props: PageProps) {

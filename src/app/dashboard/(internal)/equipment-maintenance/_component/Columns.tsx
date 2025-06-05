@@ -193,7 +193,7 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/equipment-maintenance/${equipmentMaintenance.eqp_mtn_id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/equipment-maintenance/edit?id=${equipmentMaintenance.eqp_mtn_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>

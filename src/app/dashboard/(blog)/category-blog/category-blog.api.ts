@@ -42,6 +42,7 @@ export const getAllCategorys = async ({
 }
 
 export const findCategoryById = async ({ catId }: { catId: string }) => {
+  console.log("🚀 ~ findCategoryById ~ catId:", catId)
   const res: IBackendRes<ICategory> = await sendRequest({
     url: `${URL_SERVER_BLOG}/categories/${catId}`,
     method: 'GET',
@@ -49,6 +50,7 @@ export const findCategoryById = async ({ catId }: { catId: string }) => {
       cache: 'no-store'
     }
   })
+  console.log("🚀 ~ findCategoryById ~ res:", res)
   return res
 }
 

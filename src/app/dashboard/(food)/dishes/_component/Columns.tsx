@@ -216,7 +216,7 @@ export const columns: ColumnDef<IDish>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/dishes/${dish._id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/dishes/edit?id=${dish._id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>

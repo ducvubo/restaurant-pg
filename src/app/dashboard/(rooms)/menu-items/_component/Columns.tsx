@@ -147,7 +147,7 @@ export const columns: ColumnDef<IMenuItems>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/menu-items/${menuItems.mitems_id}`} className='cursor-pointer'>
+            <Link href={`/dashboard/menu-items/edit?id=${menuItems.mitems_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
             <DropdownMenuItem asChild>
