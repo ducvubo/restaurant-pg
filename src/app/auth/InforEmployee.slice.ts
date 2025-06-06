@@ -21,6 +21,7 @@ export const initialState: IEmployee = {
     poly_name: '',
     poly_description: '',
     poly_key: [''],
+    poly_path: [''],
     poly_res_id: '',
     poly_status: 'enable',
     isDeleted: false,

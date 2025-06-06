@@ -22,6 +22,7 @@ export interface IPolicy {
   poly_res_id: string
   poly_name: string
   poly_description: string
+  poly_path: string[]
   poly_key: string[]
   isDeleted: boolean
   poly_status: 'enable' | 'disable'

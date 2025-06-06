@@ -26,54 +26,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { permissions } from '@/app/dashboard/policy/policy';
-import { Module } from '@/app/dashboard/policy/policy.interface';
-import buildPermissionSet from '@/app/dashboard/policy/buildPermissionSet';
 
 interface MenuProps {
   isOpen: boolean | undefined;
-}
-
-const hasPermissionForPath = (
-  path: string,
-  key: string,
-  poly_key: string[],
-  permissions: Module[]
-): boolean => {
-  const cleanPath = path.split('?')[0];
-  const permissionSet = buildPermissionSet(poly_key, cleanPath, permissions);
-  return permissionSet[key] || false;
-};
-
-
-const getActionKeyForPath = (pathname: string): string | null => {
-  const cleanPath = pathname.split('?')[0];
-  for (const module of permissions) {
-    for (const func of module.functions) {
-      for (const action of func.actions) {
-        for (const reqPath of action.patchRequire) {
-          const normalizedReqPath = normalizePath(reqPath, cleanPath);
-          if (cleanPath === normalizedReqPath) { // Khớp chính xác
-            return action.key;
-          }
-        }
-      }
-    }
-  }
-  return null;
-};
-
-function normalizePath(path: string, pathname: string): string {
-  const pathSegments = path.split('/');
-  const pathnameSegments = pathname.split('/');
-  return pathSegments
-    .map((segment, index) => {
-      if (segment === ':id' && index < pathnameSegments.length) {
-        return pathnameSegments[index];
-      }
-      return segment;
-    })
-    .join('/');
 }
 
 export function Menu({ isOpen }: MenuProps) {
@@ -82,79 +37,43 @@ export function Menu({ isOpen }: MenuProps) {
   const inforEmployee = useSelector((state: RootState) => state.inforEmployee);
   const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant);
   const poly_key = inforEmployee?.policy?.poly_key || [];
+  const poly_path = inforEmployee?.policy?.poly_path || [];
   const menuListEpl = getMenuListEmployee(pathname, poly_key);
   const menuList = inforRestaurant._id ? getMenuListRestaurant(pathname) : menuListEpl;
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
-    console.log('pathname', pathname);
-    setShowAlert(false);
     if (inforRestaurant._id || pathname === '/dashboard') {
       setShowAlert(false);
       return;
     }
 
-    let hasAccess = false;
-
-    // Kiểm tra submenu
-    for (const group of menuListEpl) {
-      for (const menu of group.menus) {
-        for (const submenu of menu.submenus) {
-          const submenuCleanHref = submenu.href.split('?')[0];
-          if (
-            (pathname === submenuCleanHref || pathname.startsWith(submenuCleanHref + '/')) &&
-            hasPermissionForPath(pathname, submenu.key, poly_key, permissions)
-          ) {
-            hasAccess = true;
-            break;
-          }
-        }
-        if (hasAccess) break;
-
-        const menuCleanHref = menu.href.split('?')[0];
-        if (
-          (pathname === menuCleanHref || pathname.startsWith(menuCleanHref + '/')) &&
-          hasPermissionForPath(pathname, menu.key, poly_key, permissions)
-        ) {
-          hasAccess = true;
-          break;
-        }
-      }
-      if (hasAccess) break;
-    }
-
-    // Kiểm tra non-menu routes
+    const cleanPath = pathname.split('?')[0];
+    let hasAccess = poly_path.includes(cleanPath);
     if (!hasAccess) {
-      const cleanPath = pathname.split('?')[0];
-      const actionKey = getActionKeyForPath(cleanPath);
-      if (actionKey) {
-        hasAccess = hasPermissionForPath(cleanPath, actionKey, poly_key, permissions);
-      }
+      for (const group of menuListEpl) {
+        for (const menu of group.menus) {
+          const menuCleanHref = menu.href.split('?')[0];
+          if (cleanPath === menuCleanHref) { // Khớp chính xác
+            hasAccess = poly_key.includes(menu.key);
+            if (hasAccess) break;
+          }
 
-      if (!hasAccess && !actionKey) {
-        const basePath = cleanPath.split('/').slice(0, 4).join('/');
-        for (const module of permissions) {
-          for (const func of module.functions) {
-            const funcPaths = func.actions
-              .flatMap((action) => action.patchRequire)
-              .map((path) => path.split('/').slice(0, 4).join('/'))
-              .filter((path) => path);
-            if (funcPaths.includes(basePath)) {
-              const hasActionWithPatch = func.actions.some((action) => action.patchRequire.length > 0);
-              if (!hasActionWithPatch && hasPermissionForPath(cleanPath, func.key, poly_key, permissions)) {
-                hasAccess = true;
-              }
-              break;
+          for (const submenu of menu.submenus) {
+            const submenuCleanHref = submenu.href.split('?')[0];
+            if (cleanPath === submenuCleanHref) { // Khớp chính xác
+              hasAccess = poly_key.includes(submenu.key);
+              if (hasAccess) break;
             }
           }
           if (hasAccess) break;
         }
+        if (hasAccess) break;
       }
-
-      setShowAlert(!hasAccess);
-      console.log('done');
     }
-  }, [pathname, poly_key, inforRestaurant._id, menuListEpl, router]);
+
+    setShowAlert(!hasAccess);
+  }, [pathname, poly_key, poly_path, inforRestaurant._id, menuListEpl]);
 
   const handleRedirect = () => {
     setShowAlert(false);
