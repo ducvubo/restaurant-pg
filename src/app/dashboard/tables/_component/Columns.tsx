@@ -161,7 +161,7 @@ export const columns: ColumnDef<ITable>[] = [
             <QRCodeSVG value={url} />
           </Link>
           <div className='flex gap-2 mt-2'>
-            <Button onClick={handleUpdateToken}>Đổi mã QR</Button>
+            <Button onClick={handleUpdateToken} disabled>Đổi mã QR</Button>
             <Button onClick={handleDownloadPDF}>Tải xuống</Button>
           </div>
         </div>
