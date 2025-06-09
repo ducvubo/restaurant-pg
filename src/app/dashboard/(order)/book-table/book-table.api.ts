@@ -26,7 +26,7 @@ export const getListBookTable = async ({
       pageSize,
       toDate,
       fromDate,
-      status: status,
+      status: status === 'ALL' ? '' : status,
       q
     }
   })
@@ -74,6 +74,27 @@ export const sendFeedbackBookTable = async (id: string, book_tb_feedback_restaur
     method: 'PATCH',
     body: {
       book_tb_feedback_restaurant
+    }
+  })
+  return res
+}
+
+// @Patch('hide-feedback/:book_tb_id')
+//   @UseGuards(AccountAuthGuard)
+//   @ResponseMessage('Ẩn hiển thị phản hồi của khách hàng')
+//   async hideFeedbackBookTable(
+//     @Param('book_tb_id') book_tb_id: string,
+//     @Body('book_tb_hide_feedback') book_tb_hide_feedback: boolean
+//   ): Promise<BookTableDocument> {
+//     return this.bookTableService.hideFeedbackBookTable({ book_tb_id, book_tb_hide_feedback })
+//   }
+
+export const hideFeedbackBookTable = async (id: string, book_tb_hide_feedback: boolean) => {
+  const res: IBackendRes<IBookTable> = await sendRequest({
+    url: `${process.env.URL_SERVER}/book-table/hide-feedback/${id}`,
+    method: 'PATCH',
+    body: {
+      book_tb_hide_feedback
     }
   })
   return res

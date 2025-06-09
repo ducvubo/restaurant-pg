@@ -36,8 +36,8 @@ export const columns: ColumnDef<IInternalNote>[] = [
     enableHiding: true
   },
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const internalNote = row.original
       const pathname = usePathname().split('/').pop()
@@ -53,7 +53,7 @@ export const columns: ColumnDef<IInternalNote>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/internal-note/edit?id=${internalNote.itn_note_id}`} className='cursor-pointer'>

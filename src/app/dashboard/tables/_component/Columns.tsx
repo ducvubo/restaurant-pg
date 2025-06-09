@@ -255,8 +255,8 @@ export const columns: ColumnDef<ITable>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const table = row.original
       const pathname = usePathname().split('/').pop()
@@ -272,7 +272,7 @@ export const columns: ColumnDef<ITable>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/tables/edit?id=${table._id}`} className='cursor-pointer'>

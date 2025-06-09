@@ -347,13 +347,12 @@ export function Navbar({ title }: NavbarProps) {
               unreadNoti: countRes.data.unreadNoti,
             })
           )
-          // Set hasMore to false if total notifications match loaded count
           if (countRes.data.totalNoti <= offset + res.data.data.length) {
             setHasMore(false)
           }
         }
       } else {
-        setHasMore(false) // No data returned, stop loading
+        setHasMore(false) 
       }
     } catch (error) {
       console.error('Lỗi khi tải thêm thông báo:', error)

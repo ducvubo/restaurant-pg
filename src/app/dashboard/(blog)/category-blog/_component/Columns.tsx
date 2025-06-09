@@ -115,8 +115,8 @@ export const columns: ColumnDef<ICategory>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const cat = row.original
       const pathname = usePathname().split('/').pop()
@@ -132,7 +132,7 @@ export const columns: ColumnDef<ICategory>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/category-blog/edit?id=${cat.catId}`} className='cursor-pointer'>

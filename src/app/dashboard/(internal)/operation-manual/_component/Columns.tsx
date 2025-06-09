@@ -122,8 +122,8 @@ export const columns: ColumnDef<IOperationManual>[] = [
     }
   },
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const operationManual = row.original
       const pathname = usePathname().split('/').pop()
@@ -139,7 +139,7 @@ export const columns: ColumnDef<IOperationManual>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/operation-manual/edit?id=${operationManual.opera_manual_id}`} className='cursor-pointer'>

@@ -116,8 +116,8 @@ export const columns: ColumnDef<IAmenities>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const amenities = row.original
       const pathname = usePathname().split('/').pop()
@@ -133,7 +133,7 @@ export const columns: ColumnDef<IAmenities>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/amenities/edit?id=${amenities.ame_id}`} className='cursor-pointer'>

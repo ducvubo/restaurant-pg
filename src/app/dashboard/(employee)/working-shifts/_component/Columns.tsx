@@ -119,8 +119,8 @@ export const columns: ColumnDef<IWorkingShift>[] = [
   // },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const workingShift = row.original
       const pathname = usePathname().split('/').pop()
@@ -136,7 +136,7 @@ export const columns: ColumnDef<IWorkingShift>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/working-shifts/edit?id=${workingShift.wks_id}`} className='cursor-pointer'>

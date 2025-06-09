@@ -12,19 +12,20 @@ export interface IBookTable {
   book_tb_number_children: number
   book_tb_note: string
   book_tb_status:
-    | 'WAITING_GUESR' //Chờ khách hàng xác nhận,
-    | 'GUEST_CANCEL' //Khách hàng hủy
-    | 'EXPRIED_CONFIRM_GUEST' // Hết hạn xác nhận của khách hàng
-    | 'WAITING_RESTAURANT' // Chờ nhà hàng xác nhận
-    | 'RESTAURANT_CANCEL' // Nhà hàng hủy
-    | 'RESTAURANT_CONFIRM' // Nhà hàng xác nhận
-    | 'DONE' // Hoàn thành
-    | 'EXEPTION' // ngoại lệ
+  | 'WAITING_GUESR' //Chờ khách hàng xác nhận,
+  | 'GUEST_CANCEL' //Khách hàng hủy
+  | 'EXPRIED_CONFIRM_GUEST' // Hết hạn xác nhận của khách hàng
+  | 'WAITING_RESTAURANT' // Chờ nhà hàng xác nhận
+  | 'RESTAURANT_CANCEL' // Nhà hàng hủy
+  | 'RESTAURANT_CONFIRM' // Nhà hàng xác nhận
+  | 'DONE' // Hoàn thành
+  | 'EXEPTION' // ngoại lệ
 
   book_tb_details: BookTbDetail[]
   book_tb_feedback: string
   book_tb_feedback_restaurant: string
   book_tb_star: number
+  book_tb_hide_feedback: boolean
   createdAt: string
   updatedAt: string
   book_tb_token_verify: string

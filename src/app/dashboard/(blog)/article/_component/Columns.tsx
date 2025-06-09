@@ -269,8 +269,8 @@ export const columns: ColumnDef<IArticle>[] = [
     }
   },
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const article = row.original
       const pathname = usePathname().split('/').pop()
@@ -286,7 +286,7 @@ export const columns: ColumnDef<IArticle>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <Link href={`/dashboard/article/edit?id=${article.atlId}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>

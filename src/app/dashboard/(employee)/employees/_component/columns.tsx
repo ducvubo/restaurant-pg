@@ -169,8 +169,8 @@ export const columns: ColumnDef<IEmployee>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const employees = row.original
       const pathname = usePathname().split('/').pop()
@@ -186,7 +186,7 @@ export const columns: ColumnDef<IEmployee>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <Link href={`/dashboard/employees/edit?id=${employees._id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>

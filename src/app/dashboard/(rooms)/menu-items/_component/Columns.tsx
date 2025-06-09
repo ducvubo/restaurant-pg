@@ -127,8 +127,8 @@ export const columns: ColumnDef<IMenuItems>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const menuItems = row.original
       const pathname = usePathname().split('/').pop()
@@ -144,7 +144,7 @@ export const columns: ColumnDef<IMenuItems>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/menu-items/edit?id=${menuItems.mitems_id}`} className='cursor-pointer'>

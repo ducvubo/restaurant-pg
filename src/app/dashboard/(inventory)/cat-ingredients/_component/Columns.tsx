@@ -103,8 +103,8 @@ export const columns: ColumnDef<ICatIngredient>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const catIngredient = row.original
       const pathname = usePathname().split('/').pop()
@@ -120,7 +120,7 @@ export const columns: ColumnDef<ICatIngredient>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/cat-ingredients/edit?id=${catIngredient.cat_igd_id}`} className='cursor-pointer'>

@@ -196,8 +196,8 @@ export const columns: ColumnDef<IDish>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const dish = row.original
       const pathname = usePathname().split('/').pop()
@@ -213,7 +213,7 @@ export const columns: ColumnDef<IDish>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/dishes/edit?id=${dish._id}`} className='cursor-pointer'>

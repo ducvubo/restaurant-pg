@@ -156,8 +156,8 @@ export const columns: ColumnDef<IRoom>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const amenities = row.original
       const pathname = usePathname().split('/').pop()
@@ -173,7 +173,7 @@ export const columns: ColumnDef<IRoom>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/rooms/edit?id=${amenities.room_id}`} className='cursor-pointer'>

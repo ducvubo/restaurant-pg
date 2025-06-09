@@ -122,8 +122,8 @@ export const columns: ColumnDef<ILabel>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const label = row.original
       const pathname = usePathname().split('/').pop()
@@ -139,7 +139,7 @@ export const columns: ColumnDef<ILabel>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/labels/edit?id=${label.lb_id}`} className='cursor-pointer'>

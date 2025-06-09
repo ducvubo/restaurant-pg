@@ -131,8 +131,8 @@ export const columns: ColumnDef<ISupplier>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const supplier = row.original
       const pathname = usePathname().split('/').pop()
@@ -148,7 +148,7 @@ export const columns: ColumnDef<ISupplier>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/suppliers/edit?id=${supplier.spli_id}`} className='cursor-pointer'>

@@ -173,8 +173,8 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
     }
   },
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const equipmentMaintenance = row.original
       const pathname = usePathname().split('/').pop()
@@ -190,7 +190,7 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/equipment-maintenance/edit?id=${equipmentMaintenance.eqp_mtn_id}`} className='cursor-pointer'>

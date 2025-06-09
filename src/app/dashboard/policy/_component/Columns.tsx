@@ -106,8 +106,8 @@ export const columns: ColumnDef<IPolicy>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const poly = row.original
       const pathname = usePathname().split('/').pop()
@@ -123,7 +123,7 @@ export const columns: ColumnDef<IPolicy>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/policy/edit?id=${poly._id}`} className='cursor-pointer'>

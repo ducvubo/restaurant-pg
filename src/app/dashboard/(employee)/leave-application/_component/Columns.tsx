@@ -121,7 +121,7 @@
 //     enableHiding: true
 //   },
 //   {
-//     accessorKey: 'Actions',
+//     accessorKey: 'Thao tác',
 //     id: 'Hành động',
 //     cell: ({ row }) => {
 //       const { setLoading } = useLoading()
@@ -674,7 +674,7 @@ export const columns: ColumnDef<ILeaveApplication>[] = [
     enableHiding: true
   },
   {
-    accessorKey: 'Actions',
+    accessorKey: 'Thao tác',
     id: 'Hành động',
     cell: ({ row }) => {
       const { setLoading } = useLoading()

@@ -199,8 +199,8 @@ export const columns: ColumnDef<IIngredient>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const ingredient = row.original
       const pathname = usePathname().split('/').pop()
@@ -216,7 +216,7 @@ export const columns: ColumnDef<IIngredient>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/ingredients/edit?id=${ingredient.igd_id}`} className='cursor-pointer'>

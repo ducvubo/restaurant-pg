@@ -133,8 +133,8 @@ export const columns: ColumnDef<IOperationalCosts>[] = [
     }
   },
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const OperationalCosts = row.original
       const pathname = usePathname().split('/').pop()
@@ -150,7 +150,7 @@ export const columns: ColumnDef<IOperationalCosts>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/operational-costs/edit?id=${OperationalCosts.opera_cost_id}`} className='cursor-pointer'>

@@ -117,8 +117,8 @@ export const columns: ColumnDef<IInternalProposal>[] = [
     }
   },
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const internalNote = row.original
       const pathname = usePathname().split('/').pop()
@@ -134,7 +134,7 @@ export const columns: ColumnDef<IInternalProposal>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/internal-proposal/edit?id=${internalNote.itn_proposal_id}`} className='cursor-pointer'>

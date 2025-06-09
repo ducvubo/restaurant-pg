@@ -110,8 +110,8 @@ export const columns: ColumnDef<IUnit>[] = [
   },
 
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const unit = row.original
       const pathname = usePathname().split('/').pop()
@@ -127,7 +127,7 @@ export const columns: ColumnDef<IUnit>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/units/edit?id=${unit.unt_id}`} className='cursor-pointer'>

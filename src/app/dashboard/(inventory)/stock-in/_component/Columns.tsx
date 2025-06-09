@@ -55,8 +55,8 @@ export const columns: ColumnDef<IStockIn>[] = [
     enableHiding: true
   },
   {
-    accessorKey: 'Actions',
-    id: 'Actions',
+    accessorKey: 'Thao tác',
+    id: 'Thao tác',
     cell: ({ row }) => {
       const stockIn = row.original
       const pathname = usePathname().split('/').pop()
@@ -72,7 +72,7 @@ export const columns: ColumnDef<IStockIn>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
             <Link href={`/dashboard/stock-in/edit?id=${stockIn.stki_id}`} className='cursor-pointer'>
