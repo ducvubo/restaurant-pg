@@ -227,3 +227,13 @@ export const getAllMenuItems = async () => {
 
   return res
 }
+
+export const updateFeedViewBookRoom = async (bkr_id: string, bkr_feed_view: 'active' | 'disable') => {
+  const res: IBackendRes<IBookRoom> = await sendRequest({
+    url: `${process.env.URL_SERVER_BOOK}/book-room/update-feed-view`,
+    method: 'PATCH',
+    body: { bkr_id, bkr_feed_view }
+  })
+
+  return res
+}

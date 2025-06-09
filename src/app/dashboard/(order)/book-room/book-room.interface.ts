@@ -41,6 +41,7 @@ export interface IBookRoom {
   bkr_reason_cancel: string
   bkr_detail_history: string
   bkr_status: BookRoomStatus
+  bkr_feed_view: 'active' | 'disable'
   bkr_plus_price: number
   amenities: IAmenitiesSnap[]
   menuItems: IMenuItemsSnap[]

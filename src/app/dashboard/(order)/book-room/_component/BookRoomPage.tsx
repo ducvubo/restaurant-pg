@@ -37,7 +37,8 @@ import {
   addMenuItemsToBookRoom,
   addAmenitiesToBookRoom,
   getAllAmenities,
-  getAllMenuItems
+  getAllMenuItems,
+  updateFeedViewBookRoom
 } from '../book-room.api'
 import {
   Card,
@@ -409,6 +410,16 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
     }
   }
 
+  const handleUpdateFeedViewBookRoom = async (bkr_feed_view: 'active' | 'disable') => {
+    const res = await updateFeedViewBookRoom(bookRoom.bkr_id!, bkr_feed_view)
+    if (res.statusCode === 200) {
+      toast({ title: 'Thành công', description: 'Đã cập nhật trạng thái phản hồi.', variant: 'default' })
+      refresh()
+    } else {
+      toast({ title: 'Thất bại', description: res.message || 'Không thể cập nhật trạng thái phản hồi.', variant: 'destructive' })
+    }
+  }
+
   return (
     <Card className="w-full mb-4">
       <CardHeader className="!py-0 !pt-6">
@@ -707,6 +718,16 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
               {!bookRoom.bkr_reply && (
                 <Button size="sm" onClick={handleSubmitFeedback}>
                   Gửi phản hồi
+                </Button>
+              )}
+              {bookRoom.bkr_reply && bookRoom.bkr_feed_view === 'disable' && (
+                <Button size="sm" onClick={() => handleUpdateFeedViewBookRoom('active')}>
+                  Hiển thị phản hồi
+                </Button>
+              )}
+              {bookRoom.bkr_reply && bookRoom.bkr_feed_view === 'active' && (
+                <Button size="sm" onClick={() => handleUpdateFeedViewBookRoom('disable')}>
+                  Ẩn phản hồi
                 </Button>
               )}
               {bookRoom.bkr_status === BookRoomStatus.GUEST_COMPLAINT && (
