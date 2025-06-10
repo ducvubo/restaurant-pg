@@ -9,23 +9,23 @@ import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { Loader2, UploadIcon, X } from 'lucide-react'
-import { MultiSelect } from '@/components/Multipleselect'
+import { InputTags } from '@/components/InputTag'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import EditorTiny from '@/components/EditorTiny'
 import { useRouter } from 'next/navigation'
 import { useLoading } from '@/context/LoadingContext'
 import { IBank, IResApiAddress, IRestaurant } from '@/app/auth/auth.interface'
 import { ImageUrl } from '../../(food)/foods/_component/AddOrEdit'
-import { InputTags } from '@/components/InputTag'
 import { updateInforRestaurant } from '../account.api'
+
 interface IProps {
   inforRestaurant?: IRestaurant
 }
 
-
 export default function AddOrEdit({ inforRestaurant }: IProps) {
   const { setLoading } = useLoading()
   const router = useRouter()
+  const [mode, setMode] = useState<'view' | 'edit'>('view') // New state for view/edit mode
   const [restaurant_name, setRestaurant_name] = useState(inforRestaurant?.restaurant_name || '')
   const [restaurant_phone, setRestaurant_phone] = useState(inforRestaurant?.restaurant_phone || '')
   const [provinces, setProvinces] = useState<IResApiAddress[]>([])
@@ -42,13 +42,11 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
   )
   const [address, setAddress] = useState(inforRestaurant?.restaurant_address.address_specific || '')
   const [schedule, setSchedule] = useState<{ day: string; startTime: string; endTime: string }[]>(
-    inforRestaurant?.restaurant_hours.map((item) => {
-      return {
-        day: item.day_of_week,
-        startTime: item.open,
-        endTime: item.close
-      }
-    }) || []
+    inforRestaurant?.restaurant_hours.map((item) => ({
+      day: item.day_of_week,
+      startTime: item.open,
+      endTime: item.close
+    })) || []
   )
   const [price, setPrice] = useState<{
     restaurant_price_option: 'up' | 'down' | 'range'
@@ -67,15 +65,10 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
     image_cloud: string
     image_custom: string
   }>(inforRestaurant?.restaurant_banner || { image_cloud: '', image_custom: '' })
-
   const [isUploadingBanner, setIsUploadingBanner] = useState(false)
   const fileInputBannerRef = useRef<HTMLInputElement | null>(null)
-
   const [uploadedUrlsImage, setUploadedUrlsImage] = useState<
-    {
-      image_cloud: string
-      image_custom: string
-    }[]
+    { image_cloud: string; image_custom: string }[]
   >(inforRestaurant?.restaurant_image || [])
   const [isUploadingImage, setIsUploadingImage] = useState(false)
   const fileInputImageRef = useRef<HTMLInputElement | null>(null)
@@ -85,10 +78,8 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
   const [selectedBank, setSelectedBank] = useState<string>(inforRestaurant?.restaurant_bank.bank || '')
   const [stkBank, setStkBank] = useState(inforRestaurant?.restaurant_bank.account_number || '')
   const [nameBank, setNameBank] = useState(inforRestaurant?.restaurant_bank.account_name || '')
-
-  const [amenities, setAmenities] = useState<string[]>([]);
-  const [tags, setTags] = useState<string[]>([]);
-
+  const [amenities, setAmenities] = useState<string[]>([])
+  const [tags, setTags] = useState<string[]>([])
 
   useEffect(() => {
     if (inforRestaurant) {
@@ -99,16 +90,16 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
         refDescription.current = inforRestaurant.restaurant_description
       }
       if (inforRestaurant.restaurant_metadata) {
-        const metaData = JSON.parse(inforRestaurant.restaurant_metadata);
+        const metaData = JSON.parse(inforRestaurant.restaurant_metadata)
         if (metaData.amenities) {
-          setAmenities(metaData.amenities);
+          setAmenities(metaData.amenities)
         }
         if (metaData.tags) {
-          setTags(metaData.tags);
+          setTags(metaData.tags)
         }
       }
     }
-  }, [inforRestaurant])
+  }, [inforRestaurant, mode])
 
   useEffect(() => {
     fetch('https://esgoo.net/api-tinhthanh/1/0.htm')
@@ -129,18 +120,7 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
           if (data.error === 0) {
             setDistricts(data.data)
             setWards([])
-
-            const district = data.data.find(
-              (d: {
-                id: string
-                name: string
-                name_en: string
-                full_name: string
-                full_name_en: string
-                latitude: string
-                longitude: string
-              }) => d.id === selectedDistrict?.id
-            )
+            const district = data.data.find((d: { id: string }) => d.id === selectedDistrict?.id)
             if (district) {
               setSelectedDistrict({ id: district.id, name: district.full_name })
             } else {
@@ -158,17 +138,7 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
         .then((data) => {
           if (data.error === 0) {
             setWards(data.data)
-            const ward = data.data.find(
-              (w: {
-                id: string
-                name: string
-                name_en: string
-                full_name: string
-                full_name_en: string
-                latitude: string
-                longitude: string
-              }) => w.id === selectedWard?.id
-            )
+            const ward = data.data.find((w: { id: string }) => w.id === selectedWard?.id)
             if (ward) {
               setSelectedWard({ id: ward.id, name: ward.full_name })
             } else {
@@ -202,13 +172,11 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
   ) => {
     const updatedSchedule = [...schedule]
     updatedSchedule[index][field] = value
-
     const { day, startTime, endTime } = updatedSchedule[index]
     if (field === 'startTime' || field === 'endTime') {
       if (startTime && endTime) {
         const startMinutes = timeToMinutes(startTime)
         const endMinutes = timeToMinutes(endTime)
-
         if (endMinutes <= startMinutes) {
           toast({
             title: 'Thất bại',
@@ -217,16 +185,12 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
           })
           return
         }
-
         const isOverlapping = updatedSchedule.some((scheduleItem, i) => {
           if (i === index || scheduleItem.day !== day) return false
-
           const itemStartMinutes = timeToMinutes(scheduleItem.startTime)
           const itemEndMinutes = timeToMinutes(scheduleItem.endTime)
-
           return startMinutes < itemEndMinutes && endMinutes > itemStartMinutes
         })
-
         if (isOverlapping) {
           toast({
             title: 'Thất bại',
@@ -248,17 +212,13 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
   const uploadImage = async (file: File, type: string) => {
     const formData = new FormData()
     formData.append('file', file)
-
     const res: IBackendRes<ImageUrl> = await (
       await fetch(`${process.env.NEXT_PUBLIC_URL_CLIENT}/api/upload`, {
         method: 'POST',
-        headers: {
-          folder_type: type
-        },
+        headers: { folder_type: type },
         body: formData
       })
     ).json()
-
     return res
   }
 
@@ -266,12 +226,7 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
     if (event.target.files) {
       const files = Array.from(event.target.files)
       setIsUploadingImage(true)
-
-      const uploadedImages: {
-        image_cloud: string
-        image_custom: string
-      }[] = []
-
+      const uploadedImages: { image_cloud: string; image_custom: string }[] = []
       for (const file of files) {
         try {
           const url = await uploadImage(file, 'restaurant_image')
@@ -282,7 +237,6 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
           console.error('Error uploading file:', file.name, error)
         }
       }
-
       setUploadedUrlsImage((prev) => [...prev, ...uploadedImages])
       setIsUploadingImage(false)
     }
@@ -292,7 +246,6 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
     if (event.target.files) {
       const files = Array.from(event.target.files)
       setIsUploadingBanner(true)
-
       if (files.length > 1) {
         toast({
           title: 'Thất bại',
@@ -304,15 +257,15 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
       }
       const res: IBackendRes<ImageUrl> = await uploadImage(files[0], 'restaurant_banner')
       if (res.statusCode === 201 && res.data) {
-        setIsUploadingBanner(false)
         setUploadedUrlsBanner(res.data)
-      } else {
         setIsUploadingBanner(false)
+      } else {
         toast({
           title: 'Thất bại',
           description: 'Upload ảnh thất bại!',
           variant: 'destructive'
         })
+        setIsUploadingBanner(false)
       }
     }
   }
@@ -339,7 +292,7 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
       },
       restaurant_price: price,
       restaurant_image: uploadedUrlsImage,
-      restaurant_hours: restaurant_hours,
+      restaurant_hours,
       restaurant_overview: refOverview.current.getContent(),
       restaurant_description: refDescription.current.getContent(),
       restaurant_bank: {
@@ -347,16 +300,10 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
         account_number: stkBank,
         account_name: nameBank
       },
-      restaurant_metadata: JSON.stringify({
-        amenities: amenities,
-        tags: tags
-      }),
+      restaurant_metadata: JSON.stringify({ amenities, tags })
     }
-
     setLoading(true)
-
     const res: IBackendRes<IRestaurant> = await updateInforRestaurant(data)
-    console.log("🚀 ~ onSubmit ~ res:", res)
     setLoading(false)
     if (res.statusCode === 201 || res.statusCode === 200) {
       toast({
@@ -364,28 +311,17 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
         description: 'Cập nhật thông tin nhà hàng thành công!',
         variant: 'default'
       })
+      setMode('view') // Switch to view mode after successful update
     } else if (res.statusCode === 400) {
       if (Array.isArray(res.message)) {
-        res.message.map((item: string) => {
-          toast({
-            title: 'Thất bại',
-            description: item,
-            variant: 'destructive'
-          })
-        })
+        res.message.map((item: string) =>
+          toast({ title: 'Thất bại', description: item, variant: 'destructive' })
+        )
       } else {
-        toast({
-          title: 'Thất bại',
-          description: res.message,
-          variant: 'destructive'
-        })
+        toast({ title: 'Thất bại', description: res.message, variant: 'destructive' })
       }
     } else if (res.statusCode === 409) {
-      toast({
-        title: 'Thất bại',
-        description: res.message,
-        variant: 'destructive'
-      })
+      toast({ title: 'Thất bại', description: res.message, variant: 'destructive' })
     } else if (res.code === -10) {
       toast({
         title: 'Thông báo',
@@ -407,17 +343,190 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
     }
   }
 
-  return (
+  const groupHoursByDay = (hours: { close: string; open: string; day_of_week: string }[]) => {
+    const grouped: { [key: string]: { open: string; close: string }[] } = {}
+    hours.forEach((hour) => {
+      if (!grouped[hour.day_of_week]) {
+        grouped[hour.day_of_week] = []
+      }
+      grouped[hour.day_of_week].push({ open: hour.open, close: hour.close })
+    })
+    return Object.keys(grouped).map((day) => ({
+      day_of_week: day,
+      times: grouped[day]
+    }))
+  }
+
+  // Render view mode as a table
+  const renderViewMode = () => {
+    const bank = listBank.find((b) => b.bin === selectedBank)
+    const priceDisplay =
+      price.restaurant_price_option === 'range'
+        ? `${price.restaurant_price_min} - ${price.restaurant_price_max}`
+        : price.restaurant_price_option === 'up'
+          ? `Trên ${price.restaurant_price_amount}`
+          : `Dưới ${price.restaurant_price_amount}`
+
+    return (
+      <div className='space-y-6'>
+        <div className='flex justify-end'>
+          <Button onClick={() => setMode('edit')}>Chỉnh sửa</Button>
+        </div>
+        <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
+          <tbody>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Tên nhà hàng</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>{restaurant_name}</td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Số điện thoại</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>{restaurant_phone}</td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Ngân hàng</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>{bank?.name || selectedBank}</td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Số tài khoản</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>{stkBank}</td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Tên tài khoản</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>{nameBank}</td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Địa chỉ</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                {`${address}, ${selectedWard?.name || ''}, ${selectedDistrict?.name || ''}, ${selectedProvince?.name || ''}`}
+              </td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Lịch làm việc</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                {schedule.length > 0 ? (
+                  <ul className='list-disc ml-4 mt-2'>
+                    {inforRestaurant && groupHoursByDay(inforRestaurant?.restaurant_hours).map((item, index) => (
+                      <li key={index} className='text-xs md:text-sm font-semibold'>
+                        {item.day_of_week}:
+                        <span className='font-normal'>
+                          {item.times.map((time, idx) => (
+                            <span key={idx} className='ml-1'>
+                              {time.open} - {time.close}
+                              {idx < item.times.length - 1 && ' và '}
+                            </span>
+                          ))}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  'Chưa có lịch làm việc'
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Khoảng giá</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>{priceDisplay}</td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Tiện ích</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                {amenities.length > 0 ? amenities.join(', ') : 'Chưa có tiện ích'}
+              </td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Tag</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                {tags.length > 0 ? tags.join(', ') : 'Chưa có tag'}
+              </td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Ảnh nhà hàng</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                {uploadedUrlsImage.length > 0 ? (
+                  <div className='flex flex-wrap gap-2'>
+                    {uploadedUrlsImage.map((url, index) => (
+                      <div key={index} className='relative w-24 h-24'>
+                        <Image
+                          src={url.image_cloud}
+                          alt={`Image ${index + 1}`}
+                          fill
+                          className='object-cover rounded-md'
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  'Chưa có ảnh'
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Banner nhà hàng</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                {uploadedUrlsBanner.image_cloud ? (
+                  <div className='relative w-24 h-24'>
+                    <Image
+                      src={uploadedUrlsBanner.image_cloud}
+                      alt='Banner'
+                      fill
+                      className='object-cover rounded-md'
+                    />
+                  </div>
+                ) : (
+                  'Chưa có banner'
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Mô tả nhà hàng</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: inforRestaurant?.restaurant_overview || 'Chưa có mô tả'
+                  }}
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Giới thiệu nhà hàng</td>
+              <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: inforRestaurant?.restaurant_description || 'Chưa có giới thiệu'
+                  }}
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
+  // Render edit mode (original form)
+  const renderEditMode = () => (
     <div>
+      <div className='flex justify-end mb-4 gap-2'>
+        <div className=''>
+          {isUploadingBanner || isUploadingImage ? (
+            <Button className='w-full'>
+              <Loader2 className='animate-spin' />
+            </Button>
+          ) : (
+            <Button onClick={onSubmit} className='w-full'>
+              Lưu
+            </Button>
+          )}
+        </div>
+        <Button onClick={() => setMode('view')}>Xem thông tin</Button>
+      </div>
+      {/* Original form content */}
       <div>
         <h1 className='-mb-3'>Ảnh nhà hàng</h1>
         <div className='flex gap-2'>
           <div
-            onClick={() => {
-              if (fileInputImageRef.current) {
-                fileInputImageRef.current.click()
-              }
-            }}
+            onClick={() => fileInputImageRef.current?.click()}
             className='mt-4 relative flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 aspect-square rounded-md border-2 border-dashed border-gray-300 transition-colors hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-600 focus-within:outline-2 focus-within:outline-dashed focus-within:outline-gray-500 dark:focus-within:outline-gray-400'
           >
             <div className='text-center'>
@@ -470,11 +579,7 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
         <h1 className='-mb-3'>Banner nhà hàng</h1>
         <div className='flex gap-2'>
           <div
-            onClick={() => {
-              if (fileInputBannerRef.current) {
-                fileInputBannerRef.current.click()
-              }
-            }}
+            onClick={() => fileInputBannerRef.current?.click()}
             className='mt-4 relative flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 aspect-square rounded-md border-2 border-dashed border-gray-300 transition-colors hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-600 focus-within:outline-2 focus-within:outline-dashed focus-within:outline-gray-500 dark:focus-within:outline-gray-400'
           >
             <div className='text-center'>
@@ -545,7 +650,6 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
             </SelectContent>
           </Select>
         </div>
-
         <div>
           <Label>Số tài khoản</Label>
           <Input
@@ -560,10 +664,7 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
           <Input
             placeholder='Tên tài khoản'
             className='w-full'
-            onChange={(e) => {
-              const { value } = e.target
-              setNameBank(value)
-            }}
+            onChange={(e) => setNameBank(e.target.value)}
             defaultValue={nameBank}
           />
         </div>
@@ -734,7 +835,6 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
             </SelectContent>
           </Select>
         </div>
-
         {price.restaurant_price_option === 'up' && (
           <div className='w-full'>
             <Label>Giá trên</Label>
@@ -787,7 +887,7 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
           <InputTags
             value={amenities}
             onChange={setAmenities}
-            placeholder="Nhập tiện ích (ví dụ: Wifi, Điều hòa, Bãi đỗ xe)"
+            placeholder='Nhập tiện ích (ví dụ: Wifi, Điều hòa, Bãi đỗ xe)'
           />
         </div>
         <div className='w-full'>
@@ -795,7 +895,7 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
           <InputTags
             value={tags}
             onChange={setTags}
-            placeholder="Nhập tag (ví dụ: Ẩm thực, Đồ uống, Món ăn đặc trưng)"
+            placeholder='Nhập tag (ví dụ: Ẩm thực, Đồ uống, Món ăn đặc trưng)'
           />
         </div>
       </div>
@@ -815,17 +915,8 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
         </div>
       </div>
 
-      <div className='flex justify-end mt-4 w-full'>
-        {isUploadingBanner || isUploadingImage ? (
-          <Button className='w-full'>
-            <Loader2 className='animate-spin' />
-          </Button>
-        ) : (
-          <Button onClick={onSubmit} className='w-full'>
-            Cập nhật thông tin
-          </Button>
-        )}
-      </div>
+
     </div>
   )
+  return <div>{mode === 'view' ? renderViewMode() : renderEditMode()}</div>
 }

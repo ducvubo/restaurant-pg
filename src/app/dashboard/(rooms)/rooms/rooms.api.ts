@@ -49,7 +49,6 @@ export const findRoomById = async ({ room_id }: { room_id: string }) => {
       cache: 'no-store'
     }
   })
-  console.log('🚀 ~ findRoomById ~ res:', res)
   return res
 }
 
