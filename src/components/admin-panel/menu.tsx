@@ -43,6 +43,7 @@ export function Menu({ isOpen }: MenuProps) {
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
+    return
     if (inforRestaurant._id || pathname === '/dashboard') {
       setShowAlert(false);
       return;

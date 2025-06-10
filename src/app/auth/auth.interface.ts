@@ -4,6 +4,31 @@ export interface IToken {
   type: 'employee' | 'restaurant'
 }
 
+export interface IBank {
+  id: number
+  name: string
+  code: string
+  bin: string
+  shortName: string
+  logo: string
+  transferSupported: number
+  lookupSupported: number
+  short_name: string
+  support: number
+  isTransfer: number
+  swift_code?: string
+}
+export interface IResApiAddress {
+  id: string
+  name: string
+  name_en: string
+  full_name: string
+  full_name_en: string
+  latitude: string
+  longitude: string
+}
+
+
 export interface IRestaurant {
   _id: string
   restaurant_id: string
@@ -17,29 +42,33 @@ export interface IRestaurant {
   }
   restaurant_address: {
     address_province: {
-      value: string
+      id: string
       name: string
     }
     address_district: {
-      value: string
+      id: string
       name: string
     }
     address_ward: {
-      value: string
+      id: string
       name: string
     }
     address_specific: string
   }
   restaurant_type: string[]
   restaurant_price: {
-    restaurant_price_option: string
+    restaurant_price_option: 'up' | 'down' | 'range'
+    restaurant_price_min: number
+    restaurant_price_max: number
     restaurant_price_amount: number
   }
   restaurant_hours: {
     day_of_week: string
-    open: number
-    close: number
+    open: string
+    close: string
   }[]
+  restaurant_bank: RestaurantBank
+
   restaurant_propose: string
   restaurant_overview: string
   restaurant_regulation: string
@@ -53,4 +82,11 @@ export interface IRestaurant {
   restaurant_verify: boolean
   restaurant_state: boolean
   restaurant_slug: string
+  restaurant_metadata: string
+}
+
+export interface RestaurantBank {
+  bank: string
+  account_number: string
+  account_name: string
 }
