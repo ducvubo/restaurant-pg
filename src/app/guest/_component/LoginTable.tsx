@@ -97,7 +97,7 @@ export function LoginTableForm() {
       }
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md space-y-6 bg-white/80 backdrop-blur-md p-4 rounded-xl shadow-xl mx-5">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md space-y-6 bg-white backdrop-blur-md p-4 rounded-xl shadow-xl mx-5">
           <FormField
             control={form.control}
             name='guest_name'
@@ -105,7 +105,7 @@ export function LoginTableForm() {
               <FormItem>
                 <FormLabel>Tên</FormLabel>
                 <FormControl>
-                  <Input placeholder='Vui lòng nhập tên của quý khách' {...field} />
+                  <Input className='text-base' placeholder='Vui lòng nhập tên của quý khách' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
