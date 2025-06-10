@@ -130,7 +130,7 @@ export default function OrderPage() {
               <div className='flex flex-col justify-between gap-1 w-full'>
                 <Label className='font-bold text-lg min-h-[10px]'>{dish.dish_name}</Label>
                 <span className='min-h-[10px] line-clamp-2 overflow-hidden'>{dish.dish_short_description}</span>
-                <span>Giá: {calculateFinalPrice(dish.dish_price, dish.dish_sale).toLocaleString()} đ</span>
+                <span>Giá: {Math.floor(calculateFinalPrice(dish.dish_price, dish.dish_sale)).toLocaleString()} đ</span>
               </div>
               <div className='flex flex-col justify-center gap-2'>
                 {dish.dish_sale && (
@@ -162,7 +162,7 @@ export default function OrderPage() {
           <Button className='w-full' disabled={totalQuantity === 0} onClick={handleOrderDish}>
             {totalQuantity === 0 && totalPrice === 0
               ? 'Chọn món trước khi đặt hàng'
-              : `Đặt ${totalQuantity} món với giá ${totalPrice.toLocaleString()} đ`}
+              : `Đặt ${totalQuantity} món với giá ${Math.floor(totalPrice).toLocaleString()} đ`}
           </Button>
         </div>
       </div>

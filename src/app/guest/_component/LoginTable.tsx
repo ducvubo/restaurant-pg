@@ -91,27 +91,62 @@ export function LoginTableForm() {
   }
 
   return (
+    // <div
+    //   className="min-h-screen flex items-center justify-center bg-cover bg-center"
+    //   style={{ backgroundImage: "url('/images/bg-guest.jpg')" }
+    //   }
+    // >
+    //   <Form {...form}>
+    //     <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md space-y-6 bg-white backdrop-blur-md p-4 rounded-xl shadow-xl mx-5">
+    //       <FormField
+    //         control={form.control}
+    //         name='guest_name'
+    //         render={({ field }) => (
+    //           <FormItem>
+    //             <FormLabel>Tên</FormLabel>
+    //             <FormControl>
+    //               <Input className='text-base' placeholder='Vui lòng nhập tên của quý khách' {...field} />
+    //             </FormControl>
+    //             <FormMessage />
+    //           </FormItem>
+    //         )}
+    //       />
+    //       <Button type='submit'>Vào bàn</Button>
+    //     </form>
+    //   </Form>
+    // </div>
     <div
       className="min-h-screen flex items-center justify-center bg-cover bg-center"
-      style={{ backgroundImage: "url('/images/bg-guest.jpg')" }
-      }
+      style={{ backgroundImage: "url('/images/bg-guest.jpg')" }}
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md space-y-6 bg-white backdrop-blur-md p-4 rounded-xl shadow-xl mx-5">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full max-w-md space-y-6 bg-white dark:bg-gray-900 backdrop-blur-md p-4 rounded-xl shadow-xl mx-5"
+        >
           <FormField
             control={form.control}
-            name='guest_name'
+            name="guest_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tên</FormLabel>
+                <FormLabel className="text-gray-900 dark:text-gray-100">Tên</FormLabel>
                 <FormControl>
-                  <Input className='text-base' placeholder='Vui lòng nhập tên của quý khách' {...field} />
+                  <Input
+                    className="text-base text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-blue-400"
+                    placeholder="Vui lòng nhập tên của quý khách"
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500 dark:text-red-400" />
               </FormItem>
             )}
           />
-          <Button type='submit'>Vào bàn</Button>
+          <Button
+            type="submit"
+            className="text-white dark:text-gray-900"
+          >
+            Vào bàn
+          </Button>
         </form>
       </Form>
     </div>

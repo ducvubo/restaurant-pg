@@ -126,20 +126,20 @@ export default function ListOrderPage() {
                 <Label className='font-semibold min-h-[10px]'>{item.od_dish_duplicate_id.dish_duplicate_name}</Label>
                 <span className=' italic'>
                   Giá:
-                  {calculateFinalPrice(
+                  {Math.floor(calculateFinalPrice(
                     item.od_dish_duplicate_id.dish_duplicate_price,
                     item.od_dish_duplicate_id.dish_duplicate_sale
-                  ).toLocaleString()}
+                  )).toLocaleString()}
                   đ x {item.od_dish_quantity}
                 </span>
 
                 <span className=' italic'>
                   Tổng:{' '}
                   {(
-                    calculateFinalPrice(
+                    Math.floor(calculateFinalPrice(
                       item.od_dish_duplicate_id.dish_duplicate_price,
                       item.od_dish_duplicate_id.dish_duplicate_sale
-                    ) * item.od_dish_quantity
+                    ) * item.od_dish_quantity)
                   ).toLocaleString()}
                 </span>
               </div>

@@ -312,6 +312,7 @@ export default function AddOrEdit({ inforRestaurant }: IProps) {
         variant: 'default'
       })
       setMode('view') // Switch to view mode after successful update
+      window.location.reload()
     } else if (res.statusCode === 400) {
       if (Array.isArray(res.message)) {
         res.message.map((item: string) =>

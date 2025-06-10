@@ -51,7 +51,8 @@ export const calculateFinalPrice = (price: number, sale: { sale_type: string; sa
   if (sale.sale_type === 'percentage') {
     return Math.max(0, price - (price * sale.sale_value) / 100)
   }
-  return price
+  console.log("🚀 ~ calculateFinalPrice ~ price:", price)
+  return Math.round(price)
 }
 
 export const switchStatusOrderSummaryVi = (status: string) => {
