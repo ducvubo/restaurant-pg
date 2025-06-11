@@ -77,7 +77,7 @@ export default function AddOrEdit({ id, inforDish }: Props) {
     image_cloud: '',
     image_custom: ''
   })
-  const [isSaleEnabled, setIsSaleEnabled] = useState(false)
+  const [isSaleEnabled, setIsSaleEnabled] = useState(true)
   const refDescription = useRef<any>('')
   const [finalPrice, setFinalPrice] = useState<any>(null)
 
@@ -116,6 +116,7 @@ export default function AddOrEdit({ id, inforDish }: Props) {
 
       // Đảm bảo giá sau khi giảm không âm
       setFinalPrice(Math.max(calculatedPrice, 0))
+
     } else {
       setFinalPrice(null) // Nếu không có giá trị nào hợp lệ, bỏ qua việc tính toán
     }
