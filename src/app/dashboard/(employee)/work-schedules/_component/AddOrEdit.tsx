@@ -130,6 +130,14 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
   }, [form.watch('ws_date'), id, inforWorkSchedule, constListEmployee])
 
   useEffect(() => {
+    if (inforWorkSchedule?.ws_status === 'T') {
+      toast({
+        title: 'Thông báo',
+        description: 'Lịch làm việc này đã kích hoạt, bạn không thể chỉnh sửa',
+        variant: 'destructive'
+      })
+      router.push('/dashboard/work-schedules')
+    }
     findListLabel()
     findListWorkingShift()
     findListEmployee()

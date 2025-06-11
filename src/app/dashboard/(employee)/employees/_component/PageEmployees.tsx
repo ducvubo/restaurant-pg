@@ -22,7 +22,7 @@ import Link from 'next/link'
 // import VerifyFace from './VerifyFace'
 import dynamic from 'next/dynamic'
 import { Input } from '@/components/ui/input'
-const VerifyFace = dynamic(() => import('./VerifyFace'), {
+const VerifyFace = dynamic(() => import('../../work-schedules/_component/VerifyFace'), {
   ssr: false,
 })
 
@@ -106,7 +106,7 @@ export function PageEmployees<TData, TValue>({ columns, meta, data }: DataTableP
         <Button variant={'outline'}>
           <Link href={'/dashboard/employees/add'}>Thêm</Link>
         </Button>
-        <VerifyFace />
+        {/* <VerifyFace /> */}
         {
           pathname === 'recycle' ? (
             <Button variant={'outline'}>

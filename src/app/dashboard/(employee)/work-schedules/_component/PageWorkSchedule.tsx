@@ -24,6 +24,8 @@ import { RootState } from '@/app/redux/store'
 import { useSelector } from 'react-redux'
 import { IEmployee } from '../../employees/employees.interface'
 import { useLoading } from '@/context/LoadingContext'
+import VerifyFace from './VerifyFace'
+import UploadFace from './UploadFace'
 
 interface IWorkScheduleMapping {
   date: string
@@ -357,13 +359,18 @@ export default function PageWorkSchedule() {
           </Popover>
         </div>
 
-        {inforRestaurant._id && (
-          <Link href="/dashboard/work-schedules/add">
-            <Button className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all">
-              <Plus className="mr-2 h-4 w-4" /> Thêm lịch
-            </Button>
-          </Link>
-        )}
+        <div className='flex gap-2'>
+          {inforRestaurant._id && (
+            <Link href="/dashboard/work-schedules/add">
+              <Button variant={'outline'}>
+                <Plus className="mr-2 h-4 w-4" /> Thêm lịch
+              </Button>
+            </Link>
+          )}
+          <VerifyFace />
+          <UploadFace />
+        </div>
+
       </div>
 
       <Card className="w-full backdrop-blur-sm shadow-lg rounded-xl overflow-hidden">

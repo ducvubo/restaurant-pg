@@ -23,6 +23,7 @@ import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import RegisterFaceUpload from './RegisterFaceUpload'
+import DeleteFace from './DeleteFace'
 // import RegisterFace from './RegisterFace'
 const RegisterFace = dynamic(() => import('./RegisterFace'), {
   ssr: false,
@@ -198,12 +199,27 @@ export const columns: ColumnDef<IEmployee>[] = [
             <DropdownMenuItem asChild>
               <DeleteOrRestore inforEmployee={employees} path='delete' />
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <RegisterFace inforEmployee={employees} />
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <RegisterFaceUpload inforEmployee={employees} />
-            </DropdownMenuItem>
+            {
+              employees.epl_face_id && (
+                <DropdownMenuItem asChild>
+                  <DeleteFace inforEmployee={employees} />
+                </DropdownMenuItem>
+              )
+            }
+           {
+              !employees.epl_face_id && (
+                <DropdownMenuItem asChild>
+                  <RegisterFace inforEmployee={employees} />
+                </DropdownMenuItem>
+              )
+            }
+            {
+              !employees.epl_face_id && (
+                <DropdownMenuItem asChild>
+                  <RegisterFaceUpload inforEmployee={employees} />
+                </DropdownMenuItem>
+              )
+           }
           </DropdownMenuContent>
         </DropdownMenu>
       )

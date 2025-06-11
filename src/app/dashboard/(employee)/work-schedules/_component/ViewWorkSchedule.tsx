@@ -3,10 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { ITimeSheet, IWorkSchedule } from '../work-schedule.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { ILabel } from '../../labels/label.interface'
-import { IWorkingShift } from '../../working-shifts/working-shift.interface'
 import { IEmployee } from '../../employees/employees.interface'
-import { getAllLabel, getAllWorkingShift, getAllEmployee, getTimeSheetByWorkSchedule } from '../work-schedule.api'
+import { getAllEmployee, getTimeSheetByWorkSchedule } from '../work-schedule.api'
 import { useToast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { format } from 'date-fns'
@@ -20,8 +18,7 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
   const router = useRouter()
   const { toast } = useToast()
   const [employees, setEmployees] = useState<IEmployee[]>([])
-  const [timesSheet, setSetTimeSheet] = useState<ITimeSheet[]>([])
-  console.log("🚀 ~ ViewWorkSchedule ~ timesSheet:", timesSheet)
+  const [timesSheet, setTimeSheet] = useState<ITimeSheet[]>([])
 
   const handleEdit = () => {
     router.push(`/dashboard/work-schedules/edit?id=${inforWorkSchedule.ws_id}`)
@@ -47,11 +44,10 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
     }
   }
 
-
   const fetchTimeSheetWorkSchedule = async () => {
     const res: IBackendRes<ITimeSheet[]> = await getTimeSheetByWorkSchedule({ ws_id: inforWorkSchedule.ws_id })
     if (res.statusCode === 200 && res.data) {
-      setSetTimeSheet(res.data)
+      setTimeSheet(res.data)
     } else if (res.code === -10) {
       toast({
         title: 'Thông báo',
@@ -62,7 +58,7 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
     } else {
       toast({
         title: 'Thông báo',
-        description: 'Đã có lỗi xảy ra khi lấy danh sách nhân viên, vui lòng thử lại sau',
+        description: 'Đã có lỗi xảy ra khi lấy danh sách chấm công, vui lòng thử lại sau',
         variant: 'destructive'
       })
     }
@@ -79,17 +75,16 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
 
   return (
     <div className='space-y-6'>
-      {
-        inforWorkSchedule.ws_status === 'F' && (
-          <div className='flex justify-end'>
-            <Button onClick={handleEdit}>Chỉnh sửa</Button>
-          </div>)
-      }
+      {inforWorkSchedule.ws_status === 'F' && (
+        <div className='flex justify-end'>
+          <Button onClick={handleEdit}>Chỉnh sửa</Button>
+        </div>
+      )}
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>
           <tr>
             <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Ngày</td>
-            <td className='border border-gray-300 dark:border-gray-700 p-2'>
+            <td className='border border-gray-300 dark:border-gray-200 p-2'>
               {inforWorkSchedule.ws_date
                 ? format(new Date(inforWorkSchedule.ws_date), 'dd/MM/yyyy', { locale: vi })
                 : 'Chưa thiết lập'}
@@ -97,19 +92,19 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
           </tr>
           <tr>
             <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Ca làm việc</td>
-            <td className='border border-gray-300 dark:border-gray-700 p-2'>{inforWorkSchedule.workingShift.wks_name}</td>
+            <td className='border border-gray-300 dark:border-gray-200 p-2'>{inforWorkSchedule.workingShift.wks_name}</td>
           </tr>
           <tr>
             <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Nhãn</td>
-            <td className='border border-gray-300 dark:border-gray-700 p-2'>{inforWorkSchedule.label.lb_name}</td>
+            <td className='border border-gray-300 dark:border-gray-200 p-2'>{inforWorkSchedule.label.lb_name}</td>
           </tr>
           <tr>
             <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Nhân viên</td>
-            <td className='border border-gray-300 dark:border-gray-700 p-2'>{employeeNames}</td>
+            <td className='border border-gray-300 dark:border-gray-200 p-2'>{employeeNames}</td>
           </tr>
           <tr>
             <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Ghi chú</td>
-            <td className='border border-gray-300 dark:border-gray-700 p-2'>
+            <td className='border border-gray-300 dark:border-gray-200 p-2'>
               <div
                 className='prose dark:prose-invert'
                 dangerouslySetInnerHTML={{ __html: inforWorkSchedule.ws_note || 'Chưa có ghi chú' }}
@@ -118,6 +113,45 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
           </tr>
         </tbody>
       </table>
-    </div >
+
+      <div className='space-y-4'>
+        <h2 className='text-lg font-semibold'>Danh sách chấm công</h2>
+        {timesSheet.length > 0 ? (
+          <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
+            <thead>
+              <tr className='bg-gray-100 dark:bg-gray-800'>
+                <th className='border border-gray-300 dark:border-gray-700 p-2 text-left'>Nhân viên</th>
+                <th className='border border-gray-300 dark:border-gray-700 p-2 text-left'>Check-in</th>
+                <th className='border border-gray-300 dark:border-gray-700 p-2 text-left'>Check-out</th>
+              </tr>
+            </thead>
+            <tbody>
+              {timesSheet.map((ts) => {
+                const employee = employees.find(emp => emp._id === ts.tsEmployeeId)
+                return (
+                  <tr key={ts.tsId}>
+                    <td className='border border-gray-300 dark:border-gray-200 p-2'>
+                      {employee?.epl_name || 'Không xác định'}
+                    </td>
+                    <td className='border border-gray-300 dark:border-gray-200 p-2'>
+                      {ts.tsCheckIn
+                        ? format(new Date(ts.tsCheckIn), 'dd/MM/yyyy HH:mm', { locale: vi })
+                        : 'Chưa check-in'}
+                    </td>
+                    <td className='border border-gray-300 dark:border-gray-200 p-2'>
+                      {ts.tsCheckOut
+                        ? format(new Date(ts.tsCheckOut), 'dd/MM/yyyy HH:mm', { locale: vi })
+                        : 'Chưa check-out'}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        ) : (
+          <p className='text-gray-500 dark:text-gray-400'>Chưa có dữ liệu chấm công</p>
+        )}
+      </div>
+    </div>
   )
 }

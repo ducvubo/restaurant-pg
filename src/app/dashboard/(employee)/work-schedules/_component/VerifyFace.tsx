@@ -20,8 +20,9 @@ import { toast } from '@/hooks/use-toast';
 import { useLoading } from '@/context/LoadingContext';
 import { debounce } from 'lodash';
 import { Button } from '@/components/ui/button';
-import { checkInWork } from '../employees.api';
-import { IEmployee } from '../employees.interface';
+import { IEmployee } from '../../employees/employees.interface';
+import { checkInWork } from '../work-schedule.api';
+import { Camera, Upload } from 'lucide-react';
 
 const VerifyFace = forwardRef<HTMLDivElement>((_, ref) => {
   const { setLoading } = useLoading();
@@ -141,117 +142,37 @@ const VerifyFace = forwardRef<HTMLDivElement>((_, ref) => {
 
       const data: IBackendRes<IEmployee> = await res.json();
       console.log("🚀 ~ verifyFace ~ data:", data);
-      if (data.statusCode === 201) {
+
+      if (data.statusCode === 201 && data.data) {
         const resTimeSheet = await checkInWork({
           _id: data?.data?._id as string,
           date: new Date(),
         });
-        console.log("🚀 ~ verifyFace ~ resTimeSheet:", resTimeSheet);
+
         if (resTimeSheet.statusCode === 201 || resTimeSheet.statusCode === 200) {
-          setLoading(false);
           toast({
             title: 'Thành công',
-            description: "Chấm công thành công",
+            description: `Nhân viên: ${data.data.epl_name}, Ca làm việc: ${resTimeSheet.data?.workingShift.wks_name}`,
             variant: 'default',
           });
           setIsOpen(false);
-          router.push('/dashboard/employees');
-        } else if (resTimeSheet.statusCode === 400) {
-          setLoading(false);
-          if (Array.isArray(resTimeSheet.message)) {
-            resTimeSheet.message.map((item: string) => {
-              toast({
-                title: 'Thất bại',
-                description: "Không tìm thấy ca làm việc xin vui lòng thử lại sau",
-                variant: 'destructive',
-              });
-            });
-          } else {
-            toast({
-              title: 'Thất bại',
-              description: "Không tìm thấy ca làm việc xin vui lòng thử lại sau",
-              variant: 'destructive',
-            });
-          }
-        } else if (resTimeSheet.statusCode === 404) {
-          setLoading(false);
-          toast({
-            title: 'Thông báo',
-            description: "Không tìm thấy ca làm việc xin vui lòng thử lại sau",
-            variant: 'destructive',
-          });
-        } else if (resTimeSheet.statusCode === 409) {
-          setLoading(false);
-          toast({
-            title: 'Thông báo',
-            description: "Không tìm thấy ca làm việc xin vui lòng thử lại sau",
-            variant: 'destructive',
-          });
-        } else if (resTimeSheet.code === -10) {
-          setLoading(false);
-          toast({
-            title: 'Thông báo',
-            description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
-            variant: 'destructive',
-          });
-          await deleteCookiesAndRedirect();
-        } else if (resTimeSheet.code === -11) {
-          setLoading(false);
-          toast({
-            title: 'Thông báo',
-            description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
-            variant: 'destructive',
-          });
+          router.push('/dashboard/work-schedules');
         } else {
-          setLoading(false);
-          toast({
-            title: 'Thất bại',
-            description: "Không tìm thấy ca làm việc xin vui lòng thử lại sau",
-            variant: 'destructive',
-          });
+          throw new Error(resTimeSheet.message || 'Không tìm thấy ca làm việc');
         }
-      } else if (res.status === 400) {
-        setLoading(false);
-        toast({
-          title: 'Thông báo',
-          description: "Không tìm thấy ca làm việc xin vui lòng thử lại sau",
-          variant: 'destructive',
-        });
-        setCapturedImage(null);
-      } else if (res.status === 401) {
-        setLoading(false);
-        toast({
-          title: 'Thông báo',
-          description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
-          variant: 'destructive',
-        });
-        await deleteCookiesAndRedirect();
-      } else if (res.status === 403) {
-        setLoading(false);
-        toast({
-          title: 'Thông báo',
-          description: 'Bạn không có quyền thực hiện thao tác này',
-          variant: 'destructive',
-        });
-        setCapturedImage(null);
       } else {
-        setLoading(false);
-        toast({
-          title: 'Thất bại',
-          description: "Không tìm thấy ca làm việc xin vui lòng thử lại sau",
-          variant: 'destructive',
-        });
-        setCapturedImage(null);
+        throw new Error('Không thể xác thực khuôn mặt');
       }
     } catch (err) {
       console.error('Lỗi gửi API:', err);
-      setLoading(false);
       toast({
         title: 'Thất bại',
         description: 'Không thể kết nối đến server, vui lòng thử lại sau',
         variant: 'destructive',
       });
-      setCapturedImage(null);
+      setCapturedImage(null); // Reset để cho phép chụp lại
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -259,7 +180,8 @@ const VerifyFace = forwardRef<HTMLDivElement>((_, ref) => {
     <div ref={ref}>
       <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
         <AlertDialogTrigger asChild>
-          <Button variant={'outline'} onClick={() => setIsOpen(true)}>
+          <Button variant={'outline'} onClick={() => setIsOpen(true)} className="flex items-center gap-2">
+            <Camera className="w-4 h-4" />
             Chấm công
           </Button>
         </AlertDialogTrigger>

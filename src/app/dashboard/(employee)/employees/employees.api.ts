@@ -87,13 +87,12 @@ export const updateStatus = async ({ _id, epl_status }: { _id: string; epl_statu
   return res
 }
 
-export const checkInWork = async ({ _id, date }: { _id: string, date: Date }) => {
+export const deleteFaceId = async ({ _id }: { _id: string }) => {
   const res: IBackendRes<IEmployee> = await sendRequest({
-    url: `${process.env.URL_SERVER_EMPLOYEE}/time-sheet`,
-    method: 'POST',
-    body: {
-      tsEmployeeId: _id,
-      tsCheckIn: date
+    url: `${process.env.URL_SERVER}/employees/delete-face`,
+    method: 'DELETE',
+    queryParams: {
+      id: _id
     }
   })
   return res

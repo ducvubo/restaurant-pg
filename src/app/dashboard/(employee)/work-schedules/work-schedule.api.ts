@@ -105,3 +105,15 @@ export const getTimeSheetByWorkSchedule = async ({ ws_id }: { ws_id: string }) =
   })
   return res
 }
+
+export const checkInWork = async ({ _id, date }: { _id: string, date: Date }) => {
+  const res: IBackendRes<IWorkSchedule> = await sendRequest({
+    url: `${process.env.URL_SERVER_EMPLOYEE}/time-sheet`,
+    method: 'POST',
+    body: {
+      tsEmployeeId: _id,
+      tsCheckIn: date
+    }
+  })
+  return res
+}
