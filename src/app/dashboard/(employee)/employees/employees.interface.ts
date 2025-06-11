@@ -1,4 +1,4 @@
-import { IRestaurant } from "@/app/auth/auth.interface"
+import { IRestaurant, RestaurantBank } from "@/app/auth/auth.interface"
 import { IPolicy } from "../../policy/policy.interface"
 
 export interface IEmployee {
@@ -36,4 +36,5 @@ export interface IEmployee {
     address_specific: string
   }
   restaurant_email: string
+  restaurant_bank: RestaurantBank
 }

@@ -1,99 +1,112 @@
 'use client'
-import React from 'react'
-import { IOrderRestaurant } from '../order.interface'
-import { Button } from '@/components/ui/button'
-import { RobotoMediumnormal } from '@/app/fonts/RobotoMediumnormal'
-import jsPDF from 'jspdf'
-import { calculateFinalPrice } from '@/app/utils'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/app/redux/store'
-interface Props {
-  order_summary: IOrderRestaurant
-}
-export default function GetQrPayment({ order_summary }: Props) {
-  const inforEmployee = useSelector((state: RootState) => state.inforEmployee);
-  console.log('inforEmployee', inforEmployee);
-  const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant);
-  const infor = inforRestaurant._id ? inforRestaurant : inforEmployee;
-  const name = infor.restaurant_name;
-  const address = infor.restaurant_address.address_specific + ', ' + infor.restaurant_address.address_district.name + ', ' + infor.restaurant_address.address_province.name;
-  const phone = infor.restaurant_phone;
-  const email = infor.restaurant_email;
+import React, { useState } from 'react';
+import { IOrderRestaurant } from '../order.interface';
+import { Button } from '@/components/ui/button';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/redux/store';
+import Image from 'next/image';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
-  const handleExportBill = () => {
-    const doc = new jsPDF();
-    // Thêm font
-    doc.addFileToVFS("Roboto-Medium.ttf", RobotoMediumnormal);
-    doc.addFont("Roboto-Medium.ttf", "Roboto-Medium", "normal");
-    doc.setFont("Roboto-Medium", "normal");
-    doc.setFontSize(25);
-    doc.addImage('/images/logo.png', 'PNG', 10, 10, 50, 25);
-    doc.text(`Hóa đơn`, 100, 26);
+export const calculateFinalPrice = (price: number, sale: { sale_type: string; sale_value: number } | undefined) => {
+  if (!sale) return price;
+  if (sale.sale_type === 'fixed') {
+    return Math.max(0, price - sale.sale_value);
+  }
+  if (sale.sale_type === 'percentage') {
+    return Math.max(0, price - (price * sale.sale_value) / 100);
+  }
+  console.log("🚀 ~ calculateFinalPrice ~ price:", price);
+  return Math.round(price);
+};
 
+export const calculateOrderSummary = (orderSummary: IOrderRestaurant) => {
+  let totalQuantity = 0;
+  let totalPrice = 0;
 
-    doc.setFontSize(10);
-    doc.text(`Tên nhà hàng: ${name}`, 20, 40);
-    doc.text(`Địa chỉ: ${address}`, 20, 45);
-    doc.text(`Số điện thoại: ${phone}`, 20, 50);
+  orderSummary.or_dish
+    .filter((dish) => dish.od_dish_status === 'delivered')
+    .forEach((dish) => {
+      const price = dish.od_dish_duplicate_id.dish_duplicate_price;
+      const sale = dish.od_dish_duplicate_id.dish_duplicate_sale;
+      const quantity = dish.od_dish_quantity;
+      const finalPrice = Math.floor(calculateFinalPrice(price, sale));
 
-    // Vẽ đường kẻ ngang
-    doc.setLineWidth(0.5);
-    doc.line(20, 52, 200, 52);
-
-    // Thông tin đơn hàng
-    doc.setFontSize(10);
-    doc.text(`Mã đơn hàng: ${order_summary._id}`, 20, 57);
-    doc.text(`Khách hàng: ${order_summary.od_dish_smr_guest_id.guest_name}`, 20, 62);
-    doc.text(`Bàn: ${order_summary.od_dish_smr_table_id.tbl_name}`, 20, 67);
-    doc.text(`Thời gian: ${new Date(order_summary.createdAt).toLocaleString('vi-VN')}`, 20, 72);
-
-    // Tiêu đề bảng món ăn
-    doc.setFontSize(12);
-    doc.text('STT', 20, 80);
-    doc.text('Món ăn', 40, 80);
-    doc.text('Số lượng', 100, 80);
-    doc.text('Đơn giá', 130, 80);
-    doc.text('Giảm giá', 160, 80);
-    doc.text('Thành tiền', 180, 80);
-
-    doc.line(20, 82, 200, 82);
-
-    let y = 92;
-    let total = 0;
-    order_summary.or_dish.forEach((dish, index) => {
-      if (dish.od_dish_status === 'delivered') {
-        const price = dish.od_dish_duplicate_id.dish_duplicate_price;
-        const quantity = dish.od_dish_quantity;
-        const sale = dish.od_dish_duplicate_id.dish_duplicate_sale;
-        const finalPrice = Math.floor(calculateFinalPrice(price, sale));
-        const discount = price - finalPrice;
-        const subtotal = finalPrice * quantity;
-
-
-        doc.text(`${index + 1}`, 20, y);
-        doc.text(dish.od_dish_duplicate_id.dish_duplicate_name, 40, y);
-        doc.text(`${quantity}`, 100, y);
-        doc.text(`${price.toLocaleString('vi-VN')} đ`, 130, y);
-        doc.text(`${discount.toLocaleString('vi-VN')} đ`, 160, y);
-        doc.text(`${subtotal.toLocaleString('vi-VN')} đ`, 180, y);
-        total += subtotal;
-        y += 10;
-      }
+      totalQuantity += quantity;
+      totalPrice += finalPrice * quantity;
     });
 
-    doc.line(20, y, 200, y);
-    y += 10;
+  return {
+    totalQuantity,
+    totalPrice,
+  };
+};
 
-    doc.setFontSize(14);
-    doc.text(`Tổng tiền: ${total.toLocaleString('vi-VN')} VNĐ`, 180, y, { align: 'right' });
+interface Props {
+  order_summary: IOrderRestaurant;
+}
 
-    // Lời cảm ơn
-    doc.setFontSize(12);
-    doc.text('Cảm ơn quý khách đã ủng hộ nhà hàng!', 105, y + 20, { align: 'center' });
-    // Lưu file PDF
-    doc.save(`hoa-don-${order_summary._id}.pdf`);
-  }
+export default function GetQrPayment({ order_summary }: Props) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const inforEmployee = useSelector((state: RootState) => state.inforEmployee);
+  const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant);
+  const infor = inforRestaurant._id ? inforRestaurant : inforEmployee;
+  const bank = infor.restaurant_bank;
+  const { totalQuantity, totalPrice } = calculateOrderSummary(order_summary);
+
   return (
-    <Button className='mr-2' variant='outline' onClick={handleExportBill}>Thanh toán</Button>
-  )
+    <>
+      <Button disabled={order_summary.od_dish_smr_status === 'paid' || order_summary.od_dish_smr_status === 'refuse'} className="mr-2" variant="outline" onClick={() => setIsDialogOpen(true)}>
+        Thanh toán
+      </Button>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-center">Xác nhận thanh toán</DialogTitle>
+            <DialogDescription className="text-center">
+              Vui lòng quét mã QR để thanh toán cho đơn hàng.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4">
+            {bank && (
+              <Image
+                src={`https://qr.sepay.vn/img?acc=${bank.account_number}&bank=${bank.bank}&amount=${totalPrice}&des=ORDERDISH ${order_summary._id}`}
+                width={150}
+                height={150}
+                alt="QR Code Thanh toán"
+                className="object-contain"
+              />
+            )}
+            <p className="text-center text-sm">
+              Bạn đang thanh toán cho đơn hàng gồm{' '}
+              <span className="font-bold">{totalQuantity}</span> món với tổng giá trị{' '}
+              <span className="font-bold">{totalPrice.toLocaleString('vi-VN')} đ</span>.
+              Vui lòng quét mã QR để hoàn tất thanh toán (Lưu ý: Không sửa nội dung giao dịch).
+            </p>
+            {bank && (
+              <div className="text-center text-sm">
+                <p>Tên tài khoản: {bank.account_name}</p>
+                <p>Số tài khoản: {bank.account_number}</p>
+                <p>
+                  Nội dung giao dịch:{' '}
+                  <span className="font-bold">ORDERDISH {order_summary._id}</span>
+                </p>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="flex justify-center gap-4">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Hủy
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }

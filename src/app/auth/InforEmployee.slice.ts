@@ -45,6 +45,11 @@ export const initialState: IEmployee = {
     address_specific: ''
   },
   restaurant_email: '',
+  restaurant_bank: {
+    account_name: '',
+    account_number: '',
+    bank: ''
+  }
 }
 
 const inforEmployeeSlice = createSlice({
@@ -65,7 +70,8 @@ const inforEmployeeSlice = createSlice({
         (state.restaurant_phone = action.payload.restaurant_phone),
         (state.restaurant_name = action.payload.restaurant_name),
         (state.restaurant_address = action.payload.restaurant_address),
-        (state.restaurant_email = action.payload.restaurant_email)
+        (state.restaurant_email = action.payload.restaurant_email),
+        (state.restaurant_bank = action.payload.restaurant_bank)
     },
     endAppEmployee: (state, action) => {
       return initialState
