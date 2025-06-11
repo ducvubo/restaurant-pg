@@ -210,7 +210,30 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
           poly_res_id: '',
           poly_status: 'enable',
         },
-        epl_face_id: false
+        epl_face_id: false,
+        restaurant_address: {
+          address_district: {
+            id: '',
+            name: ''
+          },
+          address_province: {
+            id: '',
+            name: ''
+          },
+          address_ward: {
+            id: '',
+            name: ''
+          },
+          address_specific: '',
+        },
+        restaurant_bank: {
+          account_name: '',
+          account_number: '',
+          bank: '',
+        },
+        restaurant_email: '',
+        restaurant_name: '',
+        restaurant_phone: '',
       })
       setListEmployees(listEpl)
     }

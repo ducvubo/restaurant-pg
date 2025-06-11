@@ -82,7 +82,7 @@ export default function AddOrderSummary() {
       setIsModalOpen(false)
       toast({
         title: 'Thành công',
-        description: 'Đã gọi món thành công',
+        description: 'Thêm hóa đơn thành công',
         variant: 'default'
       })
       form.reset({
