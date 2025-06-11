@@ -9,6 +9,7 @@ import { findLabelById, getAllLabels } from '../label.api'
 import { ILabel } from '../label.interface'
 import { PageLabel } from '../_component/PageLabel'
 import ErrorPage from '@/components/ErrorPage'
+import ViewLabel from '../_component/ViewLabel'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -88,6 +89,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin nhãn'>
         <AddOrEdit id={searchParams.id} inforLabel={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<ILabel> = await findLabelById({ lb_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy nhãn'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/labels?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin nhãn'>
+        <ViewLabel inforLabel={res.data} />
       </ContentLayout>
     )
   }

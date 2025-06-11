@@ -75,6 +75,9 @@ export const columns: ColumnDef<IStockIn>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
+            <Link href={`/dashboard/stock-in/view?id=${stockIn.stki_id}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <Link href={`/dashboard/stock-in/edit?id=${stockIn.stki_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>

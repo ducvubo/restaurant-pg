@@ -11,6 +11,7 @@ import { findArticleById, getAllArticle } from '../article.api'
 import { columns } from '../_component/Columns'
 import { PageArticle } from '../_component/PageArticle'
 import ErrorPage from '@/components/ErrorPage'
+import ViewArticle from '../_component/ViewArticle'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -107,6 +108,39 @@ async function Component({ searchParams, params }: PageProps) {
         {res.data.atlType === 'DEFAULT' && <AddArticleDefault id={searchParams.id} inforArticle={res.data} />}
         {res.data.atlType === 'IMAGE' && <AddArticleImage id={searchParams.id} inforArticle={res.data} />}
         {res.data.atlType === 'VIDEO' && <AddArticleVideo id={searchParams.id} inforArticle={res.data} />}
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IArticle> = await findArticleById({ atlId: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy nhãn'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/category-blog?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+
+    return (
+      <ContentLayout title='Xem thông tin bài viết'>
+        <ViewArticle inforArticle={res.data} />
       </ContentLayout>
     )
   }

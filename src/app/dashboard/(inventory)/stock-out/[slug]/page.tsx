@@ -9,6 +9,7 @@ import { findStockOutById, getAllStockOuts } from '../stock-out.api'
 import { IStockOut } from '../stock-out.interface'
 import { PageStockOut } from '../_component/PageStockOut'
 import ErrorPage from '@/components/ErrorPage'
+import ViewStockOut from '../_component/ViewStockOut'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -88,6 +89,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin phiếu xuất'>
         <AddOrEdit id={searchParams.id} inforStockOut={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IStockOut> = await findStockOutById({ stko_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy phiếu xuất'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/stock-out?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin phiếu xuất'>
+        <ViewStockOut inforStockOut={res.data} />
       </ContentLayout>
     )
   }

@@ -10,6 +10,7 @@ import { PageEmployees } from '../_component/PageEmployees'
 import LogoutPage from '@/app/logout/page'
 import { columns } from '../_component/columns'
 import ErrorPage from '@/components/ErrorPage'
+import ViewEmployee from '../_component/ViewEmployee'
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
 })
@@ -91,6 +92,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin nhân viên'>
         <AddOrEdit id={searchParams.id} inforEmployee={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IEmployee> = await findOneEmployee({ _id: searchParams.id })
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy nhân viên'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/employees?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+      // redirect('/login')
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin nhân viên'>
+        <ViewEmployee inforEmployee={res.data} />
       </ContentLayout>
     )
   }

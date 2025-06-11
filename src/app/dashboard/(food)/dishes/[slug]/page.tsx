@@ -19,6 +19,7 @@ import { PageDishes } from '../_component/PageDishes'
 import { columns } from '../_component/Columns'
 import LogoutPage from '@/app/logout/page'
 import ErrorPage from '@/components/ErrorPage'
+import ViewDish from '../_component/ViewDish'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -100,6 +101,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin món ăn'>
         <AddOrEdit id={searchParams.id} inforDish={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IDish> = await findDishById({ _id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy món ăn'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/dishes?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin món ăn'>
+        <ViewDish inforDish={res.data} />
       </ContentLayout>
     )
   }

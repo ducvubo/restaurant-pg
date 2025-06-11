@@ -138,6 +138,9 @@ export const columns: ColumnDef<ICategory>[] = [
             <Link href={`/dashboard/category-blog/edit?id=${cat.catId}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
+            <Link href={`/dashboard/category-blog/view?id=${cat.catId}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <DropdownMenuItem asChild>
               <DeleteOrRestore inforCategory={cat} path='delete' />
             </DropdownMenuItem>

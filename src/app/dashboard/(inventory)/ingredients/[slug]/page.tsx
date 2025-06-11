@@ -9,6 +9,7 @@ import { findIngredientById, getAllIngredients } from '../ingredient.api'
 import { IIngredient } from '../ingredient.interface'
 import { PageIngredient } from '../_component/PageIngredient'
 import ErrorPage from '@/components/ErrorPage'
+import ViewIngredient from '../_component/ViewIngredient'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -88,6 +89,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin nguyên liệu'>
         <AddOrEdit id={searchParams.id} inforIngredient={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IIngredient> = await findIngredientById({ igd_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy nguyên liệu'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/ingredients?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin nguyên liệu'>
+        <ViewIngredient inforIngredient={res.data} />
       </ContentLayout>
     )
   }

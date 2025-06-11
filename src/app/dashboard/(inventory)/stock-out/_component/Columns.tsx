@@ -69,6 +69,9 @@ export const columns: ColumnDef<IStockOut>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
+            <Link href={`/dashboard/stock-out/view?id=${stockOut.stko_id}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <Link href={`/dashboard/stock-out/edit?id=${stockOut.stko_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>

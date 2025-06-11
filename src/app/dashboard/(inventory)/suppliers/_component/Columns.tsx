@@ -151,6 +151,9 @@ export const columns: ColumnDef<ISupplier>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
+            <Link href={`/dashboard/suppliers/view?id=${supplier.spli_id}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <Link href={`/dashboard/suppliers/edit?id=${supplier.spli_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>

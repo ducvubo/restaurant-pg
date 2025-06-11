@@ -275,6 +275,9 @@ export const columns: ColumnDef<ITable>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
+            <Link href={`/dashboard/tables/view?id=${table._id}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <Link href={`/dashboard/tables/edit?id=${table._id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>

@@ -288,6 +288,9 @@ export const columns: ColumnDef<IArticle>[] = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <Link href={`/dashboard/article/view?id=${article.atlId}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <Link href={`/dashboard/article/edit?id=${article.atlId}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>

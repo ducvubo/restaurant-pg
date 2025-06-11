@@ -402,6 +402,11 @@ export default function PageWorkSchedule() {
                                                   Chỉnh sửa
                                                 </Link>
                                               </DropdownMenuItem>
+                                              <DropdownMenuItem asChild>
+                                                <Link href={`/dashboard/work-schedules/view?id=${item.ws_id}`}>
+                                                  Xem
+                                                </Link>
+                                              </DropdownMenuItem>
                                               <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                                                 <DialogTrigger asChild>
                                                   <DropdownMenuItem
@@ -434,12 +439,6 @@ export default function PageWorkSchedule() {
                                                   </DialogFooter>
                                                 </DialogContent>
                                               </Dialog>
-                                              {/* <DropdownMenuItem
-                                                onClick={() => openUpdateStatusDialog(item.ws_id, shift.wks_id)}
-                                                className="text-red-500"
-                                              >
-                                                {shift.wks_status === 'T' ? 'Ngưng kích hoạt' : 'Kích hoạt'}
-                                              </DropdownMenuItem> */}
                                               <Dialog open={isUpdateStatusDialogOpen} onOpenChange={setIsUpdateStatusDialogOpen}>
                                                 <DialogTrigger asChild>
                                                   <DropdownMenuItem

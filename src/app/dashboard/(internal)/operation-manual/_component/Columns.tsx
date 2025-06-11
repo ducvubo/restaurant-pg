@@ -142,6 +142,9 @@ export const columns: ColumnDef<IOperationManual>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
+            <Link href={`/dashboard/operation-manual/view?id=${operationManual.opera_manual_id}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <Link href={`/dashboard/operation-manual/edit?id=${operationManual.opera_manual_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>

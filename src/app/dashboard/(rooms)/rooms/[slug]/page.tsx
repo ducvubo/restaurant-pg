@@ -9,6 +9,7 @@ import { IRoom } from '../rooms.interface'
 import { findRoomById, getAllRoom } from '../rooms.api'
 import { PageRoom } from '../_component/PageRoom'
 import ErrorPage from '@/components/ErrorPage'
+import ViewRoom from '../_component/ViewRoom'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -88,6 +89,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin phòng/sảnh'>
         <AddOrEdit id={searchParams.id} inforRoom={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IRoom> = await findRoomById({ room_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy phòng/sảnh'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/rooms?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin phòng/sảnh'>
+        <ViewRoom inforRoom={res.data} />
       </ContentLayout>
     )
   }

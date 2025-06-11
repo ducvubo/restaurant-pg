@@ -9,6 +9,7 @@ import { IInternalProposal } from '../internal-proposal.interface'
 import { findInternalProposalById, getAllInternalProposals } from '../internal-proposal.api'
 import { PageInternalProposal } from '../_component/PageInternalProposal'
 import ErrorPage from '@/components/ErrorPage'
+import ViewInternalProposal from '../_component/ViewInternalProposal'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -88,6 +89,37 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin đề xuất nội bộ'>
         <AddOrEdit id={searchParams.id} inforInternalProposal={res.data} />
+      </ContentLayout>
+    )
+  }
+  if (id === 'view') {
+    const res: IBackendRes<IInternalProposal> = await findInternalProposalById({ itn_proposal_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy đề xuất nội bộ'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/internal-proposal?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin đề xuất nội bộ'>
+        <ViewInternalProposal inforInternalProposal={res.data} />
       </ContentLayout>
     )
   }

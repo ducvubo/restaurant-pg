@@ -18,6 +18,7 @@ import { findSupplierById, getAllSuppliers } from '../supplier.api'
 import { ISupplier } from '../supplier.interface'
 import { PageSupplier } from '../_component/PageSupplier'
 import ErrorPage from '@/components/ErrorPage'
+import ViewSupplier from '../_component/ViewSupplier'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -97,6 +98,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin nhà cung cấp'>
         <AddOrEdit id={searchParams.id} inforSupplier={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<ISupplier> = await findSupplierById({ spli_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy nhà cung cấp'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/suppliers?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin nhà cung cấp'>
+        <ViewSupplier inforSupplier={res.data} />
       </ContentLayout>
     )
   }

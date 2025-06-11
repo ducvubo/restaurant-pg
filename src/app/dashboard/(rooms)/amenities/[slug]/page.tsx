@@ -9,6 +9,7 @@ import { IAmenities } from '../amenities.interface'
 import { findAmenitiesById, getAllAmenities } from '../amenities.api'
 import { PageAmenities } from '../_component/PageAmenities'
 import ErrorPage from '@/components/ErrorPage'
+import ViewAmenities from '../_component/ViewAmenities'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -88,6 +89,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin dịch vụ'>
         <AddOrEdit id={searchParams.id} inforAmenities={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IAmenities> = await findAmenitiesById({ ame_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy dịch vụ'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/amenities?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin dịch vụ'>
+        <ViewAmenities inforAmenities={res.data} />
       </ContentLayout>
     )
   }

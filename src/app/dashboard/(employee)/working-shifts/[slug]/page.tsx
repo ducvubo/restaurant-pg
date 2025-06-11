@@ -19,6 +19,7 @@ import LogoutPage from '@/app/logout/page'
 import { IWorkingShift } from '../working-shift.interface'
 import { findWorkingShiftById, getAllWorkingShifts } from '../working-shift.api'
 import ErrorPage from '@/components/ErrorPage'
+import ViewWorkingShift from '../_component/ViewWorkingShip'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -99,6 +100,36 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin ca làm việc'>
         <AddOrEdit id={searchParams.id} inforWorkingShift={res.data} />
+      </ContentLayout>
+    )
+  }
+  if (id === 'view') {
+    const res: IBackendRes<IWorkingShift> = await findWorkingShiftById({ _id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy ca làm việc'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/working-shifts?page=1&size=10'
+        />
+      )
+    }
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin ca làm việc'>
+        <ViewWorkingShift inforWorkingShift={res.data} />
       </ContentLayout>
     )
   }

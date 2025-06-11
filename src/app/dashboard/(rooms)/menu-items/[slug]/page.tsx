@@ -9,6 +9,7 @@ import { IMenuItems } from '../menu-items.interface'
 import { findMenuItemsById, getAllMenuItems } from '../menu-items.api'
 import { PageMenuItems } from '../_component/PageMenuItems'
 import ErrorPage from '@/components/ErrorPage'
+import ViewMenuItems from '../_component/ViewMenuItems'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -88,6 +89,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin thực đơn'>
         <AddOrEdit id={searchParams.id} inforMenuItems={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IMenuItems> = await findMenuItemsById({ mitems_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy thực đơn'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/menu-items?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin thực đơn'>
+        <ViewMenuItems inforMenuItems={res.data} />
       </ContentLayout>
     )
   }

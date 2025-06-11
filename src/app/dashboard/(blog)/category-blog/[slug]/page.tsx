@@ -9,6 +9,7 @@ import { findCategoryById, getAllCategorys } from '../category-blog.api'
 import { ICategory } from '../category-blog.interface'
 import { PageCategory } from '../_component/PageCategory'
 import ErrorPage from '@/components/ErrorPage'
+import ViewCategory from '../_component/ViewCategoryBlog'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -23,7 +24,7 @@ async function Component({ searchParams, params }: PageProps) {
   const id = params.slug
   if (id === 'add') {
     return (
-      <ContentLayout title='Thêm nhãn'>
+      <ContentLayout title='Thêm danh mục blog'>
         <AddOrEdit id='add' />
       </ContentLayout>
     )
@@ -53,7 +54,7 @@ async function Component({ searchParams, params }: PageProps) {
 
       return (
         <div>
-          <ContentLayout title='Danh sách nhãn đã xóa'>
+          <ContentLayout title='Danh sách danh mục blog đã xóa'>
             <PageCategory data={data} columns={columns} meta={res.data.meta} />
           </ContentLayout>
         </div>
@@ -66,7 +67,7 @@ async function Component({ searchParams, params }: PageProps) {
     if (res.statusCode === 404) {
       return (
         <ToastServer
-          message='Không tìm thấy nhãn'
+          message='Không tìm thấy danh mục blog'
           title='Lỗi'
           variant='destructive'
           route='/dashboard/category-blog?page=1&size=10'
@@ -86,8 +87,40 @@ async function Component({ searchParams, params }: PageProps) {
       )
     }
     return (
-      <ContentLayout title='Chỉnh sửa thông tin nhãn'>
+      <ContentLayout title='Chỉnh sửa thông tin danh mục blog'>
         <AddOrEdit id={searchParams.id} inforCategory={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<ICategory> = await findCategoryById({ catId: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy danh mục blog'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/category-blog?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Chỉnh sửa thông tin danh mục blog'>
+        <ViewCategory inforCategory={res.data} />
       </ContentLayout>
     )
   }

@@ -18,6 +18,7 @@ import { IInternalNote } from '../internal-note.interface'
 import { findInternalNoteById, getAllInternalNotes } from '../internal-note.api'
 import { PageInternalNote } from '../_component/PageInternalNote'
 import ErrorPage from '@/components/ErrorPage'
+import ViewInternalNote from '../_component/ViewInternalNote'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -97,6 +98,37 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin ghi chú nội bộ'>
         <AddOrEdit id={searchParams.id} inforInternalNote={res.data} />
+      </ContentLayout>
+    )
+  }
+  if (id === 'view') {
+    const res: IBackendRes<IInternalNote> = await findInternalNoteById({ itn_note_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy ghi chú nội bộ'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/internal-note?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin ghi chú nội bộ'>
+        <ViewInternalNote inforInternalNote={res.data} />
       </ContentLayout>
     )
   }

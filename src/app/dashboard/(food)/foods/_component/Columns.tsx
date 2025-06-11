@@ -263,6 +263,9 @@ export const columns: ColumnDef<IFood>[] = [
             <Link href={`/dashboard/foods/edit?id=${food.food_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
+            <Link href={`/dashboard/foods/view?id=${food.food_id}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <DropdownMenuItem asChild>
               <DeleteOrRestore inforFood={food} path='delete' />
             </DropdownMenuItem>

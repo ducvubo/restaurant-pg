@@ -219,6 +219,9 @@ export const columns: ColumnDef<IDish>[] = [
             <Link href={`/dashboard/dishes/edit?id=${dish._id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
+            <Link href={`/dashboard/dishes/view?id=${dish._id}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <DropdownMenuItem asChild>
               <DeleteOrRestore inforDish={dish} path='delete' />
             </DropdownMenuItem>

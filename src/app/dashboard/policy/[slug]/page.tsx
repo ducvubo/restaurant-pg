@@ -19,6 +19,7 @@ import ErrorPage from '@/components/ErrorPage'
 import { IPolicy } from '../policy.interface'
 import { findPolicyById, getAllPolicy } from '../policy.api'
 import { PagePolicyes } from '../_component/PagePolicy'
+import ViewPolicy from '../_component/ViewPolicy'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -99,6 +100,39 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin quyền chức năng'>
         <AddOrEdit id={searchParams.id} inforPolicy={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IPolicy> = await findPolicyById({ _id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy quyền chức năng'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/policy?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+      // redirect('/login')
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin quyền chức năng'>
+        <ViewPolicy inforPolicy={res.data} />
       </ContentLayout>
     )
   }

@@ -124,8 +124,10 @@ export const columns: ColumnDef<IPolicy>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-
             <DropdownMenuSeparator />
+            <Link href={`/dashboard/policy/view?id=${poly._id}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <Link href={`/dashboard/policy/edit?id=${poly._id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>

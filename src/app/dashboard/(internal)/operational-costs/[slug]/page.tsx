@@ -9,6 +9,7 @@ import { IOperationalCosts } from '../operational-costs.interface'
 import { findOperationalCostsById, getAllOperationalCostss } from '../operational-costs.api'
 import { PageOperationalCosts } from '../_component/PageOperationalCosts'
 import ErrorPage from '@/components/ErrorPage'
+import ViewOperationalCosts from '../_component/ViewOperationalCosts'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -88,6 +89,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin chi phí vận hành'>
         <AddOrEdit id={searchParams.id} inforInternalProposal={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IOperationalCosts> = await findOperationalCostsById({ opera_cost_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy chi phí vận hành'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/operational-costs?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin chi phí vận hành'>
+        <ViewOperationalCosts inforOperationalCosts={res.data} />
       </ContentLayout>
     )
   }

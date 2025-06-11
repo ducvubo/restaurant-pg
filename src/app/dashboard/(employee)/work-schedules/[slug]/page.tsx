@@ -8,6 +8,7 @@ import LogoutPage from '@/app/logout/page'
 import { IWorkSchedule } from '../work-schedule.interface'
 import { getWorkScheduleById } from '../work-schedule.api'
 import ErrorPage from '@/components/ErrorPage'
+import ViewWorkSchedule from '../_component/ViewWorkSchedule'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -56,6 +57,39 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin lịch làm việc'>
         <AddOrEdit id={searchParams.id} inforWorkSchedule={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IWorkSchedule> = await getWorkScheduleById({ id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy lịch làm việc'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/work-schedules'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+      // redirect('/login')
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin lịch làm việc'>
+        <ViewWorkSchedule inforWorkSchedule={res.data} />
       </ContentLayout>
     )
   }

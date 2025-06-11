@@ -263,6 +263,9 @@ export const columns: ColumnDef<IFoodComboRes>[] = [
             <Link href={`/dashboard/food-combos/edit?id=${foodCombo.fcb_id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
+            <Link href={`/dashboard/food-combos/view?id=${foodCombo.fcb_id}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <DropdownMenuItem asChild>
               <DeleteOrRestore inforFoodCombo={foodCombo} path='delete' />
             </DropdownMenuItem>

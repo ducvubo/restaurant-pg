@@ -9,6 +9,7 @@ import { IOperationManual } from '../operation-manual.interface'
 import { findOperationManualById, getAllOperationManuals } from '../operation-manual.api'
 import { PageOperationManual } from '../_component/PageOperationManual'
 import ErrorPage from '@/components/ErrorPage'
+import ViewOperationManual from '../_component/ViewOperationManual'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -88,6 +89,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin tài liệu vận hành'>
         <AddOrEdit id={searchParams.id} inforOperationManual={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IOperationManual> = await findOperationManualById({ opera_manual_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy tài liệu vận hành'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/operation-manual?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin tài liệu vận hành'>
+        <ViewOperationManual inforOperationManual={res.data} />
       </ContentLayout>
     )
   }

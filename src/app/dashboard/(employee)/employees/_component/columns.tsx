@@ -191,6 +191,9 @@ export const columns: ColumnDef<IEmployee>[] = [
             <Link href={`/dashboard/employees/edit?id=${employees._id}`} className='cursor-pointer'>
               <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
             </Link>
+            <Link href={`/dashboard/employees/view?id=${employees._id}`} className='cursor-pointer'>
+              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+            </Link>
             <DropdownMenuItem asChild>
               <DeleteOrRestore inforEmployee={employees} path='delete' />
             </DropdownMenuItem>

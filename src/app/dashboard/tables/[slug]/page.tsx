@@ -18,6 +18,7 @@ import { PageTables } from '../_component/PageTables'
 import { columns } from '../_component/Columns'
 import LogoutPage from '@/app/logout/page'
 import ErrorPage from '@/components/ErrorPage'
+import ViewTable from '../_component/ViewTable'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -99,6 +100,39 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin bàn'>
         <AddOrEdit id={searchParams.id} inforTable={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<ITable> = await findTableById({ _id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy bàn'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/tables?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+      // redirect('/login')
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin bàn'>
+        <ViewTable inforTable={res.data} />
       </ContentLayout>
     )
   }

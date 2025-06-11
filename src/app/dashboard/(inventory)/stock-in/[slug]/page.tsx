@@ -9,6 +9,7 @@ import { findStockInById, getAllStockIns } from '../stock-in.api'
 import { IStockIn } from '../stock-in.interface'
 import { PageStockIn } from '../_component/PageStockIn'
 import ErrorPage from '@/components/ErrorPage'
+import ViewStockIn from '../_component/ViewStockIn'
 
 const ToastServer = dynamic(() => import('@/components/ToastServer'), {
   ssr: false
@@ -88,6 +89,38 @@ async function Component({ searchParams, params }: PageProps) {
     return (
       <ContentLayout title='Chỉnh sửa thông tin phiếu nhập'>
         <AddOrEdit id={searchParams.id} inforStockIn={res.data} />
+      </ContentLayout>
+    )
+  }
+
+  if (id === 'view') {
+    const res: IBackendRes<IStockIn> = await findStockInById({ stki_id: searchParams.id })
+
+    if (res.statusCode === 404) {
+      return (
+        <ToastServer
+          message='Không tìm thấy phiếu nhập'
+          title='Lỗi'
+          variant='destructive'
+          route='/dashboard/stock-in?page=1&size=10'
+        />
+      )
+    }
+
+    if (res.code === -10) {
+      return <LogoutPage />
+    }
+    if (res.code === -11) {
+      return <ToastServer message='Bạn không có quyền truy cập' title='Lỗi' variant='destructive' />
+    }
+    if (!res || !res.data) {
+      return (
+        <ErrorPage />
+      )
+    }
+    return (
+      <ContentLayout title='Xem thông tin phiếu nhập'>
+        <ViewStockIn inforStockIn={res.data} />
       </ContentLayout>
     )
   }
