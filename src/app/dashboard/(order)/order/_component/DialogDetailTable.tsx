@@ -193,8 +193,7 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
   //od_dish_smr_count
   return (
     <Dialog open={!!selectedTable} onOpenChange={() => setSelectedTable(null)}>
-      {/* <DialogTrigger asChild><Button variant='outline'>Edit Profile</Button></DialogTrigger> */}
-      <DialogContent className='w-[500px]"'>
+      <DialogContent className='!max-w-[900px]"'>
         <DialogHeader>
           <DialogTitle>{selectedTable?.tbl_name}</DialogTitle>
           <DialogDescription>

@@ -39,6 +39,7 @@ import AddOrderDish from './AddOrderDish'
 import AddOrderSummary from './AddOrderSummary'
 import GennerateQrOrder from './GetQrOrder'
 import GetQrOrder from './GetQrOrder'
+import ExportBill from './ExportBill'
 
 const formatVietnameseDate = (date: Date) => {
   const day = date.getDate()
@@ -410,12 +411,9 @@ export default function ListOrderPage() {
 
         <div className='flex flex-col gap-3 mt-2 mb-2'>
           {listOrder?.map((order_summary: IOrderRestaurant, index1) => {
-            // chuyển item or_dish có  od_dish_status = 'guest_cancel' xuống cuối
             const guestCancel = order_summary.or_dish.filter((item) => item.od_dish_status === 'guest_cancel')
             order_summary.or_dish = order_summary.or_dish.filter((item) => item.od_dish_status !== 'guest_cancel')
             order_summary.or_dish = [...order_summary.or_dish, ...guestCancel]
-
-            // order_summary.or_dish.sort((a, b) => 
             return (
               <Card className='w-full' key={index1}>
                 <CardHeader>
@@ -434,6 +432,7 @@ export default function ListOrderPage() {
                       <ModalUpdateStatusSummary order_summary={order_summary} />
                       <AddOrderDish order_summary={order_summary} />
                       <GetQrOrder order_summary={order_summary} />
+                      <ExportBill order_summary={order_summary} />
                     </div>
                   </div>
                 </CardHeader>
@@ -538,24 +537,24 @@ export default function ListOrderPage() {
                                   alt='vuducbo'
                                   className='w-[69px] h-[69px] rounded-lg object-cover'
                                 />
-                                <div className='-mt-1 flex flex-col'>
+                                <div className=' flex flex-col'>
                                   <Label className=''>{order_dish_item.od_dish_duplicate_id.dish_duplicate_name}</Label>
                                   <Label className='italic'>
                                     Giá:{' '}
-                                    {calculateFinalPrice(
+                                    {Math.floor(calculateFinalPrice(
                                       order_dish_item.od_dish_duplicate_id.dish_duplicate_price,
                                       order_dish_item.od_dish_duplicate_id.dish_duplicate_sale
-                                    )?.toLocaleString()}
+                                    ))?.toLocaleString()}
                                     đ x {order_dish_item.od_dish_quantity}
                                   </Label>
                                   <Label className='italic'>
                                     Tổng:{' '}
                                     {(
-                                      calculateFinalPrice(
+                                      Math.floor(calculateFinalPrice(
                                         order_dish_item.od_dish_duplicate_id.dish_duplicate_price,
                                         order_dish_item.od_dish_duplicate_id.dish_duplicate_sale
                                       ) * order_dish_item.od_dish_quantity
-                                    )?.toLocaleString()}
+                                      ))?.toLocaleString()}
                                     đ
                                   </Label>
                                 </div>

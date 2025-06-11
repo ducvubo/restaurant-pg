@@ -61,20 +61,14 @@ export default function ListOrderPage() {
     let totalPrice = 0
 
     orderSummary1?.or_dish
-      // .filter((item: any) => item.od_dish_status !== 'guest_cancel')
       .forEach((dish: any) => {
         if (dish.od_dish_status === 'delivered') {
-          totalQuantity += dish.od_dish_quantity
-          const originalPrice = dish.od_dish_duplicate_id.dish_duplicate_price
-          const sale = dish.od_dish_duplicate_id.dish_duplicate_sale
-
-          let finalPrice = originalPrice
-
-          if (sale && sale.sale_type && sale.sale_type === 'fixed') {
-            finalPrice -= sale.sale_value
-          }
-
-          totalPrice += finalPrice * dish.od_dish_quantity
+          const price = dish.od_dish_duplicate_id.dish_duplicate_price;
+          const sale = dish.od_dish_duplicate_id.dish_duplicate_sale;
+          const quantity = dish.od_dish_quantity;
+          const finalPrice = Math.floor(calculateFinalPrice(price, sale));
+          totalQuantity += quantity;
+          totalPrice += finalPrice * quantity;
         }
       })
     return {

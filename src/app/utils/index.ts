@@ -99,33 +99,41 @@ export const formatDateMongo = (dateStr: string) => {
   return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`
 }
 
-export const calculateTotalPrice = (data: any) => {
-  let totalPrice = 0
+// export const calculateTotalPrice = (data: any) => {
+//   let totalPrice = 0
+//   data.or_dish.forEach((dish: any) => {
+//     if (dish.od_dish_status === 'delivered') {
+//       const price = dish.od_dish_duplicate_id.dish_duplicate_price
+//       const sale = dish.od_dish_duplicate_id.dish_duplicate_sale
+//       const quantity = dish.od_dish_quantity
+//       let finalPrice = price
 
+//       if (sale) {
+//         if (sale.sale_type === 'fixed') {
+//           finalPrice = price - sale.sale_value
+//         } else if (sale.sale_type === 'percent') {
+//           finalPrice = price * (1 - sale.sale_value / 100)
+//         }
+//       }
+//       totalPrice += finalPrice * quantity
+//     }
+//   })
+//   return totalPrice
+// }
+
+export const calculateTotalPrice = (data: any) => {
+  let totalPrice = 0;
   data.or_dish.forEach((dish: any) => {
     if (dish.od_dish_status === 'delivered') {
-      const price = dish.od_dish_duplicate_id.dish_duplicate_price
-      const sale = dish.od_dish_duplicate_id.dish_duplicate_sale
-      const quantity = dish.od_dish_quantity
-
-      let finalPrice = price
-
-      // Kiểm tra giảm giá
-      if (sale) {
-        if (sale.sale_type === 'fixed') {
-          finalPrice = price - sale.sale_value
-        } else if (sale.sale_type === 'percent') {
-          finalPrice = price * (1 - sale.sale_value / 100)
-        }
-      }
-
-      // Tính tổng cho món ăn này
-      totalPrice += finalPrice * quantity
+      const price = dish.od_dish_duplicate_id.dish_duplicate_price;
+      const sale = dish.od_dish_duplicate_id.dish_duplicate_sale;
+      const quantity = dish.od_dish_quantity;
+      const finalPrice = Math.floor(calculateFinalPrice(price, sale));
+      totalPrice += finalPrice * quantity;
     }
-  })
-
-  return totalPrice
-}
+  });
+  return totalPrice;
+};
 
 export const formatDate = (date: Date) => {
   //21/09/2021

@@ -141,10 +141,10 @@ export default function ListTablePage() {
           {listTable?.map((table, index) => {
             return (
               <Card className='h-28 cursor-pointer' key={index} onClick={() => setSelectedTable(table)}>
-                <CardContent className='flex flex-col'>
-                  <span className='my-1'>{table.tbl_name}</span>
-                  <Separator orientation='horizontal' className='w-28 -ml-6' />
-                  <div className='flex'>
+                <CardContent className='flex flex-col w-full !p-0'>
+                  <span className='my-1 text-center'>{table.tbl_name}</span>
+                  <Separator orientation='horizontal' className='w-full' />
+                  <div className='flex justify-center'>
                     <div className='flex items-center'>
                       <div className='flex gap-1 -ml-2 mr-2'>
                         <FiUsers fontSize={'1.0em'} />
@@ -152,7 +152,7 @@ export default function ListTablePage() {
                       </div>
                     </div>
 
-                    <Separator orientation='vertical' className='h-20 w-[2px]' />
+                    <Separator orientation='vertical' className='h-20 w-[1px]' />
 
                     <div className='flex flex-col mt-1 gap-1 ml-1'>
                       <div className='flex gap-1'>
