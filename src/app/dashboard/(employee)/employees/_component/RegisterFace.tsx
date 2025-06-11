@@ -185,11 +185,14 @@ const RegisterFace = forwardRef<HTMLDivElement, Props>(({ inforEmployee }, ref) 
     <div ref={ref}>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          {path === 'recycle' ? (
-            <Button>Khôi phục</Button>
-          ) : (
-            <Button>Register Face</Button>
-          )}
+          <div
+            role='menuitem'
+            className='relative flex select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 cursor-pointer'
+            data-orientation='vertical'
+            data-radix-collection-item=''
+          >
+            Đăng ký khuôn mặt tự động
+          </div>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>

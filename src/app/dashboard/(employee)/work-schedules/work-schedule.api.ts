@@ -3,7 +3,7 @@
 import { sendRequest } from '@/lib/api'
 import { ILabel } from '../labels/label.interface'
 import { IWorkingShift } from '../working-shifts/working-shift.interface'
-import { IWorkSchedule } from './work-schedule.interface'
+import { ITimeSheet, IWorkSchedule } from './work-schedule.interface'
 import { IEmployee } from '../employees/employees.interface'
 
 const URL_SERVER_EMPLOYEE = process.env.URL_SERVER_EMPLOYEE
@@ -94,6 +94,14 @@ export const updateStatusWorkSchedule = async (id: string, status: string) => {
   const res: IBackendRes<IWorkSchedule> = await sendRequest({
     url: `${URL_SERVER_EMPLOYEE}/work-schedule/update-status/${id}/${status}`,
     method: 'PATCH',
+  })
+  return res
+}
+
+export const getTimeSheetByWorkSchedule = async ({ ws_id }: { ws_id: string }) => {
+  const res: IBackendRes<ITimeSheet[]> = await sendRequest({
+    url: `${process.env.URL_SERVER_EMPLOYEE}/time-sheet/get-by-work-schedule/${ws_id}`,
+    method: 'GET',
   })
   return res
 }

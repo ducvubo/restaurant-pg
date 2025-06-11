@@ -22,6 +22,7 @@ import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
+import RegisterFaceUpload from './RegisterFaceUpload'
 // import RegisterFace from './RegisterFace'
 const RegisterFace = dynamic(() => import('./RegisterFace'), {
   ssr: false,
@@ -199,6 +200,9 @@ export const columns: ColumnDef<IEmployee>[] = [
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <RegisterFace inforEmployee={employees} />
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <RegisterFaceUpload inforEmployee={employees} />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

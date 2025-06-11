@@ -13,3 +13,14 @@ export interface IWorkSchedule {
   ws_status: "T" | "F"
   listEmployeeId: string[]
 }
+
+export interface ITimeSheet {
+  tsId: string;
+  tsResId: string;
+  tsCheckIn: string;
+  tsCheckOut: string;
+  tsEmployeeId: string;
+  tsWsId: IWorkSchedule | null;
+  createdAt: string;
+  updatedAt: string;
+}

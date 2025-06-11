@@ -103,31 +103,32 @@ export function Navbar({ title }: NavbarProps) {
     }
   }
 
-  const runMarkNotificationAsRead = (noti_id: string) => {
-    dispatch(markNotificationAsRead(noti_id))
-    readOneNotification(noti_id)
-      .then((res) => {
-        if (res.statusCode === 200) {
-          fetchInitialData() // Reload notifications after marking as read
-        }
-      })
-      .catch((error) => {
-        console.error('Lỗi khi đánh dấu thông báo đã đọc:', error)
-      })
+  const runMarkNotificationAsRead = async (noti_id: string) => {
+    try {
+      const res = await readOneNotification(noti_id)
+      if (res && res.statusCode === 200) {
+        fetchInitialData()
+        dispatch(markNotificationAsRead(noti_id))
+      }
+    } catch (error) {
+      console.error('Lỗi khi đánh dấu thông báo đã đọc:', error)
+    }
   }
 
-  const runMarkAllNotificationsAsRead = () => {
-    dispatch(markAllNotificationsAsRead())
-    readAllNotification()
-      .then((res) => {
-        if (res.statusCode === 200) {
-          fetchInitialData() // Reload notifications after marking all as read
-        }
-      })
-      .catch((error) => {
-        console.error('Lỗi khi đánh dấu tất cả thông báo đã đọc:', error)
-      })
+  const runMarkAllNotificationsAsRead = async () => {
+    try {
+      const res = await readAllNotification()
+      if (res.statusCode === 200) {
+        fetchInitialData()
+        dispatch(markAllNotificationsAsRead())
+      } else {
+        console.error('Lỗi khi đánh dấu tất cả thông báo đã đọc:', res.message)
+      }
+    } catch (error) {
+      console.error('Lỗi khi đánh dấu tất cả thông báo đã đọc:', error)
+    }
   }
+
 
   return (
     <header className='sticky top-0 z-10 w-full bg-background/95 shadow backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:shadow-secondary'>

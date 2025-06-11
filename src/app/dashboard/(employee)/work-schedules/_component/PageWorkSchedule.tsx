@@ -30,9 +30,10 @@ interface IWorkScheduleMapping {
   ws_id: string
   workingShift: (IWorkingShift & {
     employeeData: { id: string; name: string }[]
-    label: { lb_name: string; lb_color: string }
+    label: { lb_name: string; lb_color: string },
+    ws_status: string
+    ws_id: string
   })[],
-  ws_status: "T" | "F"
 }
 
 export default function PageWorkSchedule() {
@@ -44,6 +45,7 @@ export default function PageWorkSchedule() {
     new Date(new Date().setDate(new Date().getDate() + 50))
   )
   const [listWorkSchedule, setListWorkSchedule] = useState<IWorkScheduleMapping[]>([])
+  console.log("🚀 ~ PageWorkSchedule ~ listWorkSchedule:", listWorkSchedule)
   const [employeeCache, setEmployeeCache] = useState<Map<string, { id: string; name: string }>>(new Map())
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isUpdateStatusDialogOpen, setIsUpdateStatusDialogOpen] = useState(false)
@@ -67,6 +69,7 @@ export default function PageWorkSchedule() {
 
           res.data.forEach((item) => {
             item.ws_date = new Date(new Date(item.ws_date).setHours(new Date(item.ws_date).getHours() + 7))
+            item.ws_status = item.ws_status
           })
           if (listEmployee.length > 0) {
             const data = mapWorkingShifts(res.data, newCache)
@@ -116,15 +119,21 @@ export default function PageWorkSchedule() {
       const date = format(new Date(item.ws_date), 'dd/MM/yyyy')
       if (!tempResult[date]) {
         tempResult[date] = { ws_id: item.ws_id, workingShifts: [] }
+        tempResult[date].ws_status = item.ws_status
       }
 
       if (typeof item.workingShift === 'object') {
-        const shift: IWorkingShift & { employeeData: { id: string; name: string }[]; label: { lb_name: string; lb_color: string } } = {
+        const shift: IWorkingShift & {
+          employeeData: { id: string; name: string }[]; label: { lb_name: string; lb_color: string },
+          ws_status?: string; ws_id?: string
+        } = {
           wks_id: item.workingShift.wks_id,
           wks_name: item.workingShift.wks_name,
           wks_description: item.workingShift.wks_description,
           wks_start_time: item.workingShift.wks_start_time,
           wks_end_time: item.workingShift.wks_end_time,
+          ws_status: item.ws_status,
+          ws_id: item.ws_id,
           employeeData: (item.listEmployeeId || []).map((id) => ({
             id,
             name: cache.get(id)?.name || '',
@@ -135,11 +144,11 @@ export default function PageWorkSchedule() {
       }
     })
 
+
     const result = Object.keys(tempResult).map((date) => ({
       date,
       workingShift: tempResult[date].workingShifts,
       ws_id: tempResult[date].ws_id,
-      ws_status: tempResult[date].ws_status,
     }))
 
     result.sort((a, b) => new Date(a.date.split('/').reverse().join('-')).getTime() - new Date(b.date.split('/').reverse().join('-')).getTime())
@@ -249,6 +258,9 @@ export default function PageWorkSchedule() {
           variant: 'default',
         })
         getListWorkScheduleByDate()
+        setIsUpdateStatusDialogOpen(false)
+        setDeleteScheduleId(null)
+        setDeleteScheduleDate(null)
       } else if (res.code === -10) {
         toast({
           title: 'Thông báo',
@@ -288,9 +300,9 @@ export default function PageWorkSchedule() {
     setIsDeleteDialogOpen(true)
   }
 
-  const openUpdateStatusDialog = (id: string, status: string) => {
+  const openUpdateStatusDialog = (id: string, wks_id: string) => {
     setDeleteScheduleId(id)
-    setDeleteScheduleDate(status)
+    setDeleteScheduleDate(wks_id)
     setIsUpdateStatusDialogOpen(true)
   }
 
@@ -389,7 +401,7 @@ export default function PageWorkSchedule() {
                                     <div className="flex justify-between items-center w-full">
                                       <div className="w-full">
                                         <div className="flex justify-between w-full">
-                                          <div><span className='font-semibold'>{shift.wks_name}</span>: <span className='text-sm'>({item.ws_status === 'T' ? 'Đã kích hoạt' : 'Ngưng kích hoạt'})</span></div>
+                                          <div><span className='font-semibold'>{shift.wks_name}</span>: <span className='text-sm'>({shift.ws_status === 'T' ? 'Đã kích hoạt' : 'Chưa kích hoạt'})</span></div>
                                           <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                               <Button variant="ghost" size="sm">
@@ -397,81 +409,95 @@ export default function PageWorkSchedule() {
                                               </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
+                                              {
+                                                shift.ws_status === 'F' &&
+                                                (
+                                                  <DropdownMenuItem asChild>
+                                                    <Link href={`/dashboard/work-schedules/edit?id=${shift.ws_id}`}>
+                                                      Chỉnh sửa
+                                                    </Link>
+                                                  </DropdownMenuItem>
+                                                )
+                                              }
                                               <DropdownMenuItem asChild>
-                                                <Link href={`/dashboard/work-schedules/edit?id=${item.ws_id}`}>
-                                                  Chỉnh sửa
-                                                </Link>
-                                              </DropdownMenuItem>
-                                              <DropdownMenuItem asChild>
-                                                <Link href={`/dashboard/work-schedules/view?id=${item.ws_id}`}>
+                                                <Link href={`/dashboard/work-schedules/view?id=${shift.ws_id}`}>
                                                   Xem
                                                 </Link>
                                               </DropdownMenuItem>
-                                              <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                                                <DialogTrigger asChild>
-                                                  <DropdownMenuItem
-                                                    onSelect={(e) => e.preventDefault()}
-                                                    onClick={() => openDeleteDialog(item.ws_id, item.date)}
-                                                  >
-                                                    Xóa
-                                                  </DropdownMenuItem>
-                                                </DialogTrigger>
-                                                <DialogContent>
-                                                  <DialogHeader>
-                                                    <DialogTitle>Xác nhận xóa</DialogTitle>
-                                                    <DialogDescription>
-                                                      Bạn có chắc chắn muốn xóa lịch làm việc ngày {deleteScheduleDate}? Hành động này không thể hoàn tác.
-                                                    </DialogDescription>
-                                                  </DialogHeader>
-                                                  <DialogFooter>
-                                                    <Button
-                                                      variant="outline"
-                                                      onClick={() => setIsDeleteDialogOpen(false)}
-                                                    >
-                                                      Hủy
-                                                    </Button>
-                                                    <Button
-                                                      variant="destructive"
-                                                      onClick={() => deleteScheduleId && handleDeleteWorkSchedule(deleteScheduleId)}
-                                                    >
-                                                      Xóa
-                                                    </Button>
-                                                  </DialogFooter>
-                                                </DialogContent>
-                                              </Dialog>
-                                              <Dialog open={isUpdateStatusDialogOpen} onOpenChange={setIsUpdateStatusDialogOpen}>
-                                                <DialogTrigger asChild>
-                                                  <DropdownMenuItem
-                                                    onSelect={(e) => e.preventDefault()}
-                                                    onClick={() => openUpdateStatusDialog(item.ws_id, shift.wks_id)}
-                                                  >
-                                                    {shift.wks_status === 'T' ? 'Ngưng kích hoạt' : 'Kích hoạt'}
-                                                  </DropdownMenuItem>
+                                              {
+                                                shift.ws_status === 'F' &&
+                                                (
+                                                  <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                                                    <DialogTrigger asChild>
+                                                      <DropdownMenuItem
+                                                        onSelect={(e) => e.preventDefault()}
+                                                        onClick={() => openDeleteDialog(item.ws_id, item.date)}
+                                                      >
+                                                        Xóa
+                                                      </DropdownMenuItem>
+                                                    </DialogTrigger>
+                                                    <DialogContent>
+                                                      <DialogHeader>
+                                                        <DialogTitle>Xác nhận xóa</DialogTitle>
+                                                        <DialogDescription>
+                                                          Bạn có chắc chắn muốn xóa lịch làm việc ngày {deleteScheduleDate}? Hành động này không thể hoàn tác.
+                                                        </DialogDescription>
+                                                      </DialogHeader>
+                                                      <DialogFooter>
+                                                        <Button
+                                                          variant="outline"
+                                                          onClick={() => setIsDeleteDialogOpen(false)}
+                                                        >
+                                                          Hủy
+                                                        </Button>
+                                                        <Button
+                                                          variant="destructive"
+                                                          onClick={() => deleteScheduleId && handleDeleteWorkSchedule(deleteScheduleId)}
+                                                        >
+                                                          Xóa
+                                                        </Button>
+                                                      </DialogFooter>
+                                                    </DialogContent>
+                                                  </Dialog>
+                                                )
+                                              }
+                                              {
+                                                shift.ws_status === 'F' && (
+                                                  <Dialog open={isUpdateStatusDialogOpen} onOpenChange={setIsUpdateStatusDialogOpen}>
+                                                    <DialogTrigger asChild>
+                                                      <DropdownMenuItem
+                                                        onSelect={(e) => e.preventDefault()}
+                                                        onClick={() => openUpdateStatusDialog(item.ws_id, shift.wks_id)}
+                                                      >
+                                                        {shift.wks_status === 'T' ? 'Ngưng kích hoạt' : 'Kích hoạt'}
+                                                      </DropdownMenuItem>
+                                                    </DialogTrigger>
+                                                    <DialogContent>
+                                                      <DialogHeader>
+                                                        <DialogTitle>Xác nhận cập nhật trạng thái</DialogTitle>
+                                                        <DialogDescription>
+                                                          Bạn có chắc chắn muốn kích hoạt lịch làm việc {listWorkSchedule.find(t => t.ws_id === deleteScheduleId)?.workingShift?.find(a => a.wks_id === deleteScheduleDate)?.wks_name} ngày  {listWorkSchedule.find(t => t.ws_id === deleteScheduleId)?.date} ? Hành động này không thể hoàn tác.
+                                                        </DialogDescription>
+                                                      </DialogHeader>
+                                                      <DialogFooter>
+                                                        <Button
+                                                          variant="outline"
+                                                          onClick={() => setIsUpdateStatusDialogOpen(false)}
+                                                        >
+                                                          Hủy
+                                                        </Button>
+                                                        <Button
+                                                          variant="destructive"
+                                                          onClick={() => deleteScheduleId && handleUpdateStatus(shift.ws_id, shift.ws_status === 'T' ? 'F' : 'T')}
+                                                        >
+                                                          Cập nhật
+                                                        </Button>
+                                                      </DialogFooter>
+                                                    </DialogContent>
+                                                  </Dialog>
+                                                )
+                                              }
 
-                                                </DialogTrigger>
-                                                <DialogContent>
-                                                  <DialogHeader>
-                                                    <DialogTitle>Xác nhận cập nhật trạng thái</DialogTitle>
-                                                    <DialogDescription>
-                                                      Bạn có chắc chắn muốn {item.ws_status === 'T' ? 'ngưng kích hoạt' : 'kích hoạt'} lịch làm việc ngày {deleteScheduleDate}? Hành động này không thể hoàn tác.
-                                                    </DialogDescription>
-                                                  </DialogHeader>
-                                                  <DialogFooter>
-                                                    <Button
-                                                      variant="outline"
-                                                      onClick={() => setIsUpdateStatusDialogOpen(false)}
-                                                    >
-                                                      Hủy
-                                                    </Button>
-                                                    <Button
-                                                      variant="destructive"
-                                                      onClick={() => deleteScheduleId && handleUpdateStatus(deleteScheduleId, item.ws_status === 'T' ? 'F' : 'T')}
-                                                    >
-                                                      Cập nhật
-                                                    </Button>
-                                                  </DialogFooter>
-                                                </DialogContent>
-                                              </Dialog>
                                             </DropdownMenuContent>
                                           </DropdownMenu>
 

@@ -1,12 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { IWorkSchedule } from '../work-schedule.interface'
+import { ITimeSheet, IWorkSchedule } from '../work-schedule.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { ILabel } from '../../labels/label.interface'
 import { IWorkingShift } from '../../working-shifts/working-shift.interface'
 import { IEmployee } from '../../employees/employees.interface'
-import { getAllLabel, getAllWorkingShift, getAllEmployee } from '../work-schedule.api'
+import { getAllLabel, getAllWorkingShift, getAllEmployee, getTimeSheetByWorkSchedule } from '../work-schedule.api'
 import { useToast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { format } from 'date-fns'
@@ -20,6 +20,8 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
   const router = useRouter()
   const { toast } = useToast()
   const [employees, setEmployees] = useState<IEmployee[]>([])
+  const [timesSheet, setSetTimeSheet] = useState<ITimeSheet[]>([])
+  console.log("🚀 ~ ViewWorkSchedule ~ timesSheet:", timesSheet)
 
   const handleEdit = () => {
     router.push(`/dashboard/work-schedules/edit?id=${inforWorkSchedule.ws_id}`)
@@ -45,8 +47,30 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
     }
   }
 
+
+  const fetchTimeSheetWorkSchedule = async () => {
+    const res: IBackendRes<ITimeSheet[]> = await getTimeSheetByWorkSchedule({ ws_id: inforWorkSchedule.ws_id })
+    if (res.statusCode === 200 && res.data) {
+      setSetTimeSheet(res.data)
+    } else if (res.code === -10) {
+      toast({
+        title: 'Thông báo',
+        description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
+        variant: 'destructive'
+      })
+      await deleteCookiesAndRedirect()
+    } else {
+      toast({
+        title: 'Thông báo',
+        description: 'Đã có lỗi xảy ra khi lấy danh sách nhân viên, vui lòng thử lại sau',
+        variant: 'destructive'
+      })
+    }
+  }
+
   useEffect(() => {
     fetchEmployees()
+    fetchTimeSheetWorkSchedule()
   }, [])
 
   const employeeNames = inforWorkSchedule.listEmployeeId
@@ -55,9 +79,12 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
 
   return (
     <div className='space-y-6'>
-      <div className='flex justify-end'>
-        <Button onClick={handleEdit}>Chỉnh sửa</Button>
-      </div>
+      {
+        inforWorkSchedule.ws_status === 'F' && (
+          <div className='flex justify-end'>
+            <Button onClick={handleEdit}>Chỉnh sửa</Button>
+          </div>)
+      }
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>
           <tr>
@@ -91,6 +118,6 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
           </tr>
         </tbody>
       </table>
-    </div>
+    </div >
   )
 }

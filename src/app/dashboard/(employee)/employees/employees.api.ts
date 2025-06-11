@@ -96,6 +96,5 @@ export const checkInWork = async ({ _id, date }: { _id: string, date: Date }) =>
       tsCheckIn: date
     }
   })
-  console.log("🚀 ~ checkInWork ~ res:", res)
   return res
 }

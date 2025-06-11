@@ -70,7 +70,11 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
           ? inforWorkSchedule.workingShift.wks_id
           : ''
         : '',
-      ws_date: inforWorkSchedule?.ws_date || undefined
+      // ws_date: inforWorkSchedule?.ws_date || undefined
+      //cộng thêm 7 tiếng
+      ws_date: inforWorkSchedule?.ws_date
+        ? new Date(new Date(inforWorkSchedule.ws_date).getTime() - 7 * 60 * 60 * 1000)
+        : undefined
     }
   })
 
@@ -300,7 +304,7 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
             control={form.control}
             name='ws_date'
             render={({ field }) => (
-              <FormItem className='flex flex-col'>
+              <FormItem className='flex flex-col mt-[9px]'>
                 <FormLabel>Ngày</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -348,7 +352,9 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
                   <SelectContent>
                     {listWorkingShift.map((workingShift) => (
                       <SelectItem key={workingShift.wks_id} value={workingShift.wks_id}>
-                        <Label>{workingShift.wks_name}</Label>
+                        <Label>{workingShift.wks_name} ({
+                          workingShift.wks_start_time} - {workingShift.wks_end_time
+                          })</Label>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -385,7 +391,7 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
               </FormItem>
             )}
           />
-          <div className='w-full'>
+          <div className='w-full mt-1'>
             <Label>Nhân viên</Label>
             <MultiSelect
               options={listEmployee}
