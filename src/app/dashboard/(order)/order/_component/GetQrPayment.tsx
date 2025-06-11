@@ -10,7 +10,7 @@ import { RootState } from '@/app/redux/store'
 interface Props {
   order_summary: IOrderRestaurant
 }
-export default function ExportBill({ order_summary }: Props) {
+export default function GetQrPayment({ order_summary }: Props) {
   const inforEmployee = useSelector((state: RootState) => state.inforEmployee);
   console.log('inforEmployee', inforEmployee);
   const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant);
@@ -94,6 +94,6 @@ export default function ExportBill({ order_summary }: Props) {
     doc.save(`hoa-don-${order_summary._id}.pdf`);
   }
   return (
-    <Button className='mr-2' variant='outline' onClick={handleExportBill}>Tải hóa đơn</Button>
+    <Button className='mr-2' variant='outline' onClick={handleExportBill}>Thanh toán</Button>
   )
 }

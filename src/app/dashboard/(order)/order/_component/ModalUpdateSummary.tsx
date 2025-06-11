@@ -117,7 +117,7 @@ export function ModalUpdateStatusSummary({ order_summary }: Props) {
     <>
       {order_summary.od_dish_smr_status === 'ordering' ? (
         <Select value={order_summary.od_dish_smr_status} onValueChange={handleChange}>
-          <SelectTrigger className='w-[140px] mr-[80px]'>
+          <SelectTrigger className='w-[140px] mr-[70px]'>
             <SelectValue placeholder='Chọn trạng thái' />
           </SelectTrigger>
           <SelectContent>

@@ -93,7 +93,7 @@ export default function GetQrOrder({ order_summary }: Props) {
         <DialogTrigger asChild>
           <Button
             variant='outline'
-            className='-ml-28 mr-[110px] w-32'
+            className='-ml-[123px] w-32'
             disabled={
               order_summary.od_dish_smr_status === 'paid' ||
                 order_summary.od_dish_smr_status === 'refuse' ||

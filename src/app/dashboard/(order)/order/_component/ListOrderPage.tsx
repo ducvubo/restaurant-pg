@@ -40,6 +40,7 @@ import AddOrderSummary from './AddOrderSummary'
 import GennerateQrOrder from './GetQrOrder'
 import GetQrOrder from './GetQrOrder'
 import ExportBill from './ExportBill'
+import GetQrPayment from './GetQrPayment'
 
 const formatVietnameseDate = (date: Date) => {
   const day = date.getDate()
@@ -429,10 +430,11 @@ export default function ListOrderPage() {
                       </span>
                     </div>
                     <div className='flex'>
+                      <ExportBill order_summary={order_summary} />
+                      <GetQrPayment order_summary={order_summary} />
                       <ModalUpdateStatusSummary order_summary={order_summary} />
                       <AddOrderDish order_summary={order_summary} />
                       <GetQrOrder order_summary={order_summary} />
-                      <ExportBill order_summary={order_summary} />
                     </div>
                   </div>
                 </CardHeader>
