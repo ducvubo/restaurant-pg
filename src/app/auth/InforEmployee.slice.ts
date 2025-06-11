@@ -27,6 +27,24 @@ export const initialState: IEmployee = {
     isDeleted: false,
   },
   epl_face_id: false,
+  restaurant_phone: '',
+  restaurant_name: '',
+  restaurant_address: {
+    address_province: {
+      id: '',
+      name: ''
+    },
+    address_district: {
+      id: '',
+      name: ''
+    },
+    address_ward: {
+      id: '',
+      name: ''
+    },
+    address_specific: ''
+  },
+  restaurant_email: '',
 }
 
 const inforEmployeeSlice = createSlice({
@@ -43,7 +61,11 @@ const inforEmployeeSlice = createSlice({
         (state.epl_address = action.payload.epl_address),
         (state.epl_avatar = action.payload.epl_avatar),
         (state.policy = action.payload.policy),
-        (state.restaurant_id = action.payload.epl_restaurant_id)
+        (state.restaurant_id = action.payload.epl_restaurant_id),
+        (state.restaurant_phone = action.payload.restaurant_phone),
+        (state.restaurant_name = action.payload.restaurant_name),
+        (state.restaurant_address = action.payload.restaurant_address),
+        (state.restaurant_email = action.payload.restaurant_email)
     },
     endAppEmployee: (state, action) => {
       return initialState

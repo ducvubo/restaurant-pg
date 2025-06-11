@@ -127,6 +127,7 @@ export default function RefreshToken() {
     // Hàm làm mới token và kết nối lại socket nếu thành công
     const refreshToken = async () => {
       const res = await getInfor()
+      console.log('res', res);
       const currentPathname = window.location.pathname
       if (res?.code === 0 && res.data) {
         await connectSocketWithCookie()

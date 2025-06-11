@@ -1,3 +1,4 @@
+import { IRestaurant } from "@/app/auth/auth.interface"
 import { IPolicy } from "../../policy/policy.interface"
 
 export interface IEmployee {
@@ -17,4 +18,22 @@ export interface IEmployee {
   epl_policy_id: string
   policy: IPolicy
   epl_face_id: boolean
+  restaurant_phone: string
+  restaurant_name: string
+  restaurant_address: {
+    address_province: {
+      id: string
+      name: string
+    }
+    address_district: {
+      id: string
+      name: string
+    }
+    address_ward: {
+      id: string
+      name: string
+    }
+    address_specific: string
+  }
+  restaurant_email: string
 }

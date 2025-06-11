@@ -1,18 +1,27 @@
+'use client'
 import React from 'react'
 import { IOrderRestaurant } from '../order.interface'
 import { Button } from '@/components/ui/button'
 import { RobotoMediumnormal } from '@/app/fonts/RobotoMediumnormal'
 import jsPDF from 'jspdf'
 import { calculateFinalPrice } from '@/app/utils'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/redux/store'
 interface Props {
   order_summary: IOrderRestaurant
 }
 export default function ExportBill({ order_summary }: Props) {
-  console.log('order_summary', order_summary)
-  const handleExportBill = () => {
-    console.log('handleExportBill')
-    const doc = new jsPDF();
+  const inforEmployee = useSelector((state: RootState) => state.inforEmployee);
+  console.log('inforEmployee', inforEmployee);
+  const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant);
+  const infor = inforRestaurant._id ? inforRestaurant : inforEmployee;
+  const name = infor.restaurant_name;
+  const address = infor.restaurant_address.address_specific + ', ' + infor.restaurant_address.address_district.name + ', ' + infor.restaurant_address.address_province.name;
+  const phone = infor.restaurant_phone;
+  const email = infor.restaurant_email;
 
+  const handleExportBill = () => {
+    const doc = new jsPDF();
     // Thêm font
     doc.addFileToVFS("Roboto-Medium.ttf", RobotoMediumnormal);
     doc.addFont("Roboto-Medium.ttf", "Roboto-Medium", "normal");
@@ -23,9 +32,9 @@ export default function ExportBill({ order_summary }: Props) {
 
 
     doc.setFontSize(10);
-    doc.text('Nhà hàng XYZ', 20, 40);
-    doc.text('Địa chỉ: 123 Đường Ẩm Thực, TP. Hồ Chí Minh', 20, 45);
-    doc.text('Hotline: 0123 456 789', 20, 50);
+    doc.text(`Tên nhà hàng: ${name}`, 20, 40);
+    doc.text(`Địa chỉ: ${address}`, 20, 45);
+    doc.text(`Số điện thoại: ${phone}`, 20, 50);
 
     // Vẽ đường kẻ ngang
     doc.setLineWidth(0.5);
@@ -52,22 +61,24 @@ export default function ExportBill({ order_summary }: Props) {
     let y = 92;
     let total = 0;
     order_summary.or_dish.forEach((dish, index) => {
-      const price = dish.od_dish_duplicate_id.dish_duplicate_price;
-      const quantity = dish.od_dish_quantity;
-      const sale = dish.od_dish_duplicate_id.dish_duplicate_sale;
-      const finalPrice = Math.floor(calculateFinalPrice(price, sale));
-      const discount = price - finalPrice;
-      const subtotal = finalPrice * quantity;
+      if (dish.od_dish_status === 'delivered') {
+        const price = dish.od_dish_duplicate_id.dish_duplicate_price;
+        const quantity = dish.od_dish_quantity;
+        const sale = dish.od_dish_duplicate_id.dish_duplicate_sale;
+        const finalPrice = Math.floor(calculateFinalPrice(price, sale));
+        const discount = price - finalPrice;
+        const subtotal = finalPrice * quantity;
 
 
-      doc.text(`${index + 1}`, 20, y);
-      doc.text(dish.od_dish_duplicate_id.dish_duplicate_name, 40, y);
-      doc.text(`${quantity}`, 100, y);
-      doc.text(`${price.toLocaleString('vi-VN')} đ`, 130, y);
-      doc.text(`${discount.toLocaleString('vi-VN')} đ`, 160, y);
-      doc.text(`${subtotal.toLocaleString('vi-VN')} đ`, 180, y);
-      total += subtotal;
-      y += 10;
+        doc.text(`${index + 1}`, 20, y);
+        doc.text(dish.od_dish_duplicate_id.dish_duplicate_name, 40, y);
+        doc.text(`${quantity}`, 100, y);
+        doc.text(`${price.toLocaleString('vi-VN')} đ`, 130, y);
+        doc.text(`${discount.toLocaleString('vi-VN')} đ`, 160, y);
+        doc.text(`${subtotal.toLocaleString('vi-VN')} đ`, 180, y);
+        total += subtotal;
+        y += 10;
+      }
     });
 
     doc.line(20, y, 200, y);
