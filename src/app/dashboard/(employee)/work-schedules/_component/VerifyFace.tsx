@@ -15,7 +15,6 @@ import {
 import Webcam from 'react-webcam';
 import * as faceapi from 'face-api.js';
 import { useRouter } from 'next/navigation';
-import { deleteCookiesAndRedirect } from '@/app/actions/action';
 import { toast } from '@/hooks/use-toast';
 import { useLoading } from '@/context/LoadingContext';
 import { debounce } from 'lodash';

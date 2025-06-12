@@ -1008,7 +1008,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
                     <SelectContent>
                       {listSuppliers.map((supplier) => (
                         <SelectItem key={supplier.spli_id} value={supplier.spli_id}>
-                          {supplier.spli_name}
+                          {supplier.spli_name} ({supplier.spli_type === 'supplier' ? 'Nhà cung cấp' : 'Khách hàng'})
                         </SelectItem>
                       ))}
                     </SelectContent>

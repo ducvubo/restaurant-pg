@@ -72,6 +72,7 @@ export default function AddOrEdit({ id, inforStockOut }: Props) {
   const inforEmployee = useSelector((state: RootState) => state.inforEmployee)
   const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant)
   const [listSuppliers, setListSuppliers] = useState<ISupplier[]>([])
+  console.log("🚀 ~ AddOrEdit ~ listSuppliers:", listSuppliers)
   const [listEmployees, setListEmployees] = useState<IEmployee[]>([])
   const [listIngredients, setListIngredients] = useState<IIngredient[]>([])
   const [stockOutItems, setStockOutItems] = useState<IStockOutItem[]>([])
@@ -269,7 +270,7 @@ export default function AddOrEdit({ id, inforStockOut }: Props) {
   }
 
   const findAllIngredient = async () => {
-    setLoading(true)
+    // setLoading(true)
     const res: IBackendRes<IIngredient[]> = await findIngredientName()
     if (res.statusCode === 200 && res.data) {
       setLoading(false)
@@ -606,28 +607,28 @@ export default function AddOrEdit({ id, inforStockOut }: Props) {
               }
             }
             let igdId = ''
-            const normalizedIngredient = normalizeString(item.stko_item_name || item.igd_id)
+            const normalizedIngredient = normalizeString(item.stko_item_name)
             const ingredient = listIngredients.find(
               (i) =>
                 normalizeString(i.igd_name).includes(normalizedIngredient) ||
-                normalizeString(i.igd_id) === normalizeString(item.igd_id)
+                normalizeString(i.igd_name) === normalizeString(item.stko_item_name)
             )
             if (ingredient) {
               igdId = ingredient.igd_id
             } else {
-              igdId = (await createIngredientCom(item.stko_item_name || item.igd_id, untId, item.igd_id)) as string
+              igdId = (await createIngredientCom(item.stko_item_name, untId, item.igd_id)) as string
               if (!igdId) {
                 toast({
                   title: 'Cảnh báo',
-                  description: `Không thể tạo nguyên liệu "${item.stko_item_name || item.igd_id}", vui lòng kiểm tra`,
+                  description: `Không thể tạo nguyên liệu "${item.stko_item_name}", vui lòng kiểm tra`,
                   variant: 'destructive'
                 })
                 continue
               }
             }
             mappedItems.push({
-              igd_id: igdId || item.igd_id,
-              igd_name: item.stko_item_name || ingredient?.igd_name || item.igd_id,
+              igd_id: igdId || item.stko_item_name,
+              igd_name: item.stko_item_name || ingredient?.igd_name,
               unt_name: item.stko_item_unit || unit?.unt_name || '',
               stko_item_quantity: parseFloat(item.stko_item_quantity.replace(/,/g, '')) || 0,
               stko_item_price: parseFloat(item.stko_item_price.replace(/,/g, '')) || 0
@@ -960,7 +961,7 @@ export default function AddOrEdit({ id, inforStockOut }: Props) {
                     <SelectContent>
                       {listSuppliers.map((supplier) => (
                         <SelectItem key={supplier.spli_id} value={supplier.spli_id}>
-                          {supplier.spli_name}
+                          {supplier.spli_name}({supplier.spli_type === 'supplier' ? 'Nhà cung cấp' : 'Khách hàng'})
                         </SelectItem>
                       ))}
                     </SelectContent>
