@@ -1,6 +1,7 @@
 'use server'
 
 import { sendRequest } from "@/lib/api";
+import { IArticle } from "./(blog)/article/article.interface";
 
 export interface IGetStatsDto {
   startDate?: string;
@@ -256,4 +257,18 @@ export const getStockByCategory = async (data: IGetStatsDto) => {
   return res;
 };
 
+export const getCountToalViewBlog = async () => {
+  const res: IBackendRes<number> = await sendRequest({
+    url: `${process.env.URL_SERVER_BLOG}/articles/count-total-view`,
+    method: 'GET',
+  });
+  return res;
+}
 
+export const getTop5ArticleByView = async () => {
+  const res: IBackendRes<IArticle[]> = await sendRequest({
+    url: `${process.env.URL_SERVER_BLOG}/articles/top-5-article-by-view`,
+    method: 'GET',
+  });
+  return res;
+}

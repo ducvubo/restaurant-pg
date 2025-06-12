@@ -53,9 +53,12 @@ import {
   getLowStockIngredients,
   getRecentStockTransactions,
   getOrderStatusDistributionFoodCombo,
+  getTop5ArticleByView,
+  getCountToalViewBlog,
 } from './dashboard.api';
 import { exportReportData } from './ExportReportData';
 import * as XLSX from 'xlsx';
+import { IArticle } from './(blog)/article/article.interface';
 
 
 const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFCE56', '#36A2EB'];
@@ -108,6 +111,9 @@ export default function PageDashboard() {
   const [recentStockTransactions, setRecentStockTransactions] = useState<
     { id: string; code: string; ingredient: string; quantity: number; date: string; type: 'in' | 'out' }[]
   >([]);
+  const [totalViewBlog, setTotalViewBlog] = useState<number>(0);
+  const [top5Article, setTop5Article] = useState<
+    { title: string; views: number }[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [queryParams, setQueryParams] = useState<{
@@ -142,7 +148,9 @@ export default function PageDashboard() {
           getOrderStatusDistributionFoodCombo(queryParams),
           getTotalStockValue(queryParams),
           getLowStockIngredients({ ...queryParams, threshold: 10 }),
-          getRecentStockTransactions(queryParams)
+          getRecentStockTransactions(queryParams),
+          getCountToalViewBlog(),
+          getTop5ArticleByView(),
         ];
 
         const [
@@ -161,7 +169,9 @@ export default function PageDashboard() {
           statusDistributionResCombo,
           totalStockRes,
           lowStockRes,
-          recentStockRes
+          recentStockRes,
+          totalViewBlogRes,
+          top5ArticleRes,
         ] = await Promise.all(promises);
 
         if (totalRes.statusCode === 200 && totalRes.data)
@@ -211,6 +221,16 @@ export default function PageDashboard() {
 
         if (recentStockRes.statusCode === 200 && recentStockRes.data)
           setRecentStockTransactions(recentStockRes.data);
+
+        if (totalViewBlogRes.statusCode === 200 && totalViewBlogRes.data)
+          setTotalViewBlog(totalViewBlogRes.data);
+
+        if (top5ArticleRes.statusCode === 200 && top5ArticleRes.data) {
+          setTop5Article(top5ArticleRes.data.map((item: IArticle) => ({
+            title: item.atlTitle,
+            views: item.atlView,
+          })));
+        }
 
         setError(null);
       } catch (err: any) {
@@ -568,8 +588,8 @@ export default function PageDashboard() {
             color: '',
           },
           {
-            title: 'Lượt Xem Blog',
-            value: '2600',
+            title: 'Lượt Xem Bài Viết',
+            value: totalViewBlog.toString(),
             // change: '+25%',
             icon: BookOpen,
             color: 'text-purple-600',
@@ -586,7 +606,6 @@ export default function PageDashboard() {
               <div className={`text-xl font-semibold ${metric.color}`}>
                 {metric.value}
               </div>
-              {/* <p className="text-xs ">{metric.change}</p> */}
             </CardContent>
           </Card>
         ))}
@@ -947,13 +966,13 @@ export default function PageDashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={blogPerformance}>
+              <LineChart data={top5Article}>
                 <XAxis dataKey="title" stroke="#6B7280" fontSize={12} />
                 <YAxis stroke="#6B7280" fontSize={12} />
                 <Tooltip
                   formatter={(value: number, name: string) => [
                     value,
-                    name === 'views' ? 'Lượt xem' : 'Lượt thích',
+                    name === 'views' ? 'Lượt xem' : '',
                   ]}
                 />
                 <Line
@@ -963,22 +982,15 @@ export default function PageDashboard() {
                   strokeWidth={2}
                   dot={false}
                 />
-                <Line
-                  type="monotone"
-                  dataKey="likes"
-                  stroke="#EF4444"
-                  strokeWidth={2}
-                  dot={false}
-                />
               </LineChart>
             </ResponsiveContainer>
             <div className="mt-2 flex gap-2 justify-center">
               <Badge variant="outline">
-                Xem: {blogPerformance.reduce((sum, item) => sum + item.views, 0)}
+                Xem: {top5Article.reduce((sum, item) => sum + item.views, 0)}
               </Badge>
-              <Badge variant="outline">
-                Thích: {blogPerformance.reduce((sum, item) => sum + item.likes, 0)}
-              </Badge>
+              {/* <Badge variant="outline">
+                Thích: {top5Article.reduce((sum, item) => sum + item.likes, 0)}
+              </Badge> */}
             </div>
           </CardContent>
         </Card>
