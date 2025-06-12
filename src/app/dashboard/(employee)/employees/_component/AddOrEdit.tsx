@@ -64,13 +64,13 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      epl_email: '',
+      epl_email: inforEmployee?.epl_email || '',
       epl_password: '',
-      epl_name: '',
-      epl_address: '',
-      epl_phone: '',
-      epl_gender: 'Khác',
-      epl_policy_id: ''
+      epl_name: inforEmployee?.epl_name || '',
+      epl_address: inforEmployee?.epl_address || '',
+      epl_phone: inforEmployee?.epl_phone || '',
+      epl_gender: inforEmployee?.epl_gender || 'Khác',
+      epl_policy_id: inforEmployee?.epl_policy_id || ''
     }
   })
 
@@ -199,13 +199,13 @@ export default function AddOrEdit({ id, inforEmployee }: Props) {
       return
     } else {
       if (inforEmployee) {
-        form.setValue('epl_email', inforEmployee.epl_email)
+        // form.setValue('epl_email', inforEmployee.epl_email)
         form.setValue('epl_password', 'NoPassword123*')
-        form.setValue('epl_name', inforEmployee.epl_name)
-        form.setValue('epl_address', inforEmployee.epl_address)
-        form.setValue('epl_phone', inforEmployee.epl_phone)
-        form.setValue('epl_gender', inforEmployee.epl_gender)
-        form.setValue('epl_policy_id', inforEmployee.epl_policy_id)
+        // form.setValue('epl_name', inforEmployee.epl_name)
+        // form.setValue('epl_address', inforEmployee.epl_address)
+        // form.setValue('epl_phone', inforEmployee.epl_phone)
+        // form.setValue('epl_gender', inforEmployee.epl_gender)
+        // form.setValue('epl_policy_id', inforEmployee.epl_policy_id)
         if (inforEmployee && inforEmployee.epl_avatar) {
           setAvatar(inforEmployee.epl_avatar)
         }
