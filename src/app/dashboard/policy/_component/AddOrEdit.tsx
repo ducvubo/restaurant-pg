@@ -42,39 +42,69 @@ export default function AddOrEdit({ id, inforPolicy }: Props) {
   })
 
   useEffect(() => {
-    if (id === 'add') return
+    if (id === 'add') return;
     if (inforPolicy) {
-      form.setValue('poly_name', inforPolicy.poly_name)
-      form.setValue('poly_description', inforPolicy.poly_description)
-      const selectedKeys = inforPolicy.poly_key || []
-      const newCheckedPermissions = new Set<string>(selectedKeys)
+      form.setValue('poly_name', inforPolicy.poly_name);
+      form.setValue('poly_description', inforPolicy.poly_description);
+      const selectedKeys = inforPolicy.poly_key || [];
+      const newCheckedPermissions = new Set<string>();
 
-      // Add module and function keys if any child actions are selected
+      // Tạo danh sách tất cả các khóa hợp lệ từ permissions
+      const validKeys = new Set<string>();
+      permissions.forEach((module) => {
+        validKeys.add(module.key);
+        module.functions.forEach((func) => {
+          validKeys.add(func.key);
+          func.actions.forEach((action) => {
+            validKeys.add(`${func.key}_${action.key}`);
+          });
+        });
+      });
+
+      // Chỉ thêm các khóa hợp lệ từ inforPolicy.poly_key
+      selectedKeys.forEach((key) => {
+        if (validKeys.has(key)) {
+          newCheckedPermissions.add(key);
+        } else {
+          // Nếu key là khóa action, kiểm tra xem nó có khớp với action.key
+          permissions.forEach((module) => {
+            module.functions.forEach((func) => {
+              func.actions.forEach((action) => {
+                if (key === `${func.key}_${action.key}`) {
+                  newCheckedPermissions.add(key);
+                }
+              });
+            });
+          });
+        }
+      });
+
+      // Thêm khóa module và function nếu có action được chọn
       permissions.forEach((module) => {
         const hasSelectedActions = module.functions.some((func) =>
-          func.actions.some((action) => selectedKeys.includes(`${func.key}_${action.key}`))
-        )
+          func.actions.some((action) => newCheckedPermissions.has(`${func.key}_${action.key}`))
+        );
         if (hasSelectedActions) {
-          newCheckedPermissions.add(module.key)
+          newCheckedPermissions.add(module.key);
           module.functions.forEach((func) => {
-            if (func.actions.some((action) => selectedKeys.includes(`${func.key}_${action.key}`))) {
-              newCheckedPermissions.add(func.key)
+            if (func.actions.some((action) => newCheckedPermissions.has(`${func.key}_${action.key}`))) {
+              newCheckedPermissions.add(func.key);
             }
-          })
+          });
         }
-      })
+      });
 
-      setCheckedPermissions(newCheckedPermissions)
+      setCheckedPermissions(newCheckedPermissions);
       const initialOpenModules = permissions
         .filter((module) =>
           module.functions.some((func) =>
-            func.actions.some((action) => selectedKeys.includes(`${func.key}_${action.key}`))
+            func.actions.some((action) => newCheckedPermissions.has(`${func.key}_${action.key}`))
           )
         )
-        .map((module) => module.key)
-      setOpenModules(initialOpenModules)
+        .map((module) => module.key);
+      setOpenModules(initialOpenModules);
     }
-  }, [inforPolicy, id, form])
+  }, [inforPolicy, id, form]);
 
   const toggleModule = (key: string) => {
     setOpenModules((prev) =>
@@ -198,80 +228,33 @@ export default function AddOrEdit({ id, inforPolicy }: Props) {
     })
   }
 
-  // async function onSubmit(data: z.infer<typeof FormSchema>) {
-  //   setLoading(true)
-  //   const selectedKeys = Array.from(checkedPermissions)
-  //   const payload: any = {
-  //     poly_name: data.poly_name,
-  //     poly_description: data.poly_description,
-  //     poly_key: selectedKeys,
-  //   }
-  //   console.log("🚀 ~ onSubmit ~ payload:", payload)
-
-  //   const res = id === 'add' ? await createPolicy(payload) : await updatePolicy({ ...payload, _id: id })
-
-  //   if (res.statusCode === 201 || res.statusCode === 200) {
-  //     setLoading(false)
-  //     toast({
-  //       title: 'Thành công',
-  //       description: id === 'add' ? 'Thêm quyền chức năng mới thành công' : 'Chỉnh sửa thông tin quyền chức năng thành công',
-  //       variant: 'default',
-  //     })
-  //     router.push('/dashboard/policy')
-  //     router.refresh()
-  //   } else if (res.statusCode === 400) {
-  //     setLoading(false)
-  //     if (Array.isArray(res.message)) {
-  //       res.message.map((item: string) => {
-  //         toast({
-  //           title: 'Thất bại',
-  //           description: item,
-  //           variant: 'destructive',
-  //         })
-  //       })
-  //     } else {
-  //       toast({
-  //         title: 'Thất bại',
-  //         description: res.message,
-  //         variant: 'destructive',
-  //       })
-  //     }
-  //   } else if (res.code === -10) {
-  //     setLoading(false)
-  //     toast({
-  //       title: 'Thông báo',
-  //       description: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại',
-  //       variant: 'destructive',
-  //     })
-  //     await deleteCookiesAndRedirect()
-  //   } else if (res.code === -11) {
-  //     setLoading(false)
-  //     toast({
-  //       title: 'Thông báo',
-  //       description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
-  //       variant: 'destructive',
-  //     })
-  //   } else {
-  //     setLoading(false)
-  //     toast({
-  //       title: 'Thông báo',
-  //       description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
-  //       variant: 'destructive',
-  //     })
-  //   }
-  //   setLoading(false)
-  // }
-
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setLoading(true);
     const selectedKeys: string[] = [];
     const selectedPaths: string[] = [];
+    const normalKeys: string[] = [];
 
     // Thu thập các key bằng forEach
     checkedPermissions.forEach((key) => {
       selectedKeys.push(key);
+      // Ánh xạ khóa cho poly_key_normal
+      let normalKey = key;
+      // Kiểm tra xem key có phải là khóa action (có tiền tố kép)
+      permissions.forEach((module) => {
+        module.functions.forEach((func) => {
+          func.actions.forEach((action) => {
+            const actionKey = `${func.key}_${action.key}`;
+            if (key === actionKey) {
+              // Nếu là khóa action, sử dụng action.key từ policy.ts
+              normalKey = action.key;
+            }
+          });
+        });
+      });
+      normalKeys.push(normalKey);
     });
 
+    // Thu thập các đường dẫn từ các action được chọn
     permissions.forEach((module) => {
       module.functions.forEach((func) => {
         func.actions.forEach((action) => {
@@ -281,15 +264,15 @@ export default function AddOrEdit({ id, inforPolicy }: Props) {
           }
         });
       });
-    });
-
+    })
     const uniquePaths = Array.from(new Set(selectedPaths));
-
+    //poly_key_normal chỉ nguyên bản lấy ra từ policy.ts không có key của cấp trên
     const payload: any = {
       poly_name: data.poly_name,
       poly_description: data.poly_description,
       poly_key: selectedKeys,
-      poly_path: uniquePaths, // Thêm danh sách paths vào payload
+      poly_key_normal: normalKeys,
+      poly_path: uniquePaths,
     };
     console.log("🚀 ~ onSubmit ~ payload:", payload);
 

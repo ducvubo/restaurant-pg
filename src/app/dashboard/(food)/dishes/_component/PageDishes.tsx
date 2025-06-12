@@ -28,6 +28,10 @@ import { useEffect, useState, ChangeEvent } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/redux/store';
+import { usePermission } from '@/app/auth/PermissionContext';
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -115,7 +119,7 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
       setLoading(false);
       const result: IBackendRes<IDish[]> = await response.json();
 
-      if (result.statusCode === 201 && result.data ) {
+      if (result.statusCode === 201 && result.data) {
         const listDish = await getListDish();
         const newDishesArray: any[] = [];
         result.data.forEach((dish: IDish) => {
@@ -361,31 +365,48 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
     <div className="flex flex-col" style={{ height: 'calc(100vh - 7rem)' }}>
       <div className="flex justify-end gap-2 items-center py-4">
         <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
-        <Button variant={'outline'}>
+        <Button variant={'outline'}
+          disabled={!hasPermissionKey('dish_list_create')}
+        >
           <Link href={'/dashboard/dishes/add'}>Thêm</Link>
         </Button>
         {
           pathname === 'recycle' ? (
-            <Button variant={'outline'}>
+            <Button variant={'outline'}
+              disabled={!hasPermissionKey('dish_list_view_list')}
+            >
               <Link href={'/dashboard/dishes'}>Danh sách</Link>
             </Button>
           ) : (
-            <Button variant={'outline'}>
+            <Button variant={'outline'}
+              disabled={!hasPermissionKey('dish_list_view_deleted')}
+            >
               <Link href={'/dashboard/dishes/recycle'}>Danh sách đã xóa</Link>
             </Button>
           )
         }
-        <Button variant={'outline'} asChild>
-          <label>
+        <div>
+          <Button
+            variant="outline"
+            disabled={!hasPermissionKey('dish_list_upload_image')}
+            className={(!hasPermissionKey('dish_list_upload_image') ? 'opacity-50 cursor-not-allowed pointer-events-none' : '') + ' ' + 'hover:bg-gray-100'}
+          >
             Tải ảnh menu
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImportMenu}
-              style={{ display: 'none' }}
-            />
+          </Button>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImportMenu}
+            style={{ display: 'none' }}
+            disabled={!hasPermissionKey('dish_list_upload_image')}
+            id="menu-upload-input"
+          />
+          <label
+            htmlFor="menu-upload-input"
+            className={(!hasPermissionKey('dish_list_upload_image') ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer')}
+          >
           </label>
-        </Button>
+        </div>
         <DataTableViewOptions table={table} />
       </div>
       <div className="rounded-md border flex-1 overflow-hidden">

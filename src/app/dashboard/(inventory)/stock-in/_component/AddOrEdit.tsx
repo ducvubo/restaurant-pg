@@ -201,6 +201,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
         },
         epl_policy_id: '',
         policy: {
+          poly_key_normal: [],
           poly_key: [],
           poly_path: [],
           poly_name: '',

@@ -1,26 +1,9 @@
 import { Module, ModuleAction } from './policy.interface';
 
-function defaultActions(key: string, path: string, excludeRecycle: boolean = false): ModuleAction[] {
-  return [
-    { method: 'Thêm', key: `${key}_create`, patchRequire: [`${path}/add`] },
-    { method: 'Sửa', key: `${key}_update`, patchRequire: [`${path}/:id`] },
-    { method: 'Xóa', key: `${key}_delete`, patchRequire: [`${path}/delete`] },
-    {
-      method: 'Xem chi tiết',
-      key: `${key}_view`,
-      patchRequire: [
-        `${path}/detail`,
-        path,
-        ...(excludeRecycle ? [] : [`${path}/recycle`]),
-      ],
-    },
-  ];
-}
-
 export const permissions: Module[] = [
   {
     name: 'Đơn đặt hàng',
-    key: 'order',
+    key: 'order_menu',
     functions: [
       {
         name: 'Danh sách đơn đặt hàng',
@@ -50,6 +33,16 @@ export const permissions: Module[] = [
           }, {
             method: 'Cập nhật trạng thái món ăn',
             key: 'order_dish_update_food_status',
+            patchRequire: []
+          },
+          {
+            method: 'Tạo Qr thanh toán',
+            key: 'order_dish_create_qr_payment',
+            patchRequire: []
+          },
+          {
+            method: 'Tải hóa đơn',
+            key: 'order_dish_download_invoice',
             patchRequire: []
           }
         ],
@@ -122,7 +115,7 @@ export const permissions: Module[] = [
   },
   {
     name: 'Quản lý hỗ trợ',
-    key: 'ticket_guest',
+    key: 'ticket_menu',
     functions: [
       {
         name: 'Danh sách hỏi đáp',
@@ -169,7 +162,7 @@ export const permissions: Module[] = [
   },
   {
     name: 'Phòng/Sảnh',
-    key: 'rooms',
+    key: 'rooms_menu',
     functions: [
       {
         name: 'Phòng/Sảnh',
@@ -184,6 +177,11 @@ export const permissions: Module[] = [
             method: "Thêm phòng",
             key: "room_list_create",
             patchRequire: ['/dashboard/rooms/add']
+          },
+          {
+            method: "Xem chi tiết phòng",
+            key: "room_list_view_detail",
+            patchRequire: ['/dashboard/rooms/view']
           },
           {
             method: "Sửa phòng",
@@ -219,16 +217,21 @@ export const permissions: Module[] = [
             key: "amenities_list_view_list",
             patchRequire: ['/dashboard/amenities']
           }, {
-            method: "Thêm phòng",
+            method: "Thêm dịch vụ",
             key: "amenities_list_create",
             patchRequire: ['/dashboard/amenities/add']
           },
           {
-            method: "Sửa phòng",
+            method: "Xem chi tiết dịch vụ",
+            key: "amenities_list_view_detail",
+            patchRequire: ['/dashboard/amenities/view']
+          },
+          {
+            method: "Sửa dịch vụ",
             key: "amenities_list_update",
             patchRequire: ['/dashboard/amenities/edit']
           }, {
-            method: "Xóa phòng",
+            method: "Xóa dịch vụ",
             key: "amenities_list_delete",
             patchRequire: []
           },
@@ -261,6 +264,11 @@ export const permissions: Module[] = [
             method: "Thêm món ăn",
             key: "menu_items_list_create",
             patchRequire: ['/dashboard/menu-items/add']
+          },
+          {
+            method: "Xem chi tiết món ăn",
+            key: "menu_items_list_view_detail",
+            patchRequire: ['/dashboard/menu-items/view']
           },
           {
             method: "Sửa món ăn",
@@ -298,7 +306,7 @@ export const permissions: Module[] = [
   },
   {
     name: 'Nhân viên',
-    key: 'employees',
+    key: 'employees_menu',
     functions: [
       {
         name: 'Nhân viên',
@@ -314,6 +322,11 @@ export const permissions: Module[] = [
             method: "Thêm nhân viên",
             key: "employee_list_create",
             patchRequire: ['/dashboard/employees/add']
+          },
+          {
+            method: "Xem chi tiết nhân viên",
+            key: "employee_list_view_detail",
+            patchRequire: ['/dashboard/employees/view']
           },
           {
             method: "Sửa nhân viên",
@@ -341,8 +354,8 @@ export const permissions: Module[] = [
             patchRequire: []
           },
           {
-            method: "Chấm công",
-            key: "employee_list_check_in",
+            method: "Đăng ký khuôn mặt",
+            key: "employee_list_register_face",
             patchRequire: []
           },
         ],
@@ -361,6 +374,11 @@ export const permissions: Module[] = [
             method: "Thêm nhãn",
             key: "label_list_create",
             patchRequire: ['/dashboard/labels/add']
+          },
+          {
+            method: "Xem chi tiết nhãn",
+            key: "label_list_view_detail",
+            patchRequire: ['/dashboard/labels/view']
           },
           {
             method: "Sửa nhãn",
@@ -405,6 +423,11 @@ export const permissions: Module[] = [
             patchRequire: ['/dashboard/working-shifts/add']
           },
           {
+            method: "Xem chi tiết ca làm việc",
+            key: "working_shift_list_view_detail",
+            patchRequire: ['/dashboard/working-shifts/view']
+          },
+          {
             method: "Sửa ca làm việc",
             key: "working_shift_list_update",
             patchRequire: ['/dashboard/working-shifts/edit']
@@ -436,19 +459,85 @@ export const permissions: Module[] = [
         key: 'work_schedule_list',
         description: 'Không cần check quyền trang này',
         actions: [
+          {
+            method: "Xem danh sách",
+            key: "work_schedule_list_view_list",
+            patchRequire: ['/dashboard/work-schedules']
+          },
+          {
+            method: "Thêm lịch làm việc",
+            key: "work_schedule_list_create",
+            patchRequire: ['/dashboard/work-schedules/add']
+          },
+          {
+            method: "Xem chi tiết lịch làm việc",
+            key: "work_schedule_list_view_detail",
+            patchRequire: ['/dashboard/work-schedules/view']
+          },
+          {
+            method: "Sửa lịch làm việc",
+            key: "work_schedule_list_update",
+            patchRequire: ['/dashboard/work-schedules/edit']
+          },
+          {
+            method: "Xóa lịch làm việc",
+            key: "work_schedule_list_delete",
+            patchRequire: []
+          },
+          {
+            method: "Cập nhật trạng thái",
+            key: "work_schedule_list_update_status",
+            patchRequire: []
+          },
+          {
+            method: "Chấm công",
+            key: "work_schedule_list_check_in",
+            patchRequire: []
+          }
         ],
       },
       {
         name: 'Đơn xin nghỉ phép',
         key: 'leave_application',
         description: 'Không cần check quyền trang này',
-        actions: [],
+        actions: [
+          {
+            method: "Xem danh sách",
+            key: "leave_application_view_list",
+            patchRequire: ['/dashboard/leave-application']
+          },
+          {
+            method: "Thêm đơn xin nghỉ phép",
+            key: "leave_application_create",
+            patchRequire: ['/dashboard/leave-application/add']
+          },
+          {
+            method: "Xem chi tiết đơn xin nghỉ phép",
+            key: "leave_application_view_detail",
+            patchRequire: ['/dashboard/leave-application/view']
+          },
+          {
+            method: "Sửa đơn xin nghỉ phép",
+            key: "leave_application_update",
+            patchRequire: ['/dashboard/leave-application/edit']
+          },
+          {
+            method: "Xóa đơn xin nghỉ phép",
+            key: "leave_application_delete",
+            patchRequire: []
+          },
+          {
+            method: "Cập nhật trạng thái",
+            key: "leave_application_update_status",
+            patchRequire: []
+          },
+        ],
       },
     ],
   },
   {
     name: 'Bàn ăn',
-    key: 'tables',
+    key: 'tables_menu',
     functions: [
       {
         name: 'Bàn ăn',
@@ -464,6 +553,11 @@ export const permissions: Module[] = [
             method: "Thêm bàn ăn",
             key: "table_list_create",
             patchRequire: ['/dashboard/tables/add']
+          },
+          {
+            method: "Xem chi tiết bàn ăn",
+            key: "table_list_view_detail",
+            patchRequire: ['/dashboard/tables/view']
           },
           {
             method: "Sửa bàn ăn",
@@ -505,7 +599,7 @@ export const permissions: Module[] = [
   },
   {
     name: 'Món ăn',
-    key: 'dish_list',
+    key: 'dish_menu',
     functions: [
       {
         name: 'Món ăn',
@@ -521,6 +615,11 @@ export const permissions: Module[] = [
             method: "Thêm món ăn",
             key: "dish_list_create",
             patchRequire: ['/dashboard/dishes/add']
+          },
+          {
+            method: "Xem chi tiết món ăn",
+            key: "dish_list_view_detail",
+            patchRequire: ['/dashboard/dishes/view']
           },
           {
             method: "Sửa món ăn",
@@ -556,47 +655,52 @@ export const permissions: Module[] = [
       },
       {
         name: 'Món ăn online',
-        key: 'online_dish',
+        key: 'online_food',
         description: 'Quản lý món ăn online',
         actions: [
           {
             method: "Xem danh sách",
-            key: "online_dish_view_list",
+            key: "online_food_view_list",
             patchRequire: ['/dashboard/foods']
           },
           {
             method: "Thêm món ăn online",
-            key: "online_dish_create",
+            key: "online_food_create",
             patchRequire: ['/dashboard/foods/add']
           },
           {
+            method: "Xem chi tiết món ăn online",
+            key: "online_food_view_detail",
+            patchRequire: ['/dashboard/foods/view']
+          },
+          {
             method: "Sửa món ăn online",
-            key: "online_dish_update",
+            key: "online_food_update",
             patchRequire: ['/dashboard/foods/edit']
           },
           {
             method: "Xóa món ăn online",
-            key: "online_dish_delete",
+            key: "online_food_delete",
             patchRequire: []
           },
           {
             method: "Xem danh sách đã xóa",
-            key: "online_dish_view_deleted",
+            key: "online_food_view_deleted",
             patchRequire: ['/dashboard/foods/recycle']
           },
           {
             method: "Cập nhật trạng thái",
-            key: "online_dish_update_status",
+            key: "online_food_update_status",
             patchRequire: []
           },
           {
             method: "Khôi phục",
-            key: "online_dish_restore",
+            key: "online_food_restore",
             patchRequire: []
           },
           {
             method: "Tải ảnh món ăn online",
-            key: "online_dish_upload_image",
+            key: "online_food_upload_image",
             patchRequire: []
           }
         ],
@@ -615,6 +719,11 @@ export const permissions: Module[] = [
             method: "Thêm combo món ăn",
             key: "food_combo_create",
             patchRequire: ['/dashboard/food-combos/add']
+          },
+          {
+            method: "Xem chi tiết combo món ăn",
+            key: "food_combo_view_detail",
+            patchRequire: ['/dashboard/food-combos/view']
           },
           {
             method: "Sửa combo món ăn",
@@ -659,6 +768,11 @@ export const permissions: Module[] = [
             patchRequire: ['/dashboard/special-offers/add']
           },
           {
+            method: "Xem chi tiết ưu đãi",
+            key: "special_offer_view_detail",
+            patchRequire: ['/dashboard/special-offers/view']
+          },
+          {
             method: "Sửa ưu đãi",
             key: "special_offer_update",
             patchRequire: ['/dashboard/special-offers/edit']
@@ -689,7 +803,7 @@ export const permissions: Module[] = [
   },
   {
     name: 'Khách hàng',
-    key: 'guest_list',
+    key: 'guest_menu',
     functions: [
       {
         name: 'Khách hàng',
@@ -707,7 +821,7 @@ export const permissions: Module[] = [
   },
   {
     name: 'Blog',
-    key: 'blog_list',
+    key: 'blog_menu',
     functions: [
       {
         name: 'Danh mục blog',
@@ -723,6 +837,11 @@ export const permissions: Module[] = [
             method: "Thêm danh mục blog",
             key: "category_blog_create",
             patchRequire: ['/dashboard/category-blog/add']
+          },
+          {
+            method: "Xem chi tiết danh mục blog",
+            key: "category_blog_view_detail",
+            patchRequire: ['/dashboard/category-blog/view']
           },
           {
             method: "Sửa danh mục blog",
@@ -767,6 +886,11 @@ export const permissions: Module[] = [
             patchRequire: ['/dashboard/article/add']
           },
           {
+            method: "Xem chi tiết bài viết",
+            key: "article_view_detail",
+            patchRequire: ['/dashboard/article/view']
+          },
+          {
             method: "Sửa bài viết",
             key: "article_update",
             patchRequire: ['/dashboard/article/edit']
@@ -807,7 +931,7 @@ export const permissions: Module[] = [
   },
   {
     name: 'Kho',
-    key: 'warehouse',
+    key: 'warehouse_menu',
     functions: [
       {
         name: 'Nhà cung cấp',
@@ -823,6 +947,11 @@ export const permissions: Module[] = [
             method: "Thêm nhà cung cấp",
             key: "supplier_create",
             patchRequire: ['/dashboard/suppliers/add']
+          },
+          {
+            method: "Xem chi tiết nhà cung cấp",
+            key: "supplier_view_detail",
+            patchRequire: ['/dashboard/suppliers/view']
           },
           {
             method: "Sửa nhà cung cấp",
@@ -867,6 +996,11 @@ export const permissions: Module[] = [
             patchRequire: ['/dashboard/cat-ingredients/add']
           },
           {
+            method: "Xem chi tiết danh mục nguyên liệu",
+            key: "cat_ingredient_view_detail",
+            patchRequire: ['/dashboard/cat-ingredients/view']
+          },
+          {
             method: "Sửa danh mục nguyên liệu",
             key: "cat_ingredient_update",
             patchRequire: ['/dashboard/cat-ingredients/edit']
@@ -907,6 +1041,11 @@ export const permissions: Module[] = [
             method: "Thêm đơn vị đo",
             key: "unit_create",
             patchRequire: ['/dashboard/units/add']
+          },
+          {
+            method: "Xem chi tiết đơn vị đo",
+            key: "unit_view_detail",
+            patchRequire: ['/dashboard/units/view']
           },
           {
             method: "Sửa đơn vị đo",
@@ -951,6 +1090,11 @@ export const permissions: Module[] = [
             patchRequire: ['/dashboard/ingredients/add']
           },
           {
+            method: "Xem chi tiết nguyên liệu",
+            key: "ingredient_view_detail",
+            patchRequire: ['/dashboard/ingredients/view']
+          },
+          {
             method: "Sửa nguyên liệu",
             key: "ingredient_update",
             patchRequire: ['/dashboard/ingredients/edit'],
@@ -993,6 +1137,11 @@ export const permissions: Module[] = [
             patchRequire: ['/dashboard/stock-in/add']
           },
           {
+            method: "Xem chi tiết nhập kho",
+            key: "stock_in_view_detail",
+            patchRequire: ['/dashboard/stock-in/view']
+          },
+          {
             method: "Sửa nhập kho",
             key: "stock_in_update",
             patchRequire: ['/dashboard/stock-in/edit'],
@@ -1030,6 +1179,11 @@ export const permissions: Module[] = [
             patchRequire: ['/dashboard/stock-out/add']
           },
           {
+            method: "Xem chi tiết xuất kho",
+            key: "stock_out_view_detail",
+            patchRequire: ['/dashboard/stock-out/view']
+          },
+          {
             method: "Sửa xuất kho",
             key: "stock_out_update",
             patchRequire: ['/dashboard/stock-out/edit'],
@@ -1055,7 +1209,7 @@ export const permissions: Module[] = [
   },
   {
     name: 'Nội bộ',
-    key: 'internal_list',
+    key: 'internal_menu',
     functions: [
       {
         name: 'Ghi chú',
@@ -1071,6 +1225,11 @@ export const permissions: Module[] = [
             method: "Thêm ghi chú",
             key: "internal_note_create",
             patchRequire: ['/dashboard/internal-note/add']
+          },
+          {
+            method: "Xem chi tiết ghi chú",
+            key: "internal_note_view_detail",
+            patchRequire: ['/dashboard/internal-note/view']
           },
           {
             method: "Sửa ghi chú",
@@ -1115,6 +1274,11 @@ export const permissions: Module[] = [
             patchRequire: ['/dashboard/internal-proposal/add']
           },
           {
+            method: "Xem chi tiết đề xuất",
+            key: "internal_proposal_view_detail",
+            patchRequire: ['/dashboard/internal-proposal/view']
+          },
+          {
             method: "Sửa đề xuất",
             key: "internal_proposal_update",
             patchRequire: ['/dashboard/internal-proposal/edit']
@@ -1155,6 +1319,11 @@ export const permissions: Module[] = [
             method: "Thêm bảo trì thiết bị",
             key: "equipment_maintenance_create",
             patchRequire: ['/dashboard/equipment-maintenance/add']
+          },
+          {
+            method: "Xem chi tiết bảo trì thiết bị",
+            key: "equipment_maintenance_view_detail",
+            patchRequire: ['/dashboard/equipment-maintenance/view']
           },
           {
             method: "Sửa bảo trì thiết bị",
@@ -1199,6 +1368,11 @@ export const permissions: Module[] = [
             patchRequire: ['/dashboard/operation-manual/add']
           },
           {
+            method: "Xem chi tiết tài liệu vận hành",
+            key: "operation_manual_view_detail",
+            patchRequire: ['/dashboard/operation-manual/view']
+          },
+          {
             method: "Sửa tài liệu vận hành",
             key: "operation_manual_update",
             patchRequire: ['/dashboard/operation-manual/edit']
@@ -1241,6 +1415,11 @@ export const permissions: Module[] = [
             patchRequire: ['/dashboard/operational-costs/add']
           },
           {
+            method: "Xem chi tiết chi phí vận hành",
+            key: "operational_costs_view_detail",
+            patchRequire: ['/dashboard/operational-costs/view']
+          },
+          {
             method: "Sửa chi phí vận hành",
             key: "operational_costs_update",
             patchRequire: ['/dashboard/operational-costs/edit']
@@ -1271,7 +1450,7 @@ export const permissions: Module[] = [
   },
   {
     name: 'Phân quyền',
-    key: 'policy',
+    key: 'policy_menu',
     functions: [
       {
         name: 'Quyền chức năng',
@@ -1287,6 +1466,11 @@ export const permissions: Module[] = [
             method: "Thêm quyền chức năng",
             key: "policy_list_create",
             patchRequire: ['/dashboard/policy/add']
+          },
+          {
+            method: "Xem chi tiết quyền chức năng",
+            key: "policy_list_view_detail",
+            patchRequire: ['/dashboard/policy/view']
           },
           {
             method: "Sửa quyền chức năng",

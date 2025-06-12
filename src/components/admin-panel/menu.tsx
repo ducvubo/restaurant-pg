@@ -43,8 +43,7 @@ export function Menu({ isOpen }: MenuProps) {
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
-    return
-    if (inforRestaurant._id || pathname === '/dashboard') {
+    if (inforRestaurant._id || pathname === '/dashboard/account') {
       setShowAlert(false);
       return;
     }
@@ -78,7 +77,7 @@ export function Menu({ isOpen }: MenuProps) {
 
   const handleRedirect = () => {
     setShowAlert(false);
-    router.push('/dashboard');
+    router.push('/dashboard/account');
   };
 
   if (menuList.length === 0 && !inforRestaurant._id) {
@@ -96,11 +95,11 @@ export function Menu({ isOpen }: MenuProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Không có quyền truy cập</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn không có quyền truy cập vào trang này. Bạn sẽ được chuyển về trang Dashboard.
+              Bạn không có quyền truy cập vào trang này. Bạn sẽ được chuyển về cá nhân.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={handleRedirect}>Chuyển về Dashboard</AlertDialogAction>
+            <AlertDialogAction onClick={handleRedirect}>Chuyển về cá nhân</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -60,7 +60,7 @@ const baseMenuList = (pathname: string): Group[] => {
           label: 'Đơn đặt hàng',
           active: pathname.includes('/order') || pathname === '/dashboard/book-table' || pathname === '/dashboard/book-room',
           icon: ListOrdered,
-          key: 'order', // Khớp với module.key
+          key: 'order_menu', // Khớp với module.key
           submenus: [
             {
               href: '/dashboard/order/dish',
@@ -72,19 +72,19 @@ const baseMenuList = (pathname: string): Group[] => {
               href: '/dashboard/order/table',
               label: 'Đơn đặt theo bàn',
               active: pathname === '/dashboard/order/table',
-              key: 'order_table', 
+              key: 'order_table',
             },
             {
               href: '/dashboard/book-table',
               label: 'Danh sách đặt bàn',
               active: pathname === '/dashboard/book-table',
-              key: 'book_table', 
+              key: 'book_table',
             },
             {
               href: '/dashboard/order-food',
               label: 'Danh sách đặt món ăn',
               active: pathname === '/dashboard/order-food',
-              key: 'order_food', 
+              key: 'order_food',
             },
             {
               href: '/dashboard/order-combo',
@@ -105,7 +105,7 @@ const baseMenuList = (pathname: string): Group[] => {
           label: 'Quản lý hỗ trợ',
           active: pathname.includes('/ticket-guest') || pathname === '/dashboard/connect' || pathname === '/dashboard/chat-bot',
           icon: TicketCheck,
-          key: 'ticket_guest', // Khớp với module.key
+          key: 'ticket_menu', // Khớp với module.key
           submenus: [
             {
               href: '/dashboard/ticket-guest',
@@ -132,7 +132,7 @@ const baseMenuList = (pathname: string): Group[] => {
           label: 'Quản lý phòng/sảnh',
           active: pathname.includes('/rooms') || pathname.includes('/amenities') || pathname.includes('/menu-items'),
           icon: Album,
-          key: 'rooms', // Khớp với module.key
+          key: 'rooms_menu', // Khớp với module.key
           submenus: [
             {
               href: '/dashboard/rooms',
@@ -159,7 +159,7 @@ const baseMenuList = (pathname: string): Group[] => {
           label: 'Quản lý nhân viên',
           active: pathname.includes('/employees') || pathname.includes('/labels') || pathname.includes('/working-shifts') || pathname.includes('/work-schedules') || pathname.includes('/leave-application'),
           icon: SquarePen,
-          key: 'employees', // Khớp với module.key
+          key: 'employees_menu', // Khớp với module.key
           submenus: [
             {
               href: '/dashboard/employees',
@@ -198,7 +198,7 @@ const baseMenuList = (pathname: string): Group[] => {
           label: 'Bàn ăn',
           active: pathname.includes('/tables'),
           icon: Bookmark,
-          key: 'tables', // Khớp với module.key
+          key: 'tables_menu', // Khớp với module.key
           submenus: [
             {
               href: '/dashboard/tables',
@@ -213,7 +213,7 @@ const baseMenuList = (pathname: string): Group[] => {
           label: 'Món ăn',
           active: pathname.includes('/dishes') || pathname.includes('/foods') || pathname.includes('/food-combos') || pathname.includes('/special-offers'),
           icon: Salad,
-          key: 'dish_list', // Sửa thành khớp với module.key
+          key: 'dish_menu', // Sửa thành khớp với module.key
           submenus: [
             {
               href: '/dashboard/dishes',
@@ -246,7 +246,7 @@ const baseMenuList = (pathname: string): Group[] => {
           label: 'Khách hàng',
           active: pathname.includes('/guest'),
           icon: Users,
-          key: 'guest_list', // Sửa thành khớp với module.key
+          key: 'guest_menu', // Sửa thành khớp với module.key
           submenus: [
             {
               href: '/dashboard/guest',
@@ -261,7 +261,7 @@ const baseMenuList = (pathname: string): Group[] => {
           label: 'Blog',
           active: pathname.includes('/blogs') || pathname.includes('/category-blog') || pathname.includes('/article'),
           icon: StickyNote,
-          key: 'blog_list', // Sửa thành khớp với module.key
+          key: 'blog_menu', // Sửa thành khớp với module.key
           submenus: [
             {
               href: '/dashboard/category-blog',
@@ -282,7 +282,7 @@ const baseMenuList = (pathname: string): Group[] => {
           label: 'Quản lý kho',
           active: pathname.includes('/warehouse') || pathname.includes('/suppliers') || pathname.includes('/cat-ingredients') || pathname.includes('/units') || pathname.includes('/ingredients') || pathname.includes('/stock-in') || pathname.includes('/stock-out'),
           icon: LayoutGrid,
-          key: 'warehouse', // Khớp với module.key
+          key: 'warehouse_menu', // Khớp với module.key
           submenus: [
             {
               href: '/dashboard/suppliers',
@@ -327,7 +327,7 @@ const baseMenuList = (pathname: string): Group[] => {
           label: 'Quản lý nội bộ',
           active: pathname.includes('/other') || pathname.includes('/internal-note') || pathname.includes('/internal-proposal') || pathname.includes('/equipment-maintenance') || pathname.includes('/operation-manual') || pathname.includes('/operational-costs'),
           icon: EthernetPort,
-          key: 'internal_list', // Sửa thành khớp với module.key
+          key: 'internal_menu', // Sửa thành khớp với module.key
           submenus: [
             {
               href: '/dashboard/internal-note',
@@ -366,19 +366,13 @@ const baseMenuList = (pathname: string): Group[] => {
           label: 'Phân quyền',
           active: pathname.includes('/policy') || pathname.includes('/assign-policy'),
           icon: Settings,
-          key: 'policy', // Khớp với module.key
+          key: 'policy_menu', // Khớp với module.key
           submenus: [
             {
               href: '/dashboard/policy',
               label: 'Quyền chức năng',
               active: pathname === '/dashboard/policy',
               key: 'policy_list', // Khớp với function.key
-            },
-            {
-              href: '/dashboard/assign-policy',
-              label: 'Phân quyền',
-              active: pathname === '/dashboard/assign-policy',
-              key: 'assign_policy', // Không có trong permissions, giữ nguyên
             },
           ],
         },
