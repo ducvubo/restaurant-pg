@@ -85,13 +85,13 @@ const RegisterFaceUpload = forwardRef<HTMLDivElement, Props>(({ inforEmployee },
       await new Promise((resolve) => {
         img.onload = async () => {
           try {
-            const detections = await faceapi.detectAllFaces(img, new faceapi.TinyFaceDetectorOptions());
-            if (detections.length === 1) {
-              validFiles.push(file);
-              previews.push(objectUrl);
-            } else {
-              setError(`Ảnh ${file.name} không hợp lệ: phải chứa chính xác một khuôn mặt`);
-            }
+            // const detections = await faceapi.detectAllFaces(img, new faceapi.TinyFaceDetectorOptions());
+            // if (detections.length === 1) {
+            validFiles.push(file);
+            previews.push(objectUrl);
+            // } else {
+            //   setError(`Ảnh ${file.name} không hợp lệ: phải chứa chính xác một khuôn mặt`);
+            // }
             resolve(null);
           } catch (err) {
             console.error('Lỗi phát hiện khuôn mặt:', err);
