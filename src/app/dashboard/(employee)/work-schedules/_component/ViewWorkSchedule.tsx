@@ -92,11 +92,24 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
           </tr>
           <tr>
             <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Ca làm việc</td>
-            <td className='border border-gray-300 dark:border-gray-200 p-2'>{inforWorkSchedule.workingShift.wks_name}</td>
+            <td className='border border-gray-300 dark:border-gray-200 p-2'>{inforWorkSchedule.workingShift.wks_name}
+              ({
+                inforWorkSchedule.workingShift.wks_start_time} - {inforWorkSchedule.workingShift.wks_end_time
+              })
+            </td>
           </tr>
           <tr>
             <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Nhãn</td>
-            <td className='border border-gray-300 dark:border-gray-200 p-2'>{inforWorkSchedule.label.lb_name}</td>
+            <td className='border border-gray-300 dark:border-gray-200 p-2'>
+              <span
+                className="text-white text-sm font-medium px-3 py-1 rounded-full inline-block"
+                style={{
+                  backgroundColor: inforWorkSchedule.label.lb_color
+                }}
+              >
+                {inforWorkSchedule.label.lb_name}
+              </span>
+            </td>
           </tr>
           <tr>
             <td className='border border-gray-300 dark:border-gray-700 p-2 font-bold'>Nhân viên</td>

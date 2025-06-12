@@ -124,7 +124,7 @@ const UploadFace = forwardRef<HTMLDivElement>((_, ref) => {
       console.error('Lỗi gửi API:', err);
       toast({
         title: 'Thất bại',
-        description: 'Không thể kết nối đến server, vui lòng thử lại sau',
+        description: 'Không thể xác thực khuôn mặt. Vui lòng thử lại.',
         variant: 'destructive',
       });
       resetStates();
