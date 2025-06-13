@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IArticle } from '../article.interface'
 import { deleteArticle, restoreArticle } from '../article.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface Props {
   inforArticle: IArticle
@@ -29,7 +29,7 @@ interface Props {
 export default function DeleteOrRestore({ inforArticle, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteLabel = async (atlId: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreArticle({ atlId }) : await deleteArticle({ atlId })
@@ -69,14 +69,14 @@ export default function DeleteOrRestore({ inforArticle, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('article_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('article_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'
             className='relative flex select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 cursor-pointer'
             data-orientation='vertical'
             data-radix-collection-item=''
-            data-disabled={!hasPermissionKey('article_delete')}
+            data-disabled={!hasPermission('article_delete')}
           >
             Xóa
           </div>

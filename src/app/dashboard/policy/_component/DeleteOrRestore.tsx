@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IPolicy } from '../policy.interface'
 import { deletePolicy, restorePolicy } from '../policy.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 interface Props {
   inforPolicy: IPolicy
   path: 'recycle' | 'delete'
@@ -28,7 +28,7 @@ interface Props {
 export default function DeleteOrRestore({ inforPolicy, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteTable = async (_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restorePolicy({ _id }) : await deletePolicy({ _id })
@@ -68,7 +68,7 @@ export default function DeleteOrRestore({ inforPolicy, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('policy_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('policy_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IAmenities } from '../amenities.interface'
 import { deleteAmenities, restoreAmenities } from '../amenities.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 interface Props {
   inforAmenities: IAmenities
   path: 'recycle' | 'delete'
@@ -28,7 +28,7 @@ interface Props {
 export default function DeleteOrRestore({ inforAmenities, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeletedAmenities = async (ame_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreAmenities({ ame_id }) : await deleteAmenities({ ame_id })
@@ -68,7 +68,7 @@ export default function DeleteOrRestore({ inforAmenities, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('amenities_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('amenities_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

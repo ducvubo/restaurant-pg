@@ -30,13 +30,14 @@ import { useLoading } from '@/context/LoadingContext'
 import { useRouter } from 'next/navigation'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { handleClientScriptLoad } from 'next/script'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface Props {
   order_summary: IOrderRestaurant
 }
 
 export function ModalUpdateStatusSummary({ order_summary }: Props) {
+  const { hasPermission } = usePermission()
   const { setLoading } = useLoading()
   const router = useRouter()
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -118,7 +119,7 @@ export function ModalUpdateStatusSummary({ order_summary }: Props) {
     <>
       {order_summary.od_dish_smr_status === 'ordering' ? (
         <Select value={order_summary.od_dish_smr_status} onValueChange={handleChange} disabled={
-          !hasPermissionKey('order_dish_update_status')
+          !hasPermission('order_dish_update_status')
         }>
           <SelectTrigger className='w-[140px] mr-[70px]' >
             <SelectValue placeholder='Chọn trạng thái' />

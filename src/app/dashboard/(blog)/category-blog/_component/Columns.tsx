@@ -18,7 +18,7 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../category-blog.api'
 import { MoreHorizontal } from 'lucide-react'
 import { ICategory } from '../category-blog.interface'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 export const columns: ColumnDef<ICategory>[] = [
   {
@@ -51,6 +51,7 @@ export const columns: ColumnDef<ICategory>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const router = useRouter()
       const cat = row.original
       const handleUpdateStatus = async () => {
@@ -104,11 +105,11 @@ export const columns: ColumnDef<ICategory>[] = [
         }
       }
       return cat.catStatus === 'ENABLED' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('category_blog_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('category_blog_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('category_blog_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('category_blog_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -119,6 +120,7 @@ export const columns: ColumnDef<ICategory>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const cat = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -137,17 +139,17 @@ export const columns: ColumnDef<ICategory>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('category_blog_update') && (<Link href={`/dashboard/category-blog/edit?id=${cat.catId}`} className='cursor-pointer'>
+              hasPermission('category_blog_update') && (<Link href={`/dashboard/category-blog/edit?id=${cat.catId}`} className='cursor-pointer'>
                 <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
               </Link>)
             }
             {
-              hasPermissionKey('category_blog_view_detail') && (<Link href={`/dashboard/category-blog/view?id=${cat.catId}`} className='cursor-pointer'>
+              hasPermission('category_blog_view_detail') && (<Link href={`/dashboard/category-blog/view?id=${cat.catId}`} className='cursor-pointer'>
                 <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
               </Link>)
             }
             {
-              hasPermissionKey('category_blog_delete') && (<DropdownMenuItem asChild>
+              hasPermission('category_blog_delete') && (<DropdownMenuItem asChild>
                 <DeleteOrRestore inforCategory={cat} path='delete' />
               </DropdownMenuItem>)
             }

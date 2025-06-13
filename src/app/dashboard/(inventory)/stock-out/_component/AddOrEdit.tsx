@@ -49,7 +49,7 @@ import { createIngredient, findAllCategories, findAllUnits } from '../../ingredi
 import { createUnit } from '../../units/unit.api'
 import { createCatIngredient } from '../../cat-ingredients/cat-ingredient.api'
 import slugify from 'slugify'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface Props {
   id: string
@@ -68,12 +68,12 @@ const FormSchema = z.object({
 })
 
 export default function AddOrEdit({ id, inforStockOut }: Props) {
+  const { hasPermission } = usePermission()
   const { setLoading } = useLoading()
   const router = useRouter()
   const inforEmployee = useSelector((state: RootState) => state.inforEmployee)
   const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant)
   const [listSuppliers, setListSuppliers] = useState<ISupplier[]>([])
-  console.log("🚀 ~ AddOrEdit ~ listSuppliers:", listSuppliers)
   const [listEmployees, setListEmployees] = useState<IEmployee[]>([])
   const [listIngredients, setListIngredients] = useState<IIngredient[]>([])
   const [stockOutItems, setStockOutItems] = useState<IStockOutItem[]>([])
@@ -751,7 +751,7 @@ export default function AddOrEdit({ id, inforStockOut }: Props) {
   return (
     <Form {...form}>
       {
-        hasPermissionKey('stock_out_export_to_pdf') && (
+        hasPermission('stock_out_export_to_pdf') && (
           <div className="space-y-4 p-4 border rounded-md">
             <h3 className="text-lg font-semibold">Tải lên file PDF</h3>
             <div className="flex items-center gap-2">

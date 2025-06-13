@@ -18,7 +18,8 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../cat-ingredient.api'
 import { MoreHorizontal } from 'lucide-react'
 import { ICatIngredient } from '../cat-ingredient.interface'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 export const columns: ColumnDef<ICatIngredient>[] = [
   {
     accessorKey: 'cat_igd_name',
@@ -38,6 +39,7 @@ export const columns: ColumnDef<ICatIngredient>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const router = useRouter()
       const catIngredient = row.original
       const handleUpdateStatus = async () => {
@@ -91,11 +93,11 @@ export const columns: ColumnDef<ICatIngredient>[] = [
         }
       }
       return catIngredient.cat_igd_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('cat_ingredient_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('cat_ingredient_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('cat_ingredient_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('cat_ingredient_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -106,6 +108,7 @@ export const columns: ColumnDef<ICatIngredient>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const catIngredient = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -124,21 +127,21 @@ export const columns: ColumnDef<ICatIngredient>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('cat_ingredient_view_detail') && (
+              hasPermission('cat_ingredient_view_detail') && (
                 <Link href={`/dashboard/cat-ingredients/view?id=${catIngredient.cat_igd_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('cat_ingredient_update') && (
+              hasPermission('cat_ingredient_update') && (
                 <Link href={`/dashboard/cat-ingredients/edit?id=${catIngredient.cat_igd_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('cat_ingredient_delete') && (
+              hasPermission('cat_ingredient_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforCatIngredient={catIngredient} path='delete' />
                 </DropdownMenuItem>

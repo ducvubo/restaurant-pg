@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { updateStatusInternalProposal } from '../internal-proposal.api'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'  
 
 export const columns: ColumnDef<IInternalProposal>[] = [
   {
@@ -121,6 +121,7 @@ export const columns: ColumnDef<IInternalProposal>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const internalNote = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -139,21 +140,21 @@ export const columns: ColumnDef<IInternalProposal>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('internal_proposal_view_detail') && (
+              hasPermission('internal_proposal_view_detail') && (
                 <Link href={`/dashboard/internal-proposal/view?id=${internalNote.itn_proposal_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('internal_proposal_update') && (
+              hasPermission('internal_proposal_update') && (
                 <Link href={`/dashboard/internal-proposal/edit?id=${internalNote.itn_proposal_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('internal_proposal_delete') && (
+              hasPermission('internal_proposal_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforInternalProposal={internalNote} path='delete' />
                 </DropdownMenuItem>

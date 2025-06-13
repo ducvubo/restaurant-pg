@@ -8,7 +8,7 @@ import { getListFood } from '../food-combos.api'
 import { IFood } from '../../foods/food.interface'
 import { useToast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface ViewFoodComboProps {
   inforFoodCombo: IFoodComboRes
@@ -18,7 +18,7 @@ export default function ViewFoodCombo({ inforFoodCombo }: ViewFoodComboProps) {
   const router = useRouter()
   const { toast } = useToast()
   const [foodList, setFoodList] = useState<IFood[]>([])
-
+  const { hasPermission } = usePermission()
   const handleEdit = () => {
     router.push(`/dashboard/food-combos/edit?id=${inforFoodCombo.fcb_id}`)
   }
@@ -72,7 +72,7 @@ export default function ViewFoodCombo({ inforFoodCombo }: ViewFoodComboProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit} disabled={!hasPermissionKey('food_combo_update')}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('food_combo_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

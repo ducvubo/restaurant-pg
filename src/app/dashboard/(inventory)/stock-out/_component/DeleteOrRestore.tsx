@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IStockOut } from '../stock-out.interface'
 import { deleteStockOut, restoreStockOut } from '../stock-out.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 interface Props {
   inforStockOut: IStockOut
   path: 'recycle' | 'delete'
@@ -28,7 +28,7 @@ interface Props {
 export default function DeleteOrRestore({ inforStockOut, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDelete = async (stko_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreStockOut({ stko_id }) : await deleteStockOut({ stko_id })
@@ -69,7 +69,7 @@ export default function DeleteOrRestore({ inforStockOut, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('stock_out_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('stock_out_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

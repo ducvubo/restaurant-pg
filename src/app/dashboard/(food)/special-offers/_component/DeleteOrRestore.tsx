@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { ISpecialOffer } from '../special-offer.interface'
 import { deleteSpecialOffer, restoreSpecialOffer } from '../special-offer.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'  
 interface Props {
   inforSpecialOffer: ISpecialOffer
   path: 'recycle' | 'delete'
@@ -28,7 +28,7 @@ interface Props {
 export default function DeleteOrRestore({ inforSpecialOffer, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteSpecialOffer = async (spo_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreSpecialOffer({ spo_id }) : await deleteSpecialOffer({ spo_id })
@@ -69,7 +69,7 @@ export default function DeleteOrRestore({ inforSpecialOffer, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('special_offer_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('special_offer_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

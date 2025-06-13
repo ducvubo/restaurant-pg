@@ -20,7 +20,8 @@ import { DataTablePagination } from '@/components/PaginationTable'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -45,6 +46,7 @@ export function PageSpecialOffer<TData, TValue>({ columns, meta, data }: DataTab
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [search, setSearch] = React.useState('')
+  const { hasPermission } = usePermission()
   const table = useReactTable({
     data,
     columns,
@@ -100,16 +102,16 @@ export function PageSpecialOffer<TData, TValue>({ columns, meta, data }: DataTab
     <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex justify-end gap-2 items-center py-4'>
         <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
-        <Button variant={'outline'} disabled={!hasPermissionKey('special_offer_create')}>
+        <Button variant={'outline'} disabled={!hasPermission('special_offer_create')}>
           <Link href={'/dashboard/special-offers/add'}>Thêm</Link>
         </Button>
         {
           pathname === 'recycle' ? (
-            <Button variant={'outline'} disabled={!hasPermissionKey('special_offer_view_list')}>
+            <Button variant={'outline'} disabled={!hasPermission('special_offer_view_list')}>
               <Link href={'/dashboard/special-offers'}>Danh sách</Link>
             </Button>
           ) : (
-            <Button variant={'outline'} disabled={!hasPermissionKey('special_offer_view_deleted')}>
+            <Button variant={'outline'} disabled={!hasPermission('special_offer_view_deleted')}>
               <Link href={'/dashboard/special-offers/recycle'}>Danh sách đã xóa</Link>
             </Button>
           )

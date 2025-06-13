@@ -37,7 +37,7 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface Props {
   selectedTable: ITableOrderSummary | null
@@ -45,6 +45,7 @@ interface Props {
 }
 
 export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
+  const { hasPermission } = usePermission()
   const router = useRouter()
   const { setLoading } = useLoading()
   const [listOrder, setListOrder] = useState<IOrderRestaurant[]>()
@@ -297,7 +298,7 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                       })
                                     }
                                   >
-                                    <SelectTrigger className='w-[120px]' disabled={order_summary.od_dish_smr_status !== 'ordering' || !hasPermissionKey('order_dish_update_status')}>
+                                    <SelectTrigger className='w-[120px]' disabled={order_summary.od_dish_smr_status !== 'ordering' || !hasPermission('order_dish_update_status')}>
                                       <SelectValue placeholder='Đang nấu' />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -375,7 +376,7 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                             })
                                           }
                                         >
-                                          <SelectTrigger className='w-[120px]' disabled={order_summary.od_dish_smr_status !== 'ordering' || !hasPermissionKey('order_dish_update_status')}>
+                                          <SelectTrigger className='w-[120px]' disabled={order_summary.od_dish_smr_status !== 'ordering' || !hasPermission('order_dish_update_status')}>
                                             <SelectValue placeholder='Đang nấu' />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -399,17 +400,17 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                         </AccordionItem>
                         <div className='flex mt-2'>
                           {
-                            hasPermissionKey('order_dish_update_status') && (
+                            hasPermission('order_dish_update_status') && (
                               <ModalUpdateStatusSummary order_summary={order_summary} />
                             )
                           }
                           {
-                            hasPermissionKey('order_dish_call_food') && (
+                            hasPermission('order_dish_call_food') && (
                               <AddOrderDish order_summary={order_summary} />
                             )
                           }
                           {
-                            hasPermissionKey('order_dish_create_qr') && (
+                            hasPermission('order_dish_create_qr') && (
                               <GetQrOrder order_summary={order_summary} />
                             )
                           }

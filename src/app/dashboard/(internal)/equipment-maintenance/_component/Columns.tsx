@@ -19,7 +19,8 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { updateStatusEquipmentMaintenance } from '../equipment-maintenance.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 
 export const columns: ColumnDef<IEquipmentMaintenance>[] = [
   // eqp_mtn_name: string
@@ -100,6 +101,7 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const router = useRouter()
       const equipmentMaintenance = row.original
       const handleUpdateStatus = async (eqp_mtn_status: 'pending' | ' in_progress' | ' done' | ' rejected') => {
@@ -156,10 +158,10 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
         <Select
           value={equipmentMaintenance.eqp_mtn_status}
           onValueChange={(value: 'pending' | ' in_progress' | ' done' | ' rejected') => handleUpdateStatus(value)}
-          disabled={!hasPermissionKey('equipment_maintenance_update_status')}
+          disabled={!hasPermission('equipment_maintenance_update_status')}
         >
           <SelectTrigger className='w-36' >
-            <SelectValue placeholder='Trạng thái' />    
+            <SelectValue placeholder='Trạng thái' />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -178,7 +180,8 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
-      const equipmentMaintenance = row.original
+      const { hasPermission } = usePermission()
+          const equipmentMaintenance = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
         return <DeleteOrRestore inforEquipmentMaintenance={equipmentMaintenance} path={pathname} />
@@ -196,21 +199,21 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('equipment_maintenance_view_detail') && (
+              hasPermission('equipment_maintenance_view_detail') && (
                 <Link href={`/dashboard/equipment-maintenance/view?id=${equipmentMaintenance.eqp_mtn_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('equipment_maintenance_update') && (
+              hasPermission('equipment_maintenance_update') && (
                 <Link href={`/dashboard/equipment-maintenance/edit?id=${equipmentMaintenance.eqp_mtn_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('equipment_maintenance_delete') && (
+              hasPermission('equipment_maintenance_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforEquipmentMaintenance={equipmentMaintenance} path='delete' />
                 </DropdownMenuItem>

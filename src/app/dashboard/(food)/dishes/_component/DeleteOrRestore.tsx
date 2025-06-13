@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IDish } from '../dishes.interface'
 import { deleteDish, restoreDish } from '../dishes.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 interface Props {
   inforDish: IDish
   path: 'recycle' | 'delete'
@@ -28,7 +28,7 @@ interface Props {
 export default function DeleteOrRestore({ inforDish, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteTable = async (_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreDish({ _id }) : await deleteDish({ _id })
@@ -68,7 +68,7 @@ export default function DeleteOrRestore({ inforDish, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('dish_list_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('dish_list_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

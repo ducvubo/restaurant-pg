@@ -8,7 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Button } from '@/components/ui/button'
 import { MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 export const getTextStatus = (status?: string) => {
   switch (status) {
@@ -153,6 +153,7 @@ export const columns: ColumnDef<ITicketGuestRestaurant>[] = [
     id: 'Thao tác',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Thao tác' />,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const ticket = row.original
       return (
         <DropdownMenu>
@@ -166,7 +167,7 @@ export const columns: ColumnDef<ITicketGuestRestaurant>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('ticket_list_view_detail') && (
+              hasPermission('ticket_list_view_detail') && (
                 <DropdownMenuItem className='cursor-pointer'>
                   <Link href={`/dashboard/ticket-guest/view?id=${ticket.tkgr_id}`} className='cursor-pointer'> Xem chi tiết</Link>
                 </DropdownMenuItem>

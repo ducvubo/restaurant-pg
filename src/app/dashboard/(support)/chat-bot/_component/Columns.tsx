@@ -3,7 +3,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/ColumnHeader'
 import { IChatBot } from '../chat-bot.interface'
 import { Button } from '@/components/ui/button'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 export const columns: ColumnDef<IChatBot>[] = [
   {
@@ -33,8 +33,9 @@ export const columns: ColumnDef<IChatBot>[] = [
     id: 'Action',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Action' />,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const chatBot = row.original
-      return <Button disabled={!hasPermissionKey('chat_bot_delete')}>Xóa</Button>
+      return <Button disabled={!hasPermission('chat_bot_delete')}>Xóa</Button>
     },
   }
 ]

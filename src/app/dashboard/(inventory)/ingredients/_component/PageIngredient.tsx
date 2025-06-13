@@ -20,7 +20,7 @@ import { DataTablePagination } from '@/components/PaginationTable'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'  
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -45,6 +45,7 @@ export function PageIngredient<TData, TValue>({ columns, meta, data }: DataTable
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [search, setSearch] = React.useState('')
+  const { hasPermission } = usePermission()
   const table = useReactTable({
     data,
     columns,
@@ -98,16 +99,16 @@ export function PageIngredient<TData, TValue>({ columns, meta, data }: DataTable
     <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex justify-end gap-2 items-center py-4'>
         <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
-        <Button variant={'outline'} disabled={!hasPermissionKey('ingredient_create')}>
+        <Button variant={'outline'} disabled={!hasPermission('ingredient_create')}>
           <Link href={'/dashboard/ingredients/add'}>Thêm</Link>
         </Button>
         {
           pathname === 'recycle' ? (
-            <Button variant={'outline'} disabled={!hasPermissionKey('ingredient_view_list')}>
+            <Button variant={'outline'} disabled={!hasPermission('ingredient_view_list')}>
               <Link href={'/dashboard/ingredients'}>Danh sách</Link>
             </Button>
           ) : (
-            <Button variant={'outline'} disabled={!hasPermissionKey('ingredient_view_deleted')}>
+            <Button variant={'outline'} disabled={!hasPermission('ingredient_view_deleted')}>
               <Link href={'/dashboard/ingredients/recycle'}>Danh sách đã xóa</Link>
             </Button>
           )

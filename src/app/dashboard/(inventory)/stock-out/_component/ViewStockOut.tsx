@@ -20,12 +20,14 @@ import {
   TableRow,
   TableFooter,
 } from '@/components/ui/table'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 interface ViewStockOutProps {
   inforStockOut: IStockOut
 }
 
 export default function ViewStockOut({ inforStockOut }: ViewStockOutProps) {
+  const { hasPermission } = usePermission()
   const router = useRouter()
   const { toast } = useToast()
   const [suppliers, setSuppliers] = useState<ISupplier[]>([])
@@ -165,7 +167,7 @@ export default function ViewStockOut({ inforStockOut }: ViewStockOutProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit} disabled={!hasPermissionKey('stock_out_update')}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('stock_out_update')}>Chỉnh sửa</Button>
       </div>
       <div className='space-y-4'>
         <h3 className='text-lg font-semibold'>Thông tin phiếu xuất kho</h3>

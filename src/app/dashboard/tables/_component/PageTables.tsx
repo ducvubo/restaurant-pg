@@ -20,7 +20,7 @@ import { DataTablePagination } from '@/components/PaginationTable'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
-
+import { usePermission } from '@/app/auth/PermissionContext'
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -40,6 +40,7 @@ function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (..
 }
 
 export function PageTables<TData, TValue>({ columns, meta, data }: DataTableProps<TData, TValue>) {
+  const { hasPermission } = usePermission()
   const router = useRouter()
   const pathname = usePathname().split('/').pop()
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -97,16 +98,16 @@ export function PageTables<TData, TValue>({ columns, meta, data }: DataTableProp
     <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex justify-end gap-2 items-center py-4'>
         <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
-        <Button variant={'outline'}>
+        <Button variant={'outline'} disabled={!hasPermission('table_list_create')}>
           <Link href={'/dashboard/tables/add'}>Thêm</Link>
         </Button>
         {
           pathname === 'recycle' ? (
-            <Button variant={'outline'}>
+            <Button variant={'outline'} disabled={!hasPermission('table_list_view')}>
               <Link href={'/dashboard/tables'}>Danh sách</Link>
             </Button>
           ) : (
-            <Button variant={'outline'}>
+            <Button variant={'outline'} disabled={!hasPermission('table_list_view_deleted')}>
               <Link href={'/dashboard/tables/recycle'}>Danh sách đã xóa</Link>
             </Button>
           )

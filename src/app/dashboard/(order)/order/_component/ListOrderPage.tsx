@@ -41,7 +41,7 @@ import GennerateQrOrder from './GetQrOrder'
 import GetQrOrder from './GetQrOrder'
 import ExportBill from './ExportBill'
 import GetQrPayment from './GetQrPayment'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+
 import { usePermission } from '@/app/auth/PermissionContext'
 
 const formatVietnameseDate = (date: Date) => {
@@ -392,7 +392,7 @@ export default function ListOrderPage() {
             </SelectContent>
           </Select>
           {
-            hasPermissionKey('order_dish_create') && (
+            hasPermission('order_dish_create') && (
               <AddOrderSummary />
             )
           }

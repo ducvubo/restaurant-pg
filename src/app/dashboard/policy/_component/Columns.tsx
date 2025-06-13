@@ -21,7 +21,7 @@ import Image from 'next/image'
 import { IPolicy } from '../policy.interface'
 import { updateStatus } from '../policy.api'
 import DeleteOrRestore from './DeleteOrRestore'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'  
 export const columns: ColumnDef<IPolicy>[] = [
   {
     accessorKey: 'poly_name',
@@ -41,6 +41,7 @@ export const columns: ColumnDef<IPolicy>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const router = useRouter()
       const poly = row.original
       const handleUpdateStatus = async () => {
@@ -94,11 +95,11 @@ export const columns: ColumnDef<IPolicy>[] = [
         }
       }
       return poly.poly_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('policy_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('policy_update_status')}>
           Đang hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('policy_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('policy_update_status')}>
           Ngưng hoạt động
         </Button>
       )
@@ -109,6 +110,7 @@ export const columns: ColumnDef<IPolicy>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const poly = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -126,21 +128,21 @@ export const columns: ColumnDef<IPolicy>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('policy_view_detail') && (
+              hasPermission('policy_view_detail') && (
                 <Link href={`/dashboard/policy/view?id=${poly._id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('policy_update') && (
+              hasPermission('policy_update') && (
                 <Link href={`/dashboard/policy/edit?id=${poly._id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('policy_delete') && (
+              hasPermission('policy_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforPolicy={poly} path='delete' />
                 </DropdownMenuItem>

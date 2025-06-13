@@ -20,7 +20,8 @@ import { deleteEmployee, restoreEmployee } from '../employees.api'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 interface Props {
   inforEmployee: IEmployee
   path: 'recycle' | 'delete'
@@ -28,7 +29,7 @@ interface Props {
 export default function DeleteOrRestore({ inforEmployee, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteEmployee = async (_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreEmployee({ _id }) : await deleteEmployee({ _id })
@@ -76,7 +77,7 @@ export default function DeleteOrRestore({ inforEmployee, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('employee_list_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('employee_list_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

@@ -8,7 +8,7 @@ import { getPolicyAllName } from '@/app/dashboard/policy/policy.api'
 import { IPolicy } from '@/app/dashboard/policy/policy.interface'
 import { useToast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface ViewEmployeeProps {
   inforEmployee: IEmployee
@@ -19,7 +19,7 @@ export default function ViewEmployee({ inforEmployee }: ViewEmployeeProps) {
   const { toast } = useToast()
   const [policies, setPolicies] = useState<IPolicy[]>([])
   const [policyName, setPolicyName] = useState<string>('')
-
+  const { hasPermission } = usePermission()
   const handleEdit = () => {
     router.push(`/dashboard/employees/edit?id=${inforEmployee._id}`)
   }
@@ -59,7 +59,7 @@ export default function ViewEmployee({ inforEmployee }: ViewEmployeeProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit} disabled={!hasPermissionKey('employee_list_update')}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('employee_list_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

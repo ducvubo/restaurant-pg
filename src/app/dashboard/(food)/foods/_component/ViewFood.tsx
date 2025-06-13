@@ -4,7 +4,7 @@ import { IFood } from '../food.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface ViewFoodProps {
   inforFood: IFood
@@ -12,7 +12,7 @@ interface ViewFoodProps {
 
 export default function ViewFood({ inforFood }: ViewFoodProps) {
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleEdit = () => {
     router.push(`/dashboard/foods/edit?id=${inforFood.food_id}`)
   }
@@ -27,7 +27,7 @@ export default function ViewFood({ inforFood }: ViewFoodProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit} disabled={!hasPermissionKey('online_food_update')}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('online_food_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

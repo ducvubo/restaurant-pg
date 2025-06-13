@@ -32,7 +32,8 @@ import ListAddArticle from './ListAddArticle'
 import { autoGenArticleDefault } from '../article.api'
 import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -52,6 +53,7 @@ function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (..
   }
 }
 export function PageArticle<TData, TValue>({ columns, meta, data }: DataTableProps<TData, TValue>) {
+  const { hasPermission } = usePermission()   
   const router = useRouter()
   const { setLoading } = useLoading()
   const pathname = usePathname().split('/').pop()
@@ -149,7 +151,7 @@ export function PageArticle<TData, TValue>({ columns, meta, data }: DataTablePro
         <ListAddArticle />
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button disabled={!hasPermissionKey('article_auto_create')} variant={'outline'}>Tạo bài viết tự động</Button>
+            <Button disabled={!hasPermission('article_auto_create')} variant={'outline'}>Tạo bài viết tự động</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -172,11 +174,11 @@ export function PageArticle<TData, TValue>({ columns, meta, data }: DataTablePro
           </DialogContent>
         </Dialog>
         {pathname === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('article_view_list')} variant={'outline'}>
+          <Button disabled={!hasPermission('article_view_list')} variant={'outline'}>
             <Link href={'/dashboard/article'}>Danh sách</Link>
           </Button>
         ) : (
-          <Button disabled={!hasPermissionKey('article_view_deleted')} variant={'outline'}>
+          <Button disabled={!hasPermission('article_view_deleted')} variant={'outline'}>
             <Link href={'/dashboard/article/recycle'}>Danh sách đã xóa</Link>
           </Button>
         )}

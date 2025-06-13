@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/select'
 import jsPDF from 'jspdf'
 import { RobotoMediumnormal } from '@/app/fonts/RobotoMediumnormal'
+import { usePermission } from '@/app/auth/PermissionContext'
 export const columns: ColumnDef<ITable>[] = [
   {
     accessorKey: 'tbl_name',
@@ -55,6 +56,7 @@ export const columns: ColumnDef<ITable>[] = [
     id: 'Mã QR',
     header: () => <div>Mã QR</div>,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const router = useRouter()
       const table = row.original
       const url = `${process.env.NEXT_PUBLIC_URL_CLIENT}/guest/table/${table.tbl_restaurant_id}?token=${table.tbl_token}`
@@ -161,7 +163,7 @@ export const columns: ColumnDef<ITable>[] = [
             <QRCodeSVG value={url} />
           </Link>
           <div className='flex gap-2 mt-2'>
-            <Button onClick={handleUpdateToken} disabled>Đổi mã QR</Button>
+            <Button onClick={handleUpdateToken} disabled={!hasPermission('table_list_change_qr')}>Đổi mã QR</Button>
             <Button onClick={handleDownloadPDF}>Tải xuống</Button>
           </div>
         </div>
@@ -176,6 +178,7 @@ export const columns: ColumnDef<ITable>[] = [
     enableHiding: true,
     cell: ({ row }) => {
       const router = useRouter()
+      const { hasPermission } = usePermission()
       const table = row.original
       const handleUpdateStatus = async (table_status: 'enable' | 'disable' | 'serving') => {
         const res = await updateStatus({
@@ -236,8 +239,9 @@ export const columns: ColumnDef<ITable>[] = [
         <Select
           value={table.tbl_status}
           onValueChange={(value: 'enable' | 'disable' | 'serving') => handleUpdateStatus(value)}
+
         >
-          <SelectTrigger className='w-[153px]'>
+          <SelectTrigger className='w-[153px]' disabled={!hasPermission('table_list_update_status')}>
             <SelectValue placeholder='Trạng thái' />
           </SelectTrigger>
           <SelectContent>
@@ -246,7 +250,7 @@ export const columns: ColumnDef<ITable>[] = [
               <SelectItem value='enable'>Có sẵn</SelectItem>
               <SelectItem value='disable'>Không có sẵn</SelectItem>
               <SelectItem value='serving'>Đã đặt trước</SelectItem>
-              {/* <SelectItem value='reserve'>Đang phục vụ</SelectItem> */}
+
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -258,6 +262,7 @@ export const columns: ColumnDef<ITable>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const table = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -275,15 +280,27 @@ export const columns: ColumnDef<ITable>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/tables/view?id=${table._id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/tables/edit?id=${table._id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforTable={table} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermission('table_list_view') && (
+                <Link href={`/dashboard/tables/view?id=${table._id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermission('table_list_update') && (
+                <Link href={`/dashboard/tables/edit?id=${table._id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermission('table_list_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforTable={table} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

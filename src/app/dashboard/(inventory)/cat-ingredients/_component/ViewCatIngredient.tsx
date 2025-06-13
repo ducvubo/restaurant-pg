@@ -3,14 +3,14 @@ import React from 'react'
 import { ICatIngredient } from '../cat-ingredient.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 interface ViewCatIngredientProps {
   inforCatIngredient: ICatIngredient
 }
 
 export default function ViewCatIngredient({ inforCatIngredient }: ViewCatIngredientProps) {
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleEdit = () => {
     router.push(`/dashboard/cat-ingredients/edit?id=${inforCatIngredient.cat_igd_id}`)
   }
@@ -18,7 +18,7 @@ export default function ViewCatIngredient({ inforCatIngredient }: ViewCatIngredi
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit} disabled={!hasPermissionKey('cat_ingredient_update')}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('cat_ingredient_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

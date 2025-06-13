@@ -44,7 +44,8 @@ import { createSupplier } from '../../suppliers/supplier.api'
 import { createUnit } from '../../units/unit.api'
 import { createCatIngredient } from '../../cat-ingredients/cat-ingredient.api'
 import slugify from 'slugify'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 
 interface Props {
   id: string
@@ -64,6 +65,7 @@ const FormSchema = z.object({
 })
 
 export default function AddOrEdit({ id, inforStockIn }: Props) {
+  const { hasPermission } = usePermission()
   const { setLoading } = useLoading()
   const router = useRouter()
   const inforEmployee = useSelector((state: RootState) => state.inforEmployee)
@@ -780,7 +782,7 @@ export default function AddOrEdit({ id, inforStockIn }: Props) {
   return (
     <Form {...form}>
       {
-        hasPermissionKey('stock_in_import_from_pdf') && (
+        hasPermission('stock_in_import_from_pdf') && (
           <div className="space-y-4 p-4 border rounded-md">
             <h3 className="text-lg font-semibold">Tải lên file PDF</h3>
             <div className="flex items-center gap-2">

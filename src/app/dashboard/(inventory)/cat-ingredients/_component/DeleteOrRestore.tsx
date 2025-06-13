@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { ICatIngredient } from '../cat-ingredient.interface'
 import { deleteCatIngredient, restoreCatIngredient } from '../cat-ingredient.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 interface Props {
   inforCatIngredient: ICatIngredient
   path: 'recycle' | 'delete'
@@ -28,7 +28,7 @@ interface Props {
 export default function DeleteOrRestore({ inforCatIngredient, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteCatIngredient = async (cat_igd_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreCatIngredient({ cat_igd_id }) : await deleteCatIngredient({ cat_igd_id })
@@ -68,7 +68,7 @@ export default function DeleteOrRestore({ inforCatIngredient, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('cat_ingredient_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('cat_ingredient_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

@@ -9,7 +9,8 @@ import { useToast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import Image from 'next/image'
 import { MultiSelect } from '@/components/Multipleselect'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 
 interface ViewArticleProps {
   inforArticle: IArticle
@@ -22,6 +23,7 @@ export default function ViewArticle({ inforArticle }: ViewArticleProps) {
   const [categories, setCategories] = useState<ICategory[]>([])
   const [articles, setArticles] = useState<{ value: string; label: string }[]>([])
   const [listArticleRelated, setListArticleRelated] = useState<string[]>(inforArticle.listArticleRelated || [])
+  const { hasPermission } = usePermission()
   const handleEdit = () => {
     router.push(`/dashboard/article/edit?id=${inforArticle.atlId}`)
   }
@@ -102,7 +104,7 @@ export default function ViewArticle({ inforArticle }: ViewArticleProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit} disabled={!hasPermissionKey('article_update')}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('article_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

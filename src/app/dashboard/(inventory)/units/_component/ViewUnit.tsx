@@ -3,14 +3,15 @@ import React from 'react'
 import { IUnit } from '../unit.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 interface ViewUnitProps {
   inforUnit: IUnit
 }
 
 export default function ViewUnit({ inforUnit }: ViewUnitProps) {
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleEdit = () => {
     router.push(`/dashboard/units/edit?id=${inforUnit.unt_id}`)
   }
@@ -18,7 +19,7 @@ export default function ViewUnit({ inforUnit }: ViewUnitProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit} disabled={!hasPermissionKey('unit_update')}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('unit_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

@@ -19,7 +19,7 @@ import { updateStatus } from '../menu-items.api'
 import { MoreHorizontal } from 'lucide-react'
 import { IMenuItems } from '../menu-items.interface'
 import Image from 'next/image'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'  
 export const columns: ColumnDef<IMenuItems>[] = [
   {
     accessorKey: 'mitems_image',
@@ -62,6 +62,7 @@ export const columns: ColumnDef<IMenuItems>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const router = useRouter()
       const menuItems = row.original
       const handleUpdateStatus = async () => {
@@ -115,11 +116,11 @@ export const columns: ColumnDef<IMenuItems>[] = [
         }
       }
       return menuItems.mitems_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('menu_items_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('menu_items_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('menu_items_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('menu_items_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -130,6 +131,7 @@ export const columns: ColumnDef<IMenuItems>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const menuItems = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -148,21 +150,21 @@ export const columns: ColumnDef<IMenuItems>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('menu_items_view_detail') && (
+              hasPermission('menu_items_view_detail') && (
                 <Link href={`/dashboard/menu-items/view?id=${menuItems.mitems_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('menu_items_update') && (
+              hasPermission('menu_items_update') && (
                 <Link href={`/dashboard/menu-items/edit?id=${menuItems.mitems_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('menu_items_delete') && (
+              hasPermission('menu_items_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforMenuItems={menuItems} path='delete' />
                 </DropdownMenuItem>

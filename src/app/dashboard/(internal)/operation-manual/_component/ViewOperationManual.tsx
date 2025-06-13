@@ -3,14 +3,14 @@ import React from 'react'
 import { IOperationManual } from '../operation-manual.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 interface ViewOperationManualProps {
   inforOperationManual: IOperationManual
 }
 
 export default function ViewOperationManual({ inforOperationManual }: ViewOperationManualProps) {
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleEdit = () => {
     router.push(`/dashboard/operation-manual/edit?id=${inforOperationManual.opera_manual_id}`)
   }
@@ -18,7 +18,7 @@ export default function ViewOperationManual({ inforOperationManual }: ViewOperat
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit} disabled={!hasPermissionKey('operation_manual_update')}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('operation_manual_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

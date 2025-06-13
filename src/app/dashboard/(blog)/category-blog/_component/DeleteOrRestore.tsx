@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { ICategory } from '../category-blog.interface'
 import { deleteCategory, restoreCategory } from '../category-blog.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface Props {
   inforCategory: ICategory
@@ -29,7 +29,7 @@ interface Props {
 export default function DeleteOrRestore({ inforCategory, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteLabel = async (catId: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreCategory({ catId }) : await deleteCategory({ catId })
@@ -69,7 +69,7 @@ export default function DeleteOrRestore({ inforCategory, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('category_blog_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('category_blog_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

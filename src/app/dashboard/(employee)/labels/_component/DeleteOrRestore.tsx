@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { ILabel } from '../label.interface'
 import { deleteLabel, restoreLabel } from '../label.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface Props {
   inforLabel: ILabel
@@ -29,7 +29,7 @@ interface Props {
 export default function DeleteOrRestore({ inforLabel, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteLabel = async (lb_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreLabel({ lb_id }) : await deleteLabel({ lb_id })
@@ -69,7 +69,7 @@ export default function DeleteOrRestore({ inforLabel, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('label_list_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('label_list_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

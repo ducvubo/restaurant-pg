@@ -7,7 +7,7 @@ import { IEmployee } from '@/app/dashboard/(employee)/employees/employees.interf
 import { findEmployeeName } from '@/app/dashboard/(inventory)/stock-in/stock-in.api'
 import { useToast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface ViewEquipmentMaintenanceProps {
   inforEquipmentMaintenance: IEquipmentMaintenance
@@ -17,7 +17,7 @@ export default function ViewEquipmentMaintenance({ inforEquipmentMaintenance }: 
   const router = useRouter()
   const { toast } = useToast()
   const [employees, setEmployees] = useState<IEmployee[]>([])
-
+  const { hasPermission } = usePermission()
   const handleEdit = () => {
     router.push(`/dashboard/equipment-maintenance/edit?id=${inforEquipmentMaintenance.eqp_mtn_id}`)
   }
@@ -58,7 +58,7 @@ export default function ViewEquipmentMaintenance({ inforEquipmentMaintenance }: 
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit} disabled={!hasPermissionKey('equipment_maintenance_update')}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('equipment_maintenance_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

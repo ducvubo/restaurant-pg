@@ -18,7 +18,7 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../amenities.api'
 import { MoreHorizontal } from 'lucide-react'
 import { IAmenities } from '../amenities.interface'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 export const columns: ColumnDef<IAmenities>[] = [
   {
     accessorKey: 'ame_name',
@@ -51,6 +51,7 @@ export const columns: ColumnDef<IAmenities>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const router = useRouter()
       const amenities = row.original
       const handleUpdateStatus = async () => {
@@ -104,13 +105,13 @@ export const columns: ColumnDef<IAmenities>[] = [
         }
       }
       return amenities.ame_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('amenities_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('amenities_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('amenities_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('amenities_update_status')}>
           Vô hiệu hóa
-        </Button> 
+        </Button>
       )
     }
   },
@@ -119,6 +120,7 @@ export const columns: ColumnDef<IAmenities>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const amenities = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -137,21 +139,21 @@ export const columns: ColumnDef<IAmenities>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('amenities_view_detail') && (
+              hasPermission('amenities_view_detail') && (
                 <Link href={`/dashboard/amenities/view?id=${amenities.ame_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('amenities_update') && (
+              hasPermission('amenities_update') && (
                 <Link href={`/dashboard/amenities/edit?id=${amenities.ame_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('amenities_delete') && (
+              hasPermission('amenities_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforAmenities={amenities} path='delete' />
                 </DropdownMenuItem>

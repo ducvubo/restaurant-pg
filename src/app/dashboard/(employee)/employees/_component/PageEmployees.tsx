@@ -22,7 +22,8 @@ import Link from 'next/link'
 // import VerifyFace from './VerifyFace'
 import dynamic from 'next/dynamic'
 import { Input } from '@/components/ui/input'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 const VerifyFace = dynamic(() => import('../../work-schedules/_component/VerifyFace'), {
   ssr: false,
 })
@@ -53,6 +54,7 @@ export function PageEmployees<TData, TValue>({ columns, meta, data }: DataTableP
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [search, setSearch] = React.useState('')
+  const { hasPermission } = usePermission()
   const table = useReactTable({
     data,
     columns,
@@ -104,16 +106,16 @@ export function PageEmployees<TData, TValue>({ columns, meta, data }: DataTableP
     <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex justify-end gap-2 items-center py-4'>
         <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
-        <Button variant={'outline'} disabled={!hasPermissionKey('employee_list_create')}>
+        <Button variant={'outline'} disabled={!hasPermission('employee_list_create')}>
           <Link href={'/dashboard/employees/add'}>Thêm</Link>
         </Button>
         {
           pathname === 'recycle' ? (
-            <Button variant={'outline'} disabled={!hasPermissionKey('employee_list_view_list')}>
+            <Button variant={'outline'} disabled={!hasPermission('employee_list_view_list')}>
               <Link href={'/dashboard/employees'}>Danh sách</Link>
             </Button>
           ) : (
-            <Button variant={'outline'} disabled={!hasPermissionKey('employee_list_view_deleted')}>
+            <Button variant={'outline'} disabled={!hasPermission('employee_list_view_deleted')}>
               <Link href={'/dashboard/employees/recycle'}>Danh sách đã xóa</Link>
             </Button>
           )

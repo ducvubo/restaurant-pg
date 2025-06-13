@@ -24,7 +24,7 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import RegisterFaceUpload from './RegisterFaceUpload'
 import DeleteFace from './DeleteFace'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'  
 // import RegisterFace from './RegisterFace'
 const RegisterFace = dynamic(() => import('./RegisterFace'), {
   ssr: false,
@@ -101,6 +101,7 @@ export const columns: ColumnDef<IEmployee>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const employee = row.original
       const router = useRouter()
       const handleUpdateStatus = async () => {
@@ -160,11 +161,11 @@ export const columns: ColumnDef<IEmployee>[] = [
         }
       }
       return employee.epl_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('employee_list_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!  hasPermission('employee_list_update_status')}>
           Đang làm
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('employee_list_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('employee_list_update_status')}>
           Nghỉ làm
         </Button>
       )
@@ -175,7 +176,8 @@ export const columns: ColumnDef<IEmployee>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
-      const employees = row.original
+      const { hasPermission } = usePermission()
+        const employees = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
         return <DeleteOrRestore inforEmployee={employees} path={pathname} />
@@ -192,42 +194,42 @@ export const columns: ColumnDef<IEmployee>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('employee_list_update') && (
+              hasPermission('employee_list_update') && (
                 <Link href={`/dashboard/employees/edit?id=${employees._id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('employee_list_view_detail') && (
+              hasPermission('employee_list_view_detail') && (
                 <Link href={`/dashboard/employees/view?id=${employees._id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('employee_list_delete') && (
+              hasPermission('employee_list_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforEmployee={employees} path='delete' />
                 </DropdownMenuItem>
               )
             }
             {
-              employees.epl_face_id && hasPermissionKey('employee_list_delete_face') && (
+              employees.epl_face_id && hasPermission('employee_list_delete_face') && (
                 <DropdownMenuItem asChild>
                   <DeleteFace inforEmployee={employees} />
                 </DropdownMenuItem>
               )
             }
             {
-              !employees.epl_face_id && hasPermissionKey('employee_list_register_face') && (
+              !employees.epl_face_id && hasPermission('employee_list_register_face') && (
                 <DropdownMenuItem asChild>
                   <RegisterFace inforEmployee={employees} />
                 </DropdownMenuItem>
               )
             }
             {
-              !employees.epl_face_id && hasPermissionKey('employee_list_register_face') && (
+              !employees.epl_face_id && hasPermission('employee_list_register_face') && (
                 <DropdownMenuItem asChild>
                   <RegisterFaceUpload inforEmployee={employees} />
                 </DropdownMenuItem>

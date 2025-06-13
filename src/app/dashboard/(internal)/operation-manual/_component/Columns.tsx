@@ -19,7 +19,8 @@ import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { IOperationManual } from '../operation-manual.interface'
 import { updateStatusOperationManual } from '../operation-manual.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 export const columns: ColumnDef<IOperationManual>[] = [
   {
     accessorKey: 'opera_manual_title',
@@ -58,6 +59,7 @@ export const columns: ColumnDef<IOperationManual>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const router = useRouter()
       const operationManual = row.original
       const handleUpdateStatus = async () => {
@@ -111,11 +113,11 @@ export const columns: ColumnDef<IOperationManual>[] = [
         }
       }
       return operationManual.opera_manual_status === 'active' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('operation_manual_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('operation_manual_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('operation_manual_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('operation_manual_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -125,6 +127,7 @@ export const columns: ColumnDef<IOperationManual>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const operationManual = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -143,21 +146,21 @@ export const columns: ColumnDef<IOperationManual>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('operation_manual_view_detail') && (
+              hasPermission('operation_manual_view_detail') && (
                 <Link href={`/dashboard/operation-manual/view?id=${operationManual.opera_manual_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('operation_manual_update') && (
+              hasPermission('operation_manual_update') && (
                 <Link href={`/dashboard/operation-manual/edit?id=${operationManual.opera_manual_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('operation_manual_delete') && (
+              hasPermission('operation_manual_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforOperationManual={operationManual} path='delete' />
                 </DropdownMenuItem>

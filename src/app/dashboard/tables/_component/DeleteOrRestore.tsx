@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { deleteTable, restoreTable } from '../table.api'
 import { ITable } from '../table.interface'
+import { usePermission } from '@/app/auth/PermissionContext'
 interface Props {
   inforTable: ITable
   path: 'recycle' | 'delete'
@@ -27,7 +28,7 @@ interface Props {
 export default function DeleteOrRestore({ inforTable, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteTable = async (_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreTable({ _id }) : await deleteTable({ _id })
@@ -67,7 +68,7 @@ export default function DeleteOrRestore({ inforTable, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermission('table_list_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

@@ -13,9 +13,10 @@ import { Input } from '@/components/ui/input'
 import EditorTiny from '@/components/EditorTiny'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDateMongo } from '@/app/utils'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 export default function PageDetailTicket() {
+  const { hasPermission } = usePermission()
   const params = useParams()
   const searchParams = useSearchParams()
   const [ticket, setTicket] = useState<ITicketGuestRestaurant>()
@@ -297,7 +298,7 @@ export default function PageDetailTicket() {
                   )}
                   <div className='flex justify-end mt-5 gap-2'>
                     <Button
-                      disabled={ticket.tkgr_status === 'resolved' || ticket.tkgr_status === 'close' || !hasPermissionKey('ticket_list_update_resolved')}
+                      disabled={ticket.tkgr_status === 'resolved' || ticket.tkgr_status === 'close' || !hasPermission('ticket_list_update_resolved')}
                       onClick={handleResolvedTicket}
                       size='sm'
                       variant={'outline'}
@@ -305,7 +306,7 @@ export default function PageDetailTicket() {
                       Đã giải quyết
                     </Button>
                     <Button
-                      disabled={ticket.tkgr_status === 'resolved' || ticket.tkgr_status === 'close' || !hasPermissionKey('ticket_list_reply')}
+                      disabled={ticket.tkgr_status === 'resolved' || ticket.tkgr_status === 'close' || !hasPermission('ticket_list_reply')}
                       onClick={() => setIsReplying(true)}
                       size='sm'
                     >
@@ -361,7 +362,7 @@ export default function PageDetailTicket() {
               </div>
               <div className='flex gap-2 justify-end mt-2'>
                 <Button
-                  disabled={ticket?.tkgr_status === 'resolved' || ticket?.tkgr_status === 'close' || !hasPermissionKey('ticket_list_reply')}
+                  disabled={ticket?.tkgr_status === 'resolved' || ticket?.tkgr_status === 'close' || !hasPermission('ticket_list_reply')}
                   variant='outline'
                   size='sm'
                   onClick={() => setIsReplying(false)}
@@ -370,7 +371,7 @@ export default function PageDetailTicket() {
                 </Button>
                 <Button
                   disabled={
-                    ticket?.tkgr_status === 'resolved' || ticket?.tkgr_status === 'close' || isUploading || isSubmitting || !hasPermissionKey('ticket_list_reply')
+                    ticket?.tkgr_status === 'resolved' || ticket?.tkgr_status === 'close' || isUploading || isSubmitting || !hasPermission('ticket_list_reply')
                   }
                   size='sm'
                   onClick={handleReplySubmit}

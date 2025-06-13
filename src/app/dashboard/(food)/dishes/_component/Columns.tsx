@@ -24,7 +24,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import Image from 'next/image'
 import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../dishes.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'  
 
 export const columns: ColumnDef<IDish>[] = [
   {
@@ -132,7 +132,8 @@ export const columns: ColumnDef<IDish>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
-      const router = useRouter()
+      const { hasPermission } = usePermission()
+          const router = useRouter()
       const dish = row.original
       const handleUpdateStatus = async () => {
         const res = await updateStatus({
@@ -185,11 +186,11 @@ export const columns: ColumnDef<IDish>[] = [
         }
       }
       return dish.dish_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('dish_list_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('dish_list_update_status')}>
           Đang bán
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('dish_list_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('dish_list_update_status')}>
           Ngưng bán
         </Button>
       )
@@ -200,6 +201,7 @@ export const columns: ColumnDef<IDish>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const dish = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -218,21 +220,21 @@ export const columns: ColumnDef<IDish>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('dish_list_update') && (
+              hasPermission('dish_list_update') && (
                 <Link href={`/dashboard/dishes/edit?id=${dish._id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('dish_list_view_detail') && (
+              hasPermission('dish_list_view_detail') && (
                 <Link href={`/dashboard/dishes/view?id=${dish._id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('dish_list_delete') && (
+              hasPermission('dish_list_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforDish={dish} path='delete' />
                 </DropdownMenuItem>

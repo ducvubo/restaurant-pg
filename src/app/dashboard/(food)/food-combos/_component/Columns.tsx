@@ -31,7 +31,8 @@ import { IFoodComboRes } from '../food-combos.interface'
 import Image from 'next/image'
 import { updateStateFoodCombo, updateStatusFoodCombo } from '../food-combos.api'
 import DeleteOrRestore from './DeleteOrRestore'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 export const columns: ColumnDef<IFoodComboRes>[] = [
   {
     accessorKey: 'fcb_name',
@@ -170,6 +171,7 @@ export const columns: ColumnDef<IFoodComboRes>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const foodCombo = row.original
       const router = useRouter()
       const handleUpdateStatus = async () => {
@@ -229,11 +231,11 @@ export const columns: ColumnDef<IFoodComboRes>[] = [
         }
       }
       return foodCombo.fcb_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('food_combo_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('food_combo_update_status')}>
           Đang bán
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('food_combo_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('food_combo_update_status')}>
           Ngừng bán
         </Button>
       )
@@ -244,6 +246,7 @@ export const columns: ColumnDef<IFoodComboRes>[] = [
     accessorKey: 'Thao tác',
     // id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const foodCombo = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -262,21 +265,21 @@ export const columns: ColumnDef<IFoodComboRes>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('food_combo_update') && (
+              hasPermission('food_combo_update') && (
                 <Link href={`/dashboard/food-combos/edit?id=${foodCombo.fcb_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('food_combo_view_detail') && (
+              hasPermission('food_combo_view_detail') && (
                 <Link href={`/dashboard/food-combos/view?id=${foodCombo.fcb_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('food_combo_delete') && (
+              hasPermission('food_combo_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforFoodCombo={foodCombo} path='delete' />
                 </DropdownMenuItem>

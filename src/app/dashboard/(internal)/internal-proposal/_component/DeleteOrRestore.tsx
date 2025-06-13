@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IInternalProposal } from '../internal-proposal.interface'
 import { deleteInternalProposal, restoreInternalProposal } from '../internal-proposal.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 
 interface Props {
@@ -30,7 +30,7 @@ interface Props {
 export default function DeleteOrRestore({ inforInternalProposal, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteInternalProposal = async (itn_proposal_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreInternalProposal({ itn_proposal_id }) : await deleteInternalProposal({ itn_proposal_id })
@@ -70,7 +70,7 @@ export default function DeleteOrRestore({ inforInternalProposal, path }: Props) 
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('internal_proposal_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('internal_proposal_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

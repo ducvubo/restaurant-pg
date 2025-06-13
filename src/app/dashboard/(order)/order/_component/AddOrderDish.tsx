@@ -24,13 +24,15 @@ import { toast } from '@/hooks/use-toast'
 import { restaurantCreateOrderDist } from '../order.api'
 import { useRouter } from 'next/navigation'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 
 interface Props {
   order_summary: IOrderRestaurant
 }
 export default function AddOrderDish({ order_summary }: Props) {
-  const { setLoading } = useLoading()
+  const { hasPermission } = usePermission()
+    const { setLoading } = useLoading()
   const router = useRouter()
   const inforEmployee = useSelector((state: RootState) => state.inforEmployee)
   const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant)
@@ -140,7 +142,7 @@ export default function AddOrderDish({ order_summary }: Props) {
           <Button
             variant='outline'
             className='-ml-16 mr-[130px] w-32'
-            disabled={order_summary.od_dish_smr_status === 'ordering' && hasPermissionKey('order_dish_call_food') ? false : true}
+            disabled={order_summary.od_dish_smr_status === 'ordering' && hasPermission('order_dish_call_food') ? false : true}
           >
             Gọi món
           </Button>

@@ -3,7 +3,7 @@ import React from 'react'
 import { IWorkingShift } from '../working-shift.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface ViewWorkingShiftProps {
   inforWorkingShift: IWorkingShift
@@ -11,7 +11,7 @@ interface ViewWorkingShiftProps {
 
 export default function ViewWorkingShift({ inforWorkingShift }: ViewWorkingShiftProps) {
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleEdit = () => {
     router.push(`/dashboard/working-shifts/edit?id=${inforWorkingShift.wks_id}`)
   }
@@ -19,7 +19,7 @@ export default function ViewWorkingShift({ inforWorkingShift }: ViewWorkingShift
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit} disabled={!hasPermissionKey('working_shift_list_update')}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('working_shift_list_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

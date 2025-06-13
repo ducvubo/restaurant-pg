@@ -4,12 +4,13 @@ import { IRoom } from '../rooms.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 interface ViewRoomProps {
   inforRoom: IRoom
 }
 
 export default function ViewRoom({ inforRoom }: ViewRoomProps) {
+  const { hasPermission } = usePermission()
   const router = useRouter()
   const [images, setImages] = useState<{ image_cloud: string; image_custom: string }[]>([])
 
@@ -17,7 +18,7 @@ export default function ViewRoom({ inforRoom }: ViewRoomProps) {
     router.push(`/dashboard/rooms/edit?id=${inforRoom.room_id}`)
   }
 
-  useEffect(() => { 
+  useEffect(() => {
     if (inforRoom.room_images) {
       try {
         const parsedImages = JSON.parse(inforRoom.room_images)
@@ -33,7 +34,7 @@ export default function ViewRoom({ inforRoom }: ViewRoomProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit} disabled={!hasPermissionKey('room_update')}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('room_update')}>Chỉnh sửa</Button>
       </div>
       <div className='space-y-4'>
         <h3 className='text-lg font-semibold'>Thông tin phòng/sảnh</h3>

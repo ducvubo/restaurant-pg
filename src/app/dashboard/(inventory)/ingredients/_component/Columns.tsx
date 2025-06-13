@@ -20,7 +20,7 @@ import { MoreHorizontal } from 'lucide-react'
 import { IIngredient } from '../ingredient.interface'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'    
 export const columns: ColumnDef<IIngredient>[] = [
   {
     accessorKey: 'igd_name',
@@ -134,6 +134,7 @@ export const columns: ColumnDef<IIngredient>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const router = useRouter()
       const ingredient = row.original
       const handleUpdateStatus = async () => {
@@ -187,11 +188,11 @@ export const columns: ColumnDef<IIngredient>[] = [
         }
       }
       return ingredient.igd_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('ingredient_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('ingredient_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('ingredient_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('ingredient_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -202,6 +203,7 @@ export const columns: ColumnDef<IIngredient>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const ingredient = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -220,21 +222,21 @@ export const columns: ColumnDef<IIngredient>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('ingredient_view_detail') && (
+              hasPermission('ingredient_view_detail') && (
                 <Link href={`/dashboard/ingredients/view?id=${ingredient.igd_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('ingredient_update') && (
+              hasPermission('ingredient_update') && (
                 <Link href={`/dashboard/ingredients/edit?id=${ingredient.igd_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('ingredient_delete') && (
+              hasPermission('ingredient_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforIngredient={ingredient} path='delete' />
                 </DropdownMenuItem>

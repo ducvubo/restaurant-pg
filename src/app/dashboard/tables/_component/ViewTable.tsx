@@ -3,12 +3,13 @@ import React from 'react'
 import { ITable } from '../table.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-
+import { usePermission } from '@/app/auth/PermissionContext'
 interface ViewTableProps {
   inforTable: ITable
 }
 
 export default function ViewTable({ inforTable }: ViewTableProps) {
+  const { hasPermission } = usePermission()
   const router = useRouter()
 
   const handleEdit = () => {
@@ -18,7 +19,7 @@ export default function ViewTable({ inforTable }: ViewTableProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermission('table_list_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

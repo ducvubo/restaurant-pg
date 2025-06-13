@@ -20,7 +20,8 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { ISupplier } from '../supplier.interface'
 import { deleteSupplier, restoreSupplier } from '../supplier.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 interface Props {
   inforSupplier: ISupplier
   path: 'recycle' | 'delete'
@@ -28,7 +29,7 @@ interface Props {
 export default function DeleteOrRestore({ inforSupplier, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteSupplier = async (spli_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreSupplier({ spli_id }) : await deleteSupplier({ spli_id })
@@ -68,7 +69,7 @@ export default function DeleteOrRestore({ inforSupplier, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('supplier_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('supplier_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

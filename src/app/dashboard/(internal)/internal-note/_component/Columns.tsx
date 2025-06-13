@@ -15,7 +15,7 @@ import { usePathname, } from 'next/navigation'
 import DeleteOrRestore from './DeleteOrRestore'
 import { MoreHorizontal } from 'lucide-react'
 import { IInternalNote } from '../internal-note.interface'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 export const columns: ColumnDef<IInternalNote>[] = [
   {
@@ -40,6 +40,7 @@ export const columns: ColumnDef<IInternalNote>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const internalNote = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -58,21 +59,21 @@ export const columns: ColumnDef<IInternalNote>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('internal_note_view_detail') && (
+              hasPermission('internal_note_view_detail') && (
                 <Link href={`/dashboard/internal-note/view?id=${internalNote.itn_note_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('internal_note_update') && (
+              hasPermission('internal_note_update') && (
                 <Link href={`/dashboard/internal-note/edit?id=${internalNote.itn_note_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('internal_note_delete') && (
+              hasPermission('internal_note_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforInternalNote={internalNote} path='delete' />
                 </DropdownMenuItem>

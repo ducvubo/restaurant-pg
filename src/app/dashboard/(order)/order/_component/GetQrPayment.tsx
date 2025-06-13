@@ -13,7 +13,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility';
+import { usePermission } from '@/app/auth/PermissionContext'
+;
 
 export const calculateFinalPrice = (price: number, sale: { sale_type: string; sale_value: number } | undefined) => {
   if (!sale) return price;
@@ -54,6 +55,7 @@ interface Props {
 }
 
 export default function GetQrPayment({ order_summary }: Props) {
+  const { hasPermission } = usePermission()
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const inforEmployee = useSelector((state: RootState) => state.inforEmployee);
   const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant);
@@ -63,7 +65,7 @@ export default function GetQrPayment({ order_summary }: Props) {
 
   return (
     <>
-      <Button disabled={order_summary.od_dish_smr_status === 'paid' || order_summary.od_dish_smr_status === 'refuse' || !hasPermissionKey('order_dish_create_qr_payment')} className="mr-2" variant="outline" onClick={() => setIsDialogOpen(true)}>
+      <Button disabled={order_summary.od_dish_smr_status === 'paid' || order_summary.od_dish_smr_status === 'refuse' || !hasPermission('order_dish_create_qr_payment')} className="mr-2" variant="outline" onClick={() => setIsDialogOpen(true)}>
         Thanh toán
       </Button >
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

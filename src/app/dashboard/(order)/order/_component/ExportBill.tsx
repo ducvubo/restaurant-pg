@@ -7,11 +7,13 @@ import jsPDF from 'jspdf'
 import { calculateFinalPrice } from '@/app/utils'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/app/redux/store'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+  
 interface Props {
   order_summary: IOrderRestaurant
 }
 export default function ExportBill({ order_summary }: Props) {
+  const { hasPermission } = usePermission()
   const inforEmployee = useSelector((state: RootState) => state.inforEmployee);
   console.log('inforEmployee', inforEmployee);
   const inforRestaurant = useSelector((state: RootState) => state.inforRestaurant);
@@ -95,6 +97,6 @@ export default function ExportBill({ order_summary }: Props) {
     doc.save(`hoa-don-${order_summary._id}.pdf`);
   }
   return (
-    <Button disabled={!hasPermissionKey('order_dish_download_invoice')} className='mr-2' variant='outline' onClick={handleExportBill}>Tải hóa đơn</Button>
+    <Button disabled={!hasPermission('order_dish_download_invoice')} className='mr-2' variant='outline' onClick={handleExportBill}>Tải hóa đơn</Button>
   )
 }

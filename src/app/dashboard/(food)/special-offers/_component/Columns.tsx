@@ -18,7 +18,7 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../special-offer.api'
 import { MoreHorizontal } from 'lucide-react'
 import { ISpecialOffer } from '../special-offer.interface'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'  
 
 export const columns: ColumnDef<ISpecialOffer>[] = [
   {
@@ -43,6 +43,7 @@ export const columns: ColumnDef<ISpecialOffer>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const router = useRouter()
       const specialOffer = row.original
       const handleUpdateStatus = async () => {
@@ -96,11 +97,11 @@ export const columns: ColumnDef<ISpecialOffer>[] = [
         }
       }
       return specialOffer.spo_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('special_offer_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('special_offer_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('special_offer_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('special_offer_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -111,6 +112,7 @@ export const columns: ColumnDef<ISpecialOffer>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const specialOffer = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -129,21 +131,21 @@ export const columns: ColumnDef<ISpecialOffer>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('special_offer_view_detail') && (
+              hasPermission('special_offer_view_detail') && (
                 <Link href={`/dashboard/special-offers/view?id=${specialOffer.spo_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('special_offer_update') && (
+              hasPermission('special_offer_update') && (
                 <Link href={`/dashboard/special-offers/edit?id=${specialOffer.spo_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('special_offer_delete') && (
+              hasPermission('special_offer_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforSpecialOffer={specialOffer} path='delete' />
                 </DropdownMenuItem>

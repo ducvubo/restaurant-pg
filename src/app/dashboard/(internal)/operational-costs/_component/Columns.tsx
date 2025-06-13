@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { updateStatusOperationalCosts } from '../operational-costs.api'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 export const columns: ColumnDef<IOperationalCosts>[] = [
   // opera_cost_type: string
@@ -136,6 +137,7 @@ export const columns: ColumnDef<IOperationalCosts>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const OperationalCosts = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -153,15 +155,26 @@ export const columns: ColumnDef<IOperationalCosts>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/operational-costs/view?id=${OperationalCosts.opera_cost_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/operational-costs/edit?id=${OperationalCosts.opera_cost_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforOperationalCosts={OperationalCosts} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermission('operational_costs_view_detail') && (
+                <Link href={`/dashboard/operational-costs/view?id=${OperationalCosts.opera_cost_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>)
+            }
+            {
+              hasPermission('operational_costs_update') && (
+                <Link href={`/dashboard/operational-costs/edit?id=${OperationalCosts.opera_cost_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermission('operational_costs_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforOperationalCosts={OperationalCosts} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

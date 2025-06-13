@@ -20,7 +20,8 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IIngredient } from '../ingredient.interface'
 import { deleteIngredient, restoreIngredient } from '../ingredient.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 interface Props {
   inforIngredient: IIngredient
   path: 'recycle' | 'delete'
@@ -28,7 +29,7 @@ interface Props {
 export default function DeleteOrRestore({ inforIngredient, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteIngredient = async (igd_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreIngredient({ igd_id }) : await deleteIngredient({ igd_id })
@@ -69,7 +70,7 @@ export default function DeleteOrRestore({ inforIngredient, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('ingredient_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('ingredient_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

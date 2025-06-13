@@ -31,7 +31,8 @@ import { IFood } from '../food.interface'
 import Image from 'next/image'
 import { updateStateFood, updateStatusFood } from '../food.api'
 import DeleteOrRestore from './DeleteOrRestore'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 export const columns: ColumnDef<IFood>[] = [
   {
     accessorKey: 'food_name',
@@ -170,6 +171,7 @@ export const columns: ColumnDef<IFood>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const food = row.original
       const router = useRouter()
       const handleUpdateStatus = async () => {
@@ -229,11 +231,11 @@ export const columns: ColumnDef<IFood>[] = [
         }
       }
       return food.food_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('online_food_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('online_food_update_status')}>
           Đang bán
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('online_food_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('online_food_update_status')}>
           Ngừng bán
         </Button>
       )
@@ -244,6 +246,7 @@ export const columns: ColumnDef<IFood>[] = [
     accessorKey: 'Thao tác',
     // id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const food = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -262,21 +265,21 @@ export const columns: ColumnDef<IFood>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('online_food_update') && (
+              hasPermission('online_food_update') && (
                 <Link href={`/dashboard/foods/edit?id=${food.food_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('online_food_view_detail') && (
+              hasPermission('online_food_view_detail') && (
                 <Link href={`/dashboard/foods/view?id=${food.food_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('online_food_delete') && (
+              hasPermission('online_food_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforFood={food} path='delete' />
                 </DropdownMenuItem>

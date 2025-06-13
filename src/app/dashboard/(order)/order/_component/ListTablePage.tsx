@@ -26,7 +26,7 @@ import { Separator } from '@/components/ui/separator'
 import { FiUsers } from 'react-icons/fi'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { DialogDetailTable } from './DialogDetailTable'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+
 export default function ListTablePage() {
   const [tableName, setTableName] = useState('')
   const [status, setStatus] = useState<'enable' | 'disable' | 'serving' | 'reserve' | 'all'>('all')

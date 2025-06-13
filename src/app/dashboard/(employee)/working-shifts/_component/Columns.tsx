@@ -17,7 +17,7 @@ import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { IWorkingShift } from '../working-shift.interface'
 import DeleteOrRestore from './DeleteOrRestore'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 export const columns: ColumnDef<IWorkingShift>[] = [
   {
@@ -50,6 +50,7 @@ export const columns: ColumnDef<IWorkingShift>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const workingShift = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -68,14 +69,14 @@ export const columns: ColumnDef<IWorkingShift>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('working_shift_list_view_detail') && (
+              hasPermission('working_shift_list_view_detail') && (
                 <Link href={`/dashboard/working-shifts/view?id=${workingShift.wks_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('working_shift_list_delete') && (
+              hasPermission('working_shift_list_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforWorkingShift={workingShift} path='delete' />
                 </DropdownMenuItem>

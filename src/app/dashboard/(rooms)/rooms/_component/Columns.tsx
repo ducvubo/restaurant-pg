@@ -19,7 +19,7 @@ import { updateStatus } from '../rooms.api'
 import { MoreHorizontal } from 'lucide-react'
 import { IRoom } from '../rooms.interface'
 import Image from 'next/image'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 export const columns: ColumnDef<IRoom>[] = [
   {
     accessorKey: 'room_images',
@@ -91,6 +91,7 @@ export const columns: ColumnDef<IRoom>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
     enableHiding: true,
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const router = useRouter()
       const amenities = row.original
       const handleUpdateStatus = async () => {
@@ -144,11 +145,11 @@ export const columns: ColumnDef<IRoom>[] = [
         }
       }
       return amenities.room_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('room_update_status')}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermission('room_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('room_update_status')}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermission('room_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -159,6 +160,7 @@ export const columns: ColumnDef<IRoom>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const amenities = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -177,21 +179,21 @@ export const columns: ColumnDef<IRoom>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('room_view_detail') && (
+              hasPermission('room_view_detail') && (
                 <Link href={`/dashboard/rooms/view?id=${amenities.room_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('room_update') && (
+              hasPermission('room_update') && (
                 <Link href={`/dashboard/rooms/edit?id=${amenities.room_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('room_delete') && (
+              hasPermission('room_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforRoom={amenities} path='delete' />
                 </DropdownMenuItem>

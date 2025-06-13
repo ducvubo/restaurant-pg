@@ -16,7 +16,8 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { MoreHorizontal } from 'lucide-react'
 import { IStockIn, IStockInItem } from '../stock-in.interface'
 import { formatDate, formatDateMongo } from '@/app/utils'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
+
 
 export const columns: ColumnDef<IStockIn>[] = [
   {
@@ -59,6 +60,7 @@ export const columns: ColumnDef<IStockIn>[] = [
     accessorKey: 'Thao tác',
     id: 'Thao tác',
     cell: ({ row }) => {
+      const { hasPermission } = usePermission()
       const stockIn = row.original
       const pathname = usePathname().split('/').pop()
       if (pathname === 'recycle') {
@@ -77,21 +79,21 @@ export const columns: ColumnDef<IStockIn>[] = [
 
             <DropdownMenuSeparator />
             {
-              hasPermissionKey('stock_in_view_detail') && (
+              hasPermission('stock_in_view_detail') && (
                 <Link href={`/dashboard/stock-in/view?id=${stockIn.stki_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('stock_in_update') && (
+              hasPermission('stock_in_update') && (
                 <Link href={`/dashboard/stock-in/edit?id=${stockIn.stki_id}`} className='cursor-pointer'>
                   <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
                 </Link>
               )
             }
             {
-              hasPermissionKey('stock_in_delete') && (
+              hasPermission('stock_in_delete') && (
                 <DropdownMenuItem asChild>
                   <DeleteOrRestore inforStockIn={stockIn} path='delete' />
                 </DropdownMenuItem>

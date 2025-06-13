@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IOperationManual } from '../operation-manual.interface'
 import { deleteOperationManual, restoreOperationManual } from '../operation-manual.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'  
 
 interface Props {
   inforOperationManual: IOperationManual
@@ -29,7 +29,7 @@ interface Props {
 export default function DeleteOrRestore({ inforOperationManual, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteOperationManual = async (opera_manual_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreOperationManual({ opera_manual_id }) : await deleteOperationManual({ opera_manual_id })
@@ -69,7 +69,7 @@ export default function DeleteOrRestore({ inforOperationManual, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('operation_manual_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('operation_manual_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IOperationalCosts } from '../operational-costs.interface'
 import { deleteOperationalCosts, restoreOperationalCosts } from '../operational-costs.api'
-
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface Props {
   inforOperationalCosts: IOperationalCosts
@@ -29,7 +29,7 @@ interface Props {
 export default function DeleteOrRestore({ inforOperationalCosts, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteOperationalCosts = async (opera_cost_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreOperationalCosts({ opera_cost_id }) : await deleteOperationalCosts({ opera_cost_id })
@@ -69,7 +69,7 @@ export default function DeleteOrRestore({ inforOperationalCosts, path }: Props) 
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermission('operational_costs_view_deleted')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

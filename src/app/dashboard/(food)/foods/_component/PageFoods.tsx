@@ -28,7 +28,8 @@ import { getListFood } from '../../food-combos/food-combos.api';
 import { deleteCookiesAndRedirect } from '@/app/actions/action';
 import { createFood } from '../food.api';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility';
+import { usePermission } from '@/app/auth/PermissionContext';
+;
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -62,7 +63,7 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [errors, setErrors] = React.useState<{ [key: number]: { [key: string]: boolean } }>({});
   const [search, setSearch] = React.useState('')
-
+  const { hasPermission } = usePermission()
   // Function to get the list of existing foods
   const getExistingFoods = async () => {
     const res: IBackendRes<IFood[]> = await getListFood();
@@ -343,24 +344,24 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
     <div className="flex flex-col" style={{ height: 'calc(100vh - 7rem)' }}>
       <div className="flex justify-end gap-2 items-center py-4">
         <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
-        <Button variant={'outline'} disabled={!hasPermissionKey('online_food_create')}>
+        <Button variant={'outline'} disabled={!hasPermission('online_food_create')}>
           <Link href={'/dashboard/foods/add'}>Thêm</Link>
         </Button>
         {
           pathname === 'recycle' ? (
-            <Button variant={'outline'} disabled={!hasPermissionKey('online_food_view_list')}>
+            <Button variant={'outline'} disabled={!hasPermission('online_food_view_list')}>
               <Link href={'/dashboard/foods'}>Danh sách</Link>
             </Button>
           ) : (
-            <Button variant={'outline'} disabled={!hasPermissionKey('online_food_view_deleted')}>
+            <Button variant={'outline'} disabled={!hasPermission('online_food_view_deleted')}>
               <Link href={'/dashboard/foods/recycle'}>Danh sách đã xóa</Link>
             </Button>
           )
         }
-        <Button variant={'outline'} asChild disabled={!hasPermissionKey('online_food_upload_image')} className={(!hasPermissionKey('online_food_upload_image') ? 'opacity-50 cursor-not-allowed pointer-events-none' : '') + ' ' + 'hover:bg-gray-100'}>
+        <Button variant={'outline'} asChild disabled={!hasPermission('online_food_upload_image')} className={(!hasPermission('online_food_upload_image') ? 'opacity-50 cursor-not-allowed pointer-events-none' : '') + ' ' + 'hover:bg-gray-100'}>
           Tải ảnh món ăn
           <input
-            disabled={!hasPermissionKey('online_food_upload_image')}
+            disabled={!hasPermission('online_food_upload_image')}
             type="file"
             accept="image/*"
             onChange={handleImportFood}
@@ -369,7 +370,7 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
           />
           <label
             htmlFor="foood-upload-input"
-            className={(!hasPermissionKey('online_food_upload_image') ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer')}
+            className={(!hasPermission('online_food_upload_image') ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer')}
           >
           </label>
         </Button>

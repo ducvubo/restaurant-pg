@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IEquipmentMaintenance } from '../equipment-maintenance.interface'
 import { deleteEquipmentMaintenance, restoreEquipmentMaintenance } from '../equipment-maintenance.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 
 interface Props {
@@ -30,7 +30,7 @@ interface Props {
 export default function DeleteOrRestore({ inforEquipmentMaintenance, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeleteEquipmentMaintenance = async (eqp_mtn_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreEquipmentMaintenance({ eqp_mtn_id }) : await deleteEquipmentMaintenance({ eqp_mtn_id })
@@ -70,7 +70,7 @@ export default function DeleteOrRestore({ inforEquipmentMaintenance, path }: Pro
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('equipment_maintenance_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('equipment_maintenance_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IMenuItems } from '../menu-items.interface'
 import { deleteMenuItems, restoreMenuItems } from '../menu-items.api'
-import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 interface Props {
   inforMenuItems: IMenuItems
   path: 'recycle' | 'delete'
@@ -28,7 +28,7 @@ interface Props {
 export default function DeleteOrRestore({ inforMenuItems, path }: Props) {
   const { setLoading } = useLoading()
   const router = useRouter()
-
+  const { hasPermission } = usePermission()
   const handleDeletedMenuItems = async (mitems_id: string) => {
     setLoading(true)
     const res = path === 'recycle' ? await restoreMenuItems({ mitems_id }) : await deleteMenuItems({ mitems_id })
@@ -68,7 +68,7 @@ export default function DeleteOrRestore({ inforMenuItems, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button disabled={!hasPermissionKey('menu_items_restore')}>Khôi phục</Button>
+          <Button disabled={!hasPermission('menu_items_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'
