@@ -413,7 +413,7 @@ export default function ListOrderPage() {
                 )
             )}
           </div>
-          <span className='mr-1 font-bold italic'>Tổng doanh thu: {countStatus[3]?.count?.toLocaleString()}đ</span>
+          <span className='mr-1 font-bold italic'>Tổng doanh thu: {Math.floor(+countStatus[3]?.count).toLocaleString()}đ</span>
         </div>
 
         <div className='flex flex-col gap-3 mt-2 mb-2'>

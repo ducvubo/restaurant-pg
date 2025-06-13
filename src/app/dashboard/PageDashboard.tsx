@@ -120,8 +120,8 @@ export default function PageDashboard() {
     startDate: string;
     endDate: string;
   }>({
-    startDate: '2024-01-01',
-    endDate: '2026-04-12',
+    startDate: '2025-06-12',
+    endDate: '2025-06-14',
   });
   // const queryParams = {
   //   startDate: '2024-01-01',
