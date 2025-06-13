@@ -133,12 +133,12 @@ export default function RefreshToken() {
         await connectSocketWithCookie()
         if (res.type === 'restaurant') {
           runAppRestaurant(res.data)
-          if (!currentPathname.startsWith('/dashboard')) {
+          if (!currentPathname.startsWith('/dashboard/account')) {
             // router.push('/dashboard')
           }
         } else if (res.type === 'employee') {
           runAppEmployee(res.data)
-          if (!currentPathname.startsWith('/dashboard')) {
+          if (!currentPathname.startsWith('/dashboard/account')) {
             // router.push('/dashboard')
           }
         }

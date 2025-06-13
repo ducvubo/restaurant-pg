@@ -103,7 +103,7 @@ export function LoginForm() {
           title: 'Thành công',
           description: 'Đăng nhập thành công'
         })
-        router.push(localStorage.getItem('currentUrl') || '/dashboard')
+        router.push(localStorage.getItem('currentUrl') || '/dashboard/account')
       } else if (res?.code === -5) {
         setLoading(false)
         setIsLoading(false) // Tắt trạng thái loading
@@ -147,7 +147,7 @@ export function LoginForm() {
           title: 'Thành công',
           description: 'Đăng nhập thành công'
         })
-        router.push('/dashboard/order/dish')
+        router.push('/dashboard/account')
       } else if (res?.code === -5) {
         setLoading(false)
         setIsLoading(false) // Tắt trạng thái loading
