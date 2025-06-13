@@ -26,6 +26,7 @@ import { IEmployee } from '../../employees/employees.interface'
 import { useLoading } from '@/context/LoadingContext'
 import VerifyFace from './VerifyFace'
 import UploadFace from './UploadFace'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 interface IWorkScheduleMapping {
   date: string
@@ -39,6 +40,7 @@ interface IWorkScheduleMapping {
 }
 
 export default function PageWorkSchedule() {
+  const { hasPermission } = usePermission()
   const { setLoading } = useLoading()
   const [startDate, setStartDate] = useState<Date>(
     new Date(new Date().setDate(new Date().getDate() - 50))
@@ -47,7 +49,6 @@ export default function PageWorkSchedule() {
     new Date(new Date().setDate(new Date().getDate() + 50))
   )
   const [listWorkSchedule, setListWorkSchedule] = useState<IWorkScheduleMapping[]>([])
-  console.log("🚀 ~ PageWorkSchedule ~ listWorkSchedule:", listWorkSchedule)
   const [employeeCache, setEmployeeCache] = useState<Map<string, { id: string; name: string }>>(new Map())
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isUpdateStatusDialogOpen, setIsUpdateStatusDialogOpen] = useState(false)
@@ -360,15 +361,23 @@ export default function PageWorkSchedule() {
         </div>
 
         <div className='flex gap-2'>
-          {inforRestaurant._id && (
+          {hasPermission('work_schedule_list_create') && (
             <Link href="/dashboard/work-schedules/add">
               <Button variant={'outline'}>
                 <Plus className="mr-2 h-4 w-4" /> Thêm lịch
               </Button>
             </Link>
           )}
-          <VerifyFace />
-          <UploadFace />
+          {
+            hasPermission('work_schedule_list_check_in') && (
+              <VerifyFace />
+            )
+          }
+          {
+            hasPermission('work_schedule_list_upload_face') && (
+              <UploadFace />
+            )
+          }
         </div>
 
       </div>
@@ -393,10 +402,10 @@ export default function PageWorkSchedule() {
                         </div>
                         <ScrollArea className="h-[400px]">
                           <div
-                            className={cn(
-                              'flex flex-col gap-2',
-                              inforEmployee._id ? 'pointer-events-none' : 'pointer-events-auto'
-                            )}
+                          // className={cn(
+                          //   'flex flex-col gap-2',
+                          //   inforEmployee._id ? 'pointer-events-none' : 'pointer-events-auto'
+                          // )}
                           >
                             <div className="space-y-3">
                               {item.workingShift.length > 0 ? (
@@ -417,7 +426,7 @@ export default function PageWorkSchedule() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
                                               {
-                                                shift.ws_status === 'F' &&
+                                                shift.ws_status === 'F' && hasPermission('work_schedule_list_update') &&
                                                 (
                                                   <DropdownMenuItem asChild>
                                                     <Link href={`/dashboard/work-schedules/edit?id=${shift.ws_id}`}>
@@ -426,13 +435,17 @@ export default function PageWorkSchedule() {
                                                   </DropdownMenuItem>
                                                 )
                                               }
-                                              <DropdownMenuItem asChild>
-                                                <Link href={`/dashboard/work-schedules/view?id=${shift.ws_id}`}>
-                                                  Xem
-                                                </Link>
-                                              </DropdownMenuItem>
                                               {
-                                                shift.ws_status === 'F' &&
+                                                hasPermission('work_schedule_list_view_detail') && (
+                                                  <DropdownMenuItem asChild>
+                                                    <Link href={`/dashboard/work-schedules/view?id=${shift.ws_id}`}>
+                                                      Xem
+                                                    </Link>
+                                                  </DropdownMenuItem>
+                                                )
+                                              }
+                                              {
+                                                shift.ws_status === 'F' && hasPermission('work_schedule_list_delete') &&
                                                 (
                                                   <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                                                     <DialogTrigger asChild>
@@ -469,7 +482,7 @@ export default function PageWorkSchedule() {
                                                 )
                                               }
                                               {
-                                                shift.ws_status === 'F' && (
+                                                shift.ws_status === 'F' && hasPermission('work_schedule_list_update_status') && (
                                                   <Dialog open={isUpdateStatusDialogOpen} onOpenChange={setIsUpdateStatusDialogOpen}>
                                                     <DialogTrigger asChild>
                                                       <DropdownMenuItem
