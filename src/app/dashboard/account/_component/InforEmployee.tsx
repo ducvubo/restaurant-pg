@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { IEmployee } from '../../(employee)/employees/employees.interface'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,7 +9,8 @@ import Image from 'next/image'
 import { Loader2, UploadIcon, X } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
-import { updateInforEmployee } from '../account.api'
+import { getListWorkSchedule, updateInforEmployee } from '../account.api'
+import { IWorkSchedule } from '../../(employee)/work-schedules/work-schedule.interface'
 
 interface InforEmployeeProps {
   inforEmployee: IEmployee
@@ -35,6 +36,9 @@ export default function InforEmployee({ inforEmployee }: InforEmployeeProps) {
   }>(inforEmployee?.epl_avatar || { image_cloud: '', image_custom: '' })
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
   const fileInputAvatarRef = useRef<HTMLInputElement | null>(null)
+  const [listWorkSchedule, setListWorkSchedule] = useState<IWorkSchedule[]>([])
+
+  console.log("🚀 ~ InforEmployee ~ listWorkSchedule:", listWorkSchedule)
 
   const validateForm = () => {
     if (!epl_name.trim()) {
@@ -96,6 +100,16 @@ export default function InforEmployee({ inforEmployee }: InforEmployeeProps) {
     setEpl_avatar({ image_cloud: '', image_custom: '' })
   }
 
+  const findListWorkSchedule = async () => {
+    const res: IBackendRes<IWorkSchedule[]> = await getListWorkSchedule()
+    if (res.statusCode === 200 || res.statusCode === 201 && res.data) {
+      setListWorkSchedule(res.data || [])
+    }
+  }
+
+  useEffect(() => {
+    findListWorkSchedule()
+  }, [])
 
   const onSubmit = async () => {
     if (!validateForm()) return
@@ -130,6 +144,26 @@ export default function InforEmployee({ inforEmployee }: InforEmployeeProps) {
         description: 'Cập nhật thông tin nhân viên thất bại, vui lòng thử lại',
         variant: 'destructive'
       })
+    }
+  }
+
+  const getShiftStatus = (wsDate: string, startTime: string, endTime: string) => {
+    const currentDate = new Date()
+    const shiftDate = new Date(wsDate)
+    const [startHour, startMinute] = startTime.split(':').map(Number)
+    const [endHour, endMinute] = endTime.split(':').map(Number)
+
+    const shiftStart = new Date(shiftDate)
+    shiftStart.setHours(startHour, startMinute, 0, 0)
+    const shiftEnd = new Date(shiftDate)
+    shiftEnd.setHours(endHour, endMinute, 0, 0)
+
+    if (currentDate < shiftStart) {
+      return 'Sắp bắt đầu'
+    } else if (currentDate >= shiftStart && currentDate <= shiftEnd) {
+      return 'Đang diễn ra'
+    } else {
+      return 'Đã kết thúc'
     }
   }
 
@@ -184,6 +218,55 @@ export default function InforEmployee({ inforEmployee }: InforEmployeeProps) {
           </tr>
         </tbody>
       </table>
+
+      <div className='mt-6'>
+        <h2 className='text-lg font-bold mb-2'>Lịch làm việc trong tháng</h2>
+        <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
+          <thead>
+            <tr className='bg-gray-100 dark:bg-gray-800'>
+              <th className='border border-gray-300 dark:border-gray-700 p-2 text-left'>Ca làm việc</th>
+              <th className='border border-gray-300 dark:border-gray-700 p-2 text-left'>Nhãn</th>
+              <th className='border border-gray-300 dark:border-gray-700 p-2 text-left'>Ngày</th>
+              <th className='border border-gray-300 dark:border-gray-700 p-2 text-left'>Thời gian</th>
+              <th className='border border-gray-300 dark:border-gray-700 p-2 text-left'>Trạng thái</th>
+              <th className='border border-gray-300 dark:border-gray-700 p-2 text-left'>Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody>
+            {listWorkSchedule.map((schedule) => (
+              <tr key={schedule.ws_id}>
+                <td className='border border-gray-300 dark:border-gray-700 p-2'>{schedule.workingShift.wks_name}</td>
+                <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                  <span
+                    className="text-white text-sm font-medium px-3 py-1 rounded-full inline-block"
+                    style={{
+                      backgroundColor: schedule.label.lb_color
+                    }}
+                  >
+                    {schedule.label.lb_name}
+                  </span>
+                </td>
+                <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                  {new Date(schedule.ws_date).toLocaleDateString('vi-VN')}
+                </td>
+                <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                  {schedule.workingShift.wks_start_time} - {schedule.workingShift.wks_end_time}
+                </td>
+                <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                  {getShiftStatus(
+                    new Date(schedule.ws_date).toISOString(),
+                    schedule.workingShift.wks_start_time || '',
+                    schedule.workingShift.wks_end_time || ''
+                  )}
+                </td>
+                <td className='border border-gray-300 dark:border-gray-700 p-2'>
+                  <div dangerouslySetInnerHTML={{ __html: schedule.ws_note }} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 
