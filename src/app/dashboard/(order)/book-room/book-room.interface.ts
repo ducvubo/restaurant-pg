@@ -1,3 +1,5 @@
+import { IRoom } from "../../(rooms)/rooms/rooms.interface"
+
 export enum BookRoomStatus {
   NEW_CREATED = 'NEW_CREATED',
   OVERTIME_GUEST = 'OVERTIME_GUEST',
@@ -43,8 +45,11 @@ export interface IBookRoom {
   bkr_status: BookRoomStatus
   bkr_feed_view: 'active' | 'disable'
   bkr_plus_price: number
+  bkr_base_price?: number
+  bkr_deposit_price?: number
   amenities: IAmenitiesSnap[]
   menuItems: IMenuItemsSnap[]
+  room?: IRoom
 }
 
 export interface IAmenitiesSnap {

@@ -432,6 +432,21 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void; hasPerm
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-sm italic text-muted-foreground">
+                Phòng: {bookRoom.room?.room_name || 'Không có thông tin phòng'}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-sm italic text-muted-foreground">
+                Giá cọc: {bookRoom.bkr_deposit_price?.toLocaleString() || 'Không có thông tin phòng'}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-sm italic text-muted-foreground">
+                Giá cơ bản: {bookRoom.bkr_base_price?.toLocaleString() || 'Không có thông tin phòng'}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-sm italic text-muted-foreground">
                 Tổng hóa đơn: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice)}
               </span>
             </div>
@@ -814,9 +829,7 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void; hasPerm
 export default function BookRoomPage() {
   const today = new Date()
   const defaultToDate = new Date(today.setHours(0, 0, 0, 0))
-  defaultToDate.setDate(defaultToDate.getDate() - 70)
   const defaultFromDate = new Date(defaultToDate)
-  defaultFromDate.setDate(defaultFromDate.getDate() + 70)
   const [toDate, setToDate] = useState<Date>(defaultToDate)
   const [fromDate, setFromDate] = useState<Date>(defaultFromDate)
   const [pageIndex, setPageIndex] = useState(1)
@@ -896,6 +909,27 @@ export default function BookRoomPage() {
     debouncedFindListBookRoom()
     return () => debouncedFindListBookRoom.cancel()
   }, [searchParam])
+
+  //khi thay đổi toDate hoặc fromDate thì gán lên url
+  useEffect(() => {
+    const params = new URLSearchParams()
+    params.set('toDate', toDate.toISOString())
+    params.set('fromDate', fromDate.toISOString())
+    params.set('pageIndex', pageIndex.toString())
+    params.set('pageSize', pageSize.toString())
+    params.set('query', query)
+    params.set('status', status)
+    window.history.replaceState({}, '', `?${params.toString()}`)
+  }, [toDate, fromDate, pageIndex, pageSize, query, status])
+
+  useEffect(() => {
+    const toDateParam = searchParam ? new Date(searchParam) : defaultToDate
+    const fromDateParam = new Date(toDateParam)
+    fromDateParam.setDate(fromDateParam.getDate() + 70)
+    setToDate(toDateParam)
+    setFromDate(fromDateParam)
+  }, [searchParam])
+
 
   return (
     <section>
