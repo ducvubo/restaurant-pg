@@ -160,7 +160,7 @@ export default function PageDetailTicket() {
         refContent.current.setContent('') // Clear editor content
         setReplyAttachmentLinks([])
         setIsReplying(false)
-        
+
         toast({
           title: 'Thành công',
           description: 'Đã gửi phản hồi thành công'
@@ -198,7 +198,7 @@ export default function PageDetailTicket() {
   }
 
   const handleResolvedTicket = async () => {
-    const res: IBackendRes<ITicketGuestRestaurant> = await resolvedTicket(params.slug as string)
+    const res: IBackendRes<ITicketGuestRestaurant> = await resolvedTicket(id as string)
     if (res.statusCode === 200 || res.statusCode === 201) {
       getTicket()
       toast({
