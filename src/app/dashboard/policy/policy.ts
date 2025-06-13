@@ -60,6 +60,16 @@ export const permissions: Module[] = [
             method: 'Cập nhật trạng thái',
             key: 'book_table_update_status',
             patchRequire: []
+          },
+          {
+            method: 'Trả lời feedback',
+            key: 'book_table_reply_feedback',
+            patchRequire: []
+          },
+          {
+            method: 'Cập nhật trạng thái feedback',
+            key: 'book_table_update_feedback_status',
+            patchRequire: []
           }
         ],
       },
@@ -75,6 +85,16 @@ export const permissions: Module[] = [
           }, {
             method: 'Cập nhật trạng thái',
             key: 'order_food_update_status',
+            patchRequire: []
+          },
+          {
+            method: 'Trả lời feedback',
+            key: 'order_food_reply_feedback',
+            patchRequire: []
+          },
+          {
+            method: 'Cập nhật trạng thái feedback',
+            key: 'order_food_update_feedback_status',
             patchRequire: []
           }
         ],
@@ -92,6 +112,16 @@ export const permissions: Module[] = [
             method: 'Cập nhật trạng thái',
             key: 'order_combo_update_status',
             patchRequire: []
+          },
+          {
+            method: 'Trả lời feedback',
+            key: 'order_combo_reply_feedback',
+            patchRequire: []
+          },
+          {
+            method: 'Cập nhật trạng thái feedback',
+            key: 'order_combo_update_feedback_status',
+            patchRequire: []
           }
         ],
       },
@@ -108,7 +138,27 @@ export const permissions: Module[] = [
             method: 'Cập nhật trạng thái',
             key: 'book_room_update_status',
             patchRequire: []
-          }
+          },
+          {
+            method: 'Trả lời feedback',
+            key: 'book_room_reply_feedback',
+            patchRequire: []
+          },
+          {
+            method: 'Cập nhật trạng thái feedback',
+            key: 'book_room_update_feedback_status',
+            patchRequire: []
+          },
+          {
+            method: 'Thêm món ăn',
+            key: 'book_room_add_menu_item',
+            patchRequire: []
+          },
+          {
+            method: 'Thêm tiện ích',
+            key: 'book_room_add_amenity',
+            patchRequire: []
+          },
         ]
       },
     ],
@@ -132,6 +182,16 @@ export const permissions: Module[] = [
             key: 'ticket_list_view_detail',
             patchRequire: ['/dashboard/ticket-guest/view'],
           },
+          {
+            method: 'Cập nhật giải quyết',
+            key: 'ticket_list_update_resolved',
+            patchRequire: ['/dashboard/ticket-guest/view']
+          },
+          {
+            method: 'Trả lời hỏi đáp',
+            key: 'ticket_list_reply',
+            patchRequire: ['/dashboard/ticket-guest/view']
+          },
         ],
       },
       {
@@ -144,6 +204,11 @@ export const permissions: Module[] = [
             key: 'ticket_connect_view_list',
             patchRequire: ['/dashboard/connect']
           },
+          {
+            method: 'Gửi tin nhắn',
+            key: 'ticket_connect_send_message',
+            patchRequire: ['/dashboard/connect']
+          }
         ],
       },
       {
@@ -156,6 +221,11 @@ export const permissions: Module[] = [
             key: 'chat_bot_view_list',
             patchRequire: ['/dashboard/chat-bot']
           },
+          {
+            method: 'Xóa',
+            key: 'chat_bot_delete',
+            patchRequire: ['/dashboard/chat-bot']
+          }
         ],
       },
     ],
@@ -171,38 +241,38 @@ export const permissions: Module[] = [
         actions: [
           {
             method: "Xem danh sách",
-            key: "room_list_view_list",
+            key: "room_view_list",
             patchRequire: ['/dashboard/rooms']
           }, {
             method: "Thêm phòng",
-            key: "room_list_create",
+            key: "room_create",
             patchRequire: ['/dashboard/rooms/add']
           },
           {
             method: "Xem chi tiết phòng",
-            key: "room_list_view_detail",
+            key: "room_view_detail",
             patchRequire: ['/dashboard/rooms/view']
           },
           {
             method: "Sửa phòng",
-            key: "room_list_update",
+            key: "room_update",
             patchRequire: ['/dashboard/rooms/edit']
           }, {
             method: "Xóa phòng",
-            key: "room_list_delete",
+            key: "room_delete",
             patchRequire: []
           },
           {
             method: "Xem danh sách đã xóa",
-            key: "room_list_view_deleted",
+            key: "room_view_deleted",
             patchRequire: ['/dashboard/rooms/recycle']
           }, {
             method: "Cập nhật trạng thái",
-            key: "room_list_update_status",
+            key: "room_update_status",
             patchRequire: []
           }, {
             method: "Khôi phục",
-            key: "room_list_restore",
+            key: "room_restore",
             patchRequire: []
           }
         ],
@@ -214,38 +284,38 @@ export const permissions: Module[] = [
         actions: [
           {
             method: "Xem danh sách",
-            key: "amenities_list_view_list",
+            key: "amenities_view_list",
             patchRequire: ['/dashboard/amenities']
           }, {
             method: "Thêm dịch vụ",
-            key: "amenities_list_create",
+            key: "amenities_create",
             patchRequire: ['/dashboard/amenities/add']
           },
           {
             method: "Xem chi tiết dịch vụ",
-            key: "amenities_list_view_detail",
+            key: "amenities_view_detail",
             patchRequire: ['/dashboard/amenities/view']
           },
           {
             method: "Sửa dịch vụ",
-            key: "amenities_list_update",
+            key: "amenities_update",
             patchRequire: ['/dashboard/amenities/edit']
           }, {
             method: "Xóa dịch vụ",
-            key: "amenities_list_delete",
+            key: "amenities_delete",
             patchRequire: []
           },
           {
             method: "Xem danh sách đã xóa",
-            key: "amenities_list_view_deleted",
+            key: "amenities_view_deleted",
             patchRequire: ['/dashboard/amenities/recycle']
           }, {
             method: "Cập nhật trạng thái",
-            key: "amenities_list_update_status",
+            key: "amenities_update_status",
             patchRequire: []
           }, {
             method: "Khôi phục",
-            key: "amenities_list_restore",
+            key: "amenities_restore",
             patchRequire: []
           }
         ],
@@ -257,47 +327,47 @@ export const permissions: Module[] = [
         actions: [
           {
             method: "Xem danh sách",
-            key: "menu_items_list_view_list",
+            key: "menu_items_view_list",
             patchRequire: ['/dashboard/menu-items']
           },
           {
             method: "Thêm món ăn",
-            key: "menu_items_list_create",
+            key: "menu_items_create",
             patchRequire: ['/dashboard/menu-items/add']
           },
           {
             method: "Xem chi tiết món ăn",
-            key: "menu_items_list_view_detail",
+            key: "menu_items_view_detail",
             patchRequire: ['/dashboard/menu-items/view']
           },
           {
             method: "Sửa món ăn",
-            key: "menu_items_list_update",
+            key: "menu_items_update",
             patchRequire: ['/dashboard/menu-items/edit']
           },
           {
             method: "Xóa món ăn",
-            key: "menu_items_list_delete",
+            key: "menu_items_delete",
             patchRequire: []
           },
           {
             method: "Xem danh sách đã xóa",
-            key: "menu_items_list_view_deleted",
+            key: "menu_items_view_deleted",
             patchRequire: ['/dashboard/menu-items/recycle']
           },
           {
             method: "Cập nhật trạng thái",
-            key: "menu_items_list_update_status",
+            key: "menu_items_update_status",
             patchRequire: []
           },
           {
             method: "Khôi phục",
-            key: "menu_items_list_restore",
+            key: "menu_items_restore",
             patchRequire: []
           },
           {
             method: "Tải ảnh menu",
-            key: "menu_items_list_upload_image_menu",
+            key: "menu_items_upload_image_menu",
             patchRequire: []
           }
         ],
@@ -358,6 +428,11 @@ export const permissions: Module[] = [
             key: "employee_list_register_face",
             patchRequire: []
           },
+          {
+            method: "Xóa khuôn mặt",
+            key: "employee_list_delete_face",
+            patchRequire: []
+          }
         ],
       },
       {
@@ -520,16 +595,6 @@ export const permissions: Module[] = [
             method: "Sửa đơn xin nghỉ phép",
             key: "leave_application_update",
             patchRequire: ['/dashboard/leave-application/edit']
-          },
-          {
-            method: "Xóa đơn xin nghỉ phép",
-            key: "leave_application_delete",
-            patchRequire: []
-          },
-          {
-            method: "Cập nhật trạng thái",
-            key: "leave_application_update_status",
-            patchRequire: []
           },
         ],
       },
@@ -883,7 +948,7 @@ export const permissions: Module[] = [
           {
             method: "Thêm bài viết",
             key: "article_create",
-            patchRequire: ['/dashboard/article/add']
+            patchRequire: ['/dashboard/article/default', '/dashboard/article/image', '/dashboard/article/video']
           },
           {
             method: "Xem chi tiết bài viết",
@@ -896,6 +961,11 @@ export const permissions: Module[] = [
             patchRequire: ['/dashboard/article/edit']
           },
           {
+            method: "Gửi phê duyệt",
+            key: "article_send_approval",
+            patchRequire: []
+          },
+          {
             method: "Duyệt bài",
             key: "article_approve",
             patchRequire: []
@@ -903,6 +973,26 @@ export const permissions: Module[] = [
           {
             method: "Xuất bản",
             key: "article_publish",
+            patchRequire: []
+          },
+          {
+            method: "Lên lịch xuất bản",
+            key: "article_schedule_publish",
+            patchRequire: []
+          },
+          {
+            method: "Hủy lịch xuất bản",
+            key: "article_cancel_schedule_publish",
+            patchRequire: []
+          },
+          {
+            method: "Hủy xuất bản",
+            key: "article_cancel_publish",
+            patchRequire: []
+          },
+          {
+            method: "Từ chối bài viết",
+            key: "article_reject",
             patchRequire: []
           },
           {
@@ -923,6 +1013,11 @@ export const permissions: Module[] = [
           {
             method: "Khôi phục",
             key: "article_restore",
+            patchRequire: []
+          },
+          {
+            method: "Tạo bài viết tự động",
+            key: "article_auto_create",
             patchRequire: []
           }
         ],
@@ -1160,6 +1255,11 @@ export const permissions: Module[] = [
             method: "Khôi phục",
             key: "stock_in_restore",
             patchRequire: []
+          },
+          {
+            method: "Nhập từ PDF",
+            key: "stock_in_import_from_pdf",
+            patchRequire: []
           }
         ],
       },
@@ -1201,6 +1301,11 @@ export const permissions: Module[] = [
           {
             method: "Khôi phục",
             key: "stock_out_restore",
+            patchRequire: []
+          },
+          {
+            method: "Xuất từ PDF",
+            key: "stock_out_export_to_pdf",
             patchRequire: []
           }
         ],
@@ -1459,42 +1564,42 @@ export const permissions: Module[] = [
         actions: [
           {
             method: "Xem danh sách",
-            key: "policy_list_view_list",
+            key: "policy_view_list",
             patchRequire: ['/dashboard/policy']
           },
           {
             method: "Thêm quyền chức năng",
-            key: "policy_list_create",
+            key: "policy_create",
             patchRequire: ['/dashboard/policy/add']
           },
           {
             method: "Xem chi tiết quyền chức năng",
-            key: "policy_list_view_detail",
+            key: "policy_view_detail",
             patchRequire: ['/dashboard/policy/view']
           },
           {
             method: "Sửa quyền chức năng",
-            key: "policy_list_update",
+            key: "policy_update",
             patchRequire: ['/dashboard/policy/edit']
           },
           {
             method: "Xóa quyền chức năng",
-            key: "policy_list_delete",
+            key: "policy_delete",
             patchRequire: []
           },
           {
             method: "Xem danh sách đã xóa",
-            key: "policy_list_view_deleted",
+            key: "policy_view_deleted",
             patchRequire: ['/dashboard/policy/recycle']
           },
           {
             method: "Cập nhật trạng thái",
-            key: "policy_list_update_status",
+            key: "policy_update_status",
             patchRequire: []
           },
           {
             method: "Khôi phục",
-            key: "policy_list_restore",
+            key: "policy_restore",
             patchRequire: []
           }
         ],

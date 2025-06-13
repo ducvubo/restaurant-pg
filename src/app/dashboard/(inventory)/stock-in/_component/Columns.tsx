@@ -16,6 +16,7 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { MoreHorizontal } from 'lucide-react'
 import { IStockIn, IStockInItem } from '../stock-in.interface'
 import { formatDate, formatDateMongo } from '@/app/utils'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 export const columns: ColumnDef<IStockIn>[] = [
   {
@@ -75,15 +76,27 @@ export const columns: ColumnDef<IStockIn>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/stock-in/view?id=${stockIn.stki_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/stock-in/edit?id=${stockIn.stki_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforStockIn={stockIn} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('stock_in_view_detail') && (
+                <Link href={`/dashboard/stock-in/view?id=${stockIn.stki_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('stock_in_update') && (
+                <Link href={`/dashboard/stock-in/edit?id=${stockIn.stki_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('stock_in_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforStockIn={stockIn} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

@@ -25,6 +25,7 @@ import {
   unpublishScheduleArticle
 } from '../article.api'
 import DeleteOrRestore from './DeleteOrRestore'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 export const columns: ColumnDef<IArticle>[] = [
   {
@@ -176,6 +177,7 @@ export const columns: ColumnDef<IArticle>[] = [
               className='cursor-pointer text-blue-500 hover:text-blue-700'
               onClick={() => handleUpdateStatus(1)}
               title='Gửi phê duyệt'
+              data-disabled={!hasPermissionKey('article_send_approval')}
             >
               <Send size={20} />
             </div>
@@ -188,6 +190,7 @@ export const columns: ColumnDef<IArticle>[] = [
                 className='cursor-pointer text-red-500 hover:text-red-700'
                 onClick={() => handleUpdateStatus(7)}
                 title='Bài viết không đạt'
+                data-disabled={!hasPermissionKey('article_reject')}
               >
                 <XCircle size={20} />
               </div>
@@ -195,6 +198,7 @@ export const columns: ColumnDef<IArticle>[] = [
                 className='cursor-pointer text-green-500 hover:text-green-700'
                 onClick={() => handleUpdateStatus(2)}
                 title='Duyệt bài viết'
+                data-disabled={!hasPermissionKey('article_approve')}
               >
                 <CheckCircle size={20} />
               </div>
@@ -207,6 +211,7 @@ export const columns: ColumnDef<IArticle>[] = [
               className='cursor-pointer text-blue-500 hover:text-blue-700'
               onClick={() => handleUpdateStatus(1)}
               title='Gửi phê duyệt'
+              data-disabled={!hasPermissionKey('article_send_approval')}
             >
               <Send size={20} />
             </div>
@@ -219,6 +224,7 @@ export const columns: ColumnDef<IArticle>[] = [
                 className='cursor-pointer text-purple-500 hover:text-purple-700'
                 onClick={() => handleUpdateStatus(3)}
                 title='Xuất bản'
+                data-disabled={!hasPermissionKey('article_publish')}
               >
                 <Upload size={20} />
               </div>
@@ -226,6 +232,7 @@ export const columns: ColumnDef<IArticle>[] = [
                 className='cursor-pointer text-yellow-500 hover:text-yellow-700'
                 onClick={() => handleUpdateStatus(4)}
                 title='Lên lịch xuất bản'
+                data-disabled={!hasPermissionKey('article_schedule_publish')}
               >
                 <Clock size={20} />
               </div>
@@ -238,6 +245,7 @@ export const columns: ColumnDef<IArticle>[] = [
               className='cursor-pointer text-red-500 hover:text-red-700'
               onClick={() => handleUpdateStatus(6)}
               title='Hủy lịch xuất bản'
+              data-disabled={!hasPermissionKey('article_cancel_schedule_publish')}
             >
               <Clock size={20} />
             </div>
@@ -249,6 +257,7 @@ export const columns: ColumnDef<IArticle>[] = [
               className='cursor-pointer text-orange-500 hover:text-orange-700'
               onClick={() => handleUpdateStatus(5)}
               title='Hủy xuất bản'
+              data-disabled={!hasPermissionKey('article_cancel_publish')}
             >
               <Ban size={20} />
             </div>
@@ -260,6 +269,7 @@ export const columns: ColumnDef<IArticle>[] = [
               className='cursor-pointer text-blue-500 hover:text-blue-700'
               onClick={() => handleUpdateStatus(1)}
               title='Gửi phê duyệt'
+              data-disabled={!hasPermissionKey('article_send_approval')}
             >
               <Send size={20} />
             </div>
@@ -288,16 +298,20 @@ export const columns: ColumnDef<IArticle>[] = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/article/view?id=${article.atlId}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/article/edit?id=${article.atlId}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
+            {hasPermissionKey('article_view_detail') && (
+              <Link href={`/dashboard/article/view?id=${article.atlId}`} className='cursor-pointer'>
+                <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+              </Link>
+            )}
+            {hasPermissionKey('article_update') && (
+              <Link data-disabled={!hasPermissionKey('article_update')} href={`/dashboard/article/edit?id=${article.atlId}`} className='cursor-pointer'>
+                <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+              </Link>
+            )}
             {(article.atlStatus === 'DRAFT' || article.atlStatus === 'REJECTED' || article.atlStatus === 'UNPUBLISHED') && (
-              <DropdownMenuItem asChild>
+              hasPermissionKey('article_delete') && (<DropdownMenuItem asChild>
                 <DeleteOrRestore inforArticle={article} path='delete' />
-              </DropdownMenuItem>
+              </DropdownMenuItem>)
             )}
           </DropdownMenuContent>
         </DropdownMenu>

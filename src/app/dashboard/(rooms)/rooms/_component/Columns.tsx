@@ -19,7 +19,7 @@ import { updateStatus } from '../rooms.api'
 import { MoreHorizontal } from 'lucide-react'
 import { IRoom } from '../rooms.interface'
 import Image from 'next/image'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 export const columns: ColumnDef<IRoom>[] = [
   {
     accessorKey: 'room_images',
@@ -144,11 +144,11 @@ export const columns: ColumnDef<IRoom>[] = [
         }
       }
       return amenities.room_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('room_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('room_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -176,15 +176,27 @@ export const columns: ColumnDef<IRoom>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/rooms/view?id=${amenities.room_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/rooms/edit?id=${amenities.room_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforRoom={amenities} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('room_view_detail') && (
+                <Link href={`/dashboard/rooms/view?id=${amenities.room_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('room_update') && (
+                <Link href={`/dashboard/rooms/edit?id=${amenities.room_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('room_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforRoom={amenities} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

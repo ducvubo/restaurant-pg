@@ -20,6 +20,7 @@ import {
   TableRow,
   TableFooter,
 } from '@/components/ui/table'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 interface ViewStockInProps {
   inforStockIn: IStockIn
@@ -161,7 +162,7 @@ export default function ViewStockIn({ inforStockIn }: ViewStockInProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermissionKey('stock_in_update')}>Chỉnh sửa</Button>
       </div>
       <div className='space-y-4'>
         <h3 className='text-lg font-semibold'>Thông tin phiếu nhập kho</h3>

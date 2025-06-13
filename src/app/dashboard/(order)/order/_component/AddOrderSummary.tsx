@@ -21,6 +21,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useLoading } from '@/context/LoadingContext'
 import { useRouter } from 'next/navigation'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 const FormSchema = z.object({
   od_dish_smr_table_id: z.string({ message: 'Vui lòng chọn bàn' }).nonempty({ message: 'Vui lòng chọn bàn' })
 })
@@ -138,7 +139,7 @@ export default function AddOrderSummary() {
     <div>
       <Dialog onOpenChange={(isOpen) => setIsModalOpen(isOpen)} open={isModalOpen}>
         <DialogTrigger asChild>
-          <Button variant='outline'>Thêm hóa đơn</Button>
+          <Button variant='outline' disabled={!hasPermissionKey('order_dish_create')}>Thêm hóa đơn</Button>
         </DialogTrigger>
         <DialogContent className='w-auto'>
           <DialogHeader>

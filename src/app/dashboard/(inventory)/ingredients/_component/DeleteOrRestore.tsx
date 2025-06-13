@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IIngredient } from '../ingredient.interface'
 import { deleteIngredient, restoreIngredient } from '../ingredient.api'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforIngredient: IIngredient
   path: 'recycle' | 'delete'
@@ -69,7 +69,7 @@ export default function DeleteOrRestore({ inforIngredient, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('ingredient_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

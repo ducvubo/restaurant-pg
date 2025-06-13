@@ -2,6 +2,8 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/ColumnHeader'
 import { IChatBot } from '../chat-bot.interface'
+import { Button } from '@/components/ui/button'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 export const columns: ColumnDef<IChatBot>[] = [
   {
@@ -26,5 +28,13 @@ export const columns: ColumnDef<IChatBot>[] = [
       return <span>{date.toLocaleString()}</span>
     },
     enableHiding: true
-  },
+  }, {
+    accessorKey: 'Action',
+    id: 'Action',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Action' />,
+    cell: ({ row }) => {
+      const chatBot = row.original
+      return <Button disabled={!hasPermissionKey('chat_bot_delete')}>Xóa</Button>
+    },
+  }
 ]

@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { updateStatusEquipmentMaintenance } from '../equipment-maintenance.api'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 export const columns: ColumnDef<IEquipmentMaintenance>[] = [
   // eqp_mtn_name: string
@@ -155,9 +156,10 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
         <Select
           value={equipmentMaintenance.eqp_mtn_status}
           onValueChange={(value: 'pending' | ' in_progress' | ' done' | ' rejected') => handleUpdateStatus(value)}
+          disabled={!hasPermissionKey('equipment_maintenance_update_status')}
         >
           <SelectTrigger className='w-36' >
-            <SelectValue placeholder='Trạng thái' />
+            <SelectValue placeholder='Trạng thái' />    
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -193,15 +195,27 @@ export const columns: ColumnDef<IEquipmentMaintenance>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/equipment-maintenance/view?id=${equipmentMaintenance.eqp_mtn_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/equipment-maintenance/edit?id=${equipmentMaintenance.eqp_mtn_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforEquipmentMaintenance={equipmentMaintenance} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('equipment_maintenance_view_detail') && (
+                <Link href={`/dashboard/equipment-maintenance/view?id=${equipmentMaintenance.eqp_mtn_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('equipment_maintenance_update') && (
+                <Link href={`/dashboard/equipment-maintenance/edit?id=${equipmentMaintenance.eqp_mtn_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('equipment_maintenance_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforEquipmentMaintenance={equipmentMaintenance} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

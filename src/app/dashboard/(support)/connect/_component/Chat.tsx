@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DocumentData } from "firebase/firestore";
+import { hasPermissionKey } from "@/app/dashboard/policy/PermissionCheckUtility";
 
 // Định nghĩa type cho tin nhắn
 interface Message {
@@ -155,7 +156,7 @@ const Chat = ({ restaurantId, customerId, userType }: ChatProps) => {
           onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
           className="dark:text-white text-black border-gray-700"
         />
-        <Button onClick={handleSendMessage}>Gửi</Button>
+        <Button onClick={handleSendMessage} disabled={!hasPermissionKey('ticket_connect_send_message')}>Gửi</Button>
       </div>
     </div>
   );

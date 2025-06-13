@@ -19,7 +19,7 @@ import { DataTableViewOptions } from '@/components/ColumnToggle'
 import { DataTablePagination } from '@/components/PaginationTable'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -97,16 +97,16 @@ export function PageInternalNote<TData, TValue>({ columns, meta, data }: DataTab
     <div className='flex flex-col' style={{ height: 'calc(100vh - 7rem)' }}>
       <div className='flex justify-end gap-2 items-center py-4'>
         <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
-        <Button variant={'outline'}>
+        <Button variant={'outline'} disabled={!hasPermissionKey('internal_note_create')}>
           <Link href={'/dashboard/internal-note/add'}>Thêm</Link>
         </Button>
         {
           pathname === 'recycle' ? (
-            <Button variant={'outline'}>
+            <Button variant={'outline'} disabled={!hasPermissionKey('internal_note_view_list')}>
               <Link href={'/dashboard/internal-note'}>Danh sách</Link>
             </Button>
           ) : (
-            <Button variant={'outline'}>
+            <Button variant={'outline'} disabled={!hasPermissionKey('internal_note_view_deleted')}>
               <Link href={'/dashboard/internal-note/recycle'}>Danh sách đã xóa</Link>
             </Button>
           )

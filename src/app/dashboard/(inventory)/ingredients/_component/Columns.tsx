@@ -20,7 +20,7 @@ import { MoreHorizontal } from 'lucide-react'
 import { IIngredient } from '../ingredient.interface'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 export const columns: ColumnDef<IIngredient>[] = [
   {
     accessorKey: 'igd_name',
@@ -187,11 +187,11 @@ export const columns: ColumnDef<IIngredient>[] = [
         }
       }
       return ingredient.igd_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('ingredient_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('ingredient_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -219,15 +219,27 @@ export const columns: ColumnDef<IIngredient>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/ingredients/view?id=${ingredient.igd_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/ingredients/edit?id=${ingredient.igd_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforIngredient={ingredient} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('ingredient_view_detail') && (
+                <Link href={`/dashboard/ingredients/view?id=${ingredient.igd_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('ingredient_update') && (
+                <Link href={`/dashboard/ingredients/edit?id=${ingredient.igd_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('ingredient_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforIngredient={ingredient} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

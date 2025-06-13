@@ -41,6 +41,8 @@ import GennerateQrOrder from './GetQrOrder'
 import GetQrOrder from './GetQrOrder'
 import ExportBill from './ExportBill'
 import GetQrPayment from './GetQrPayment'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 const formatVietnameseDate = (date: Date) => {
   const day = date.getDate()
@@ -56,6 +58,7 @@ const disableFutureDates = (date: any) => {
   return isAfter(date, new Date())
 }
 export default function ListOrderPage() {
+  const { hasPermission } = usePermission()
   const { setLoading } = useLoading()
   const router = useRouter()
   const today = new Date()
@@ -388,8 +391,11 @@ export default function ListOrderPage() {
               </SelectGroup>
             </SelectContent>
           </Select>
-
-          <AddOrderSummary />
+          {
+            hasPermissionKey('order_dish_create') && (
+              <AddOrderSummary />
+            )
+          }
         </div>
 
         <div className='flex gap-3 mt-5 justify-between'>
@@ -504,7 +510,7 @@ export default function ListOrderPage() {
                                   })
                                 }
                               >
-                                <SelectTrigger className='w-[140px]' disabled={order_summary.od_dish_smr_status !== 'ordering'}>
+                                <SelectTrigger className='w-[140px]' disabled={order_summary.od_dish_smr_status !== 'ordering' || !hasPermission('order_dish_update_food_status')}>
                                   <SelectValue placeholder='Đang nấu' />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -583,7 +589,7 @@ export default function ListOrderPage() {
                                       })
                                     }
                                   >
-                                    <SelectTrigger className='w-[140px]' disabled={order_summary.od_dish_smr_status !== 'ordering'}>
+                                    <SelectTrigger className='w-[140px]' disabled={order_summary.od_dish_smr_status !== 'ordering' || !hasPermission('order_dish_update_food_status')}>
                                       <SelectValue placeholder='Đang nấu' />
                                     </SelectTrigger>
                                     <SelectContent>

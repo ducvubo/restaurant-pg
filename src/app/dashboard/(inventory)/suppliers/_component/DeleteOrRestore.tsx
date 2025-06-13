@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { ISupplier } from '../supplier.interface'
 import { deleteSupplier, restoreSupplier } from '../supplier.api'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforSupplier: ISupplier
   path: 'recycle' | 'delete'
@@ -67,7 +68,7 @@ export default function DeleteOrRestore({ inforSupplier, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('supplier_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

@@ -3,7 +3,7 @@ import React from 'react'
 import { IInternalNote } from '../internal-note.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface ViewInternalNoteProps {
   inforInternalNote: IInternalNote
 }
@@ -18,7 +18,7 @@ export default function ViewInternalNote({ inforInternalNote }: ViewInternalNote
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermissionKey('internal_note_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

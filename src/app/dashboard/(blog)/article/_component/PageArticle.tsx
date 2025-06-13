@@ -32,6 +32,7 @@ import ListAddArticle from './ListAddArticle'
 import { autoGenArticleDefault } from '../article.api'
 import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -148,7 +149,7 @@ export function PageArticle<TData, TValue>({ columns, meta, data }: DataTablePro
         <ListAddArticle />
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant={'outline'}>Tạo bài viết tự động</Button>
+            <Button disabled={!hasPermissionKey('article_auto_create')} variant={'outline'}>Tạo bài viết tự động</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -171,11 +172,11 @@ export function PageArticle<TData, TValue>({ columns, meta, data }: DataTablePro
           </DialogContent>
         </Dialog>
         {pathname === 'recycle' ? (
-          <Button variant={'outline'}>
+          <Button disabled={!hasPermissionKey('article_view_list')} variant={'outline'}>
             <Link href={'/dashboard/article'}>Danh sách</Link>
           </Button>
         ) : (
-          <Button variant={'outline'}>
+          <Button disabled={!hasPermissionKey('article_view_deleted')} variant={'outline'}>
             <Link href={'/dashboard/article/recycle'}>Danh sách đã xóa</Link>
           </Button>
         )}

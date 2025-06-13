@@ -68,12 +68,12 @@ const baseMenuList = (pathname: string): Group[] => {
               active: pathname === '/dashboard/order/dish',
               key: 'order_dish', // Khớp với function.key
             },
-            {
-              href: '/dashboard/order/table',
-              label: 'Đơn đặt theo bàn',
-              active: pathname === '/dashboard/order/table',
-              key: 'order_table',
-            },
+            // {
+            //   href: '/dashboard/order/table',
+            //   label: 'Đơn đặt theo bàn',
+            //   active: pathname === '/dashboard/order/table',
+            //   key: 'order_table',
+            // },
             {
               href: '/dashboard/book-table',
               label: 'Danh sách đặt bàn',

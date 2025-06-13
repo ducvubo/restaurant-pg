@@ -28,6 +28,7 @@ import { getListFood } from '../../food-combos/food-combos.api';
 import { deleteCookiesAndRedirect } from '@/app/actions/action';
 import { createFood } from '../food.api';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -342,29 +343,34 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
     <div className="flex flex-col" style={{ height: 'calc(100vh - 7rem)' }}>
       <div className="flex justify-end gap-2 items-center py-4">
         <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
-        <Button variant={'outline'}>
+        <Button variant={'outline'} disabled={!hasPermissionKey('online_food_create')}>
           <Link href={'/dashboard/foods/add'}>Thêm</Link>
         </Button>
         {
           pathname === 'recycle' ? (
-            <Button variant={'outline'}>
+            <Button variant={'outline'} disabled={!hasPermissionKey('online_food_view_list')}>
               <Link href={'/dashboard/foods'}>Danh sách</Link>
             </Button>
           ) : (
-            <Button variant={'outline'}>
+            <Button variant={'outline'} disabled={!hasPermissionKey('online_food_view_deleted')}>
               <Link href={'/dashboard/foods/recycle'}>Danh sách đã xóa</Link>
             </Button>
           )
         }
-        <Button variant={'outline'} asChild>
-          <label>
-            Tải ảnh món ăn
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImportFood}
-              style={{ display: 'none' }}
-            />
+        <Button variant={'outline'} asChild disabled={!hasPermissionKey('online_food_upload_image')} className={(!hasPermissionKey('online_food_upload_image') ? 'opacity-50 cursor-not-allowed pointer-events-none' : '') + ' ' + 'hover:bg-gray-100'}>
+          Tải ảnh món ăn
+          <input
+            disabled={!hasPermissionKey('online_food_upload_image')}
+            type="file"
+            accept="image/*"
+            onChange={handleImportFood}
+            style={{ display: 'none' }}
+            id="foood-upload-input"
+          />
+          <label
+            htmlFor="foood-upload-input"
+            className={(!hasPermissionKey('online_food_upload_image') ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer')}
+          >
           </label>
         </Button>
         <DataTableViewOptions table={table} />

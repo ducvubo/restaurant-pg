@@ -19,7 +19,7 @@ import { updateStatus } from '../menu-items.api'
 import { MoreHorizontal } from 'lucide-react'
 import { IMenuItems } from '../menu-items.interface'
 import Image from 'next/image'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 export const columns: ColumnDef<IMenuItems>[] = [
   {
     accessorKey: 'mitems_image',
@@ -115,11 +115,11 @@ export const columns: ColumnDef<IMenuItems>[] = [
         }
       }
       return menuItems.mitems_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('menu_items_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('menu_items_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -147,15 +147,27 @@ export const columns: ColumnDef<IMenuItems>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/menu-items/view?id=${menuItems.mitems_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/menu-items/edit?id=${menuItems.mitems_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforMenuItems={menuItems} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('menu_items_view_detail') && (
+                <Link href={`/dashboard/menu-items/view?id=${menuItems.mitems_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('menu_items_update') && (
+                <Link href={`/dashboard/menu-items/edit?id=${menuItems.mitems_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('menu_items_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforMenuItems={menuItems} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

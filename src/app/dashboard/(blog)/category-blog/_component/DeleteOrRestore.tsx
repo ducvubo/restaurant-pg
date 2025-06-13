@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { ICategory } from '../category-blog.interface'
 import { deleteCategory, restoreCategory } from '../category-blog.api'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 interface Props {
   inforCategory: ICategory
@@ -68,7 +69,7 @@ export default function DeleteOrRestore({ inforCategory, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('category_blog_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

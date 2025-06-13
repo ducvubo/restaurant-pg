@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { ICatIngredient } from '../cat-ingredient.interface'
 import { deleteCatIngredient, restoreCatIngredient } from '../cat-ingredient.api'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforCatIngredient: ICatIngredient
   path: 'recycle' | 'delete'
@@ -68,7 +68,7 @@ export default function DeleteOrRestore({ inforCatIngredient, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('cat_ingredient_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

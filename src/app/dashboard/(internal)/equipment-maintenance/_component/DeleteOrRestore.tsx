@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IEquipmentMaintenance } from '../equipment-maintenance.interface'
 import { deleteEquipmentMaintenance, restoreEquipmentMaintenance } from '../equipment-maintenance.api'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 
 interface Props {
@@ -69,7 +70,7 @@ export default function DeleteOrRestore({ inforEquipmentMaintenance, path }: Pro
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('equipment_maintenance_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

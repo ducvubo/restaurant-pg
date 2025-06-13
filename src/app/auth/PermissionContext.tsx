@@ -23,11 +23,6 @@ export const PermissionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (inforRestaurant?._id) {
       return true;
     }
-
-    console.log('permissions', permissions);
-    console.log('key', key);
-    console.log('permissions?.includes(key)', permissions?.includes(key));
-
     return permissions?.includes(key) || false;
   };
 

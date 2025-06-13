@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { deleteFood, restoreFood } from '../food.api'
 import { IFood } from '../food.interface'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforFood: IFood
   path: 'recycle' | 'delete'
@@ -74,7 +75,7 @@ export default function DeleteOrRestore({ inforFood, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('online_food_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

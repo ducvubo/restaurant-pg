@@ -17,6 +17,7 @@ import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { IWorkingShift } from '../working-shift.interface'
 import DeleteOrRestore from './DeleteOrRestore'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 export const columns: ColumnDef<IWorkingShift>[] = [
   {
@@ -45,79 +46,6 @@ export const columns: ColumnDef<IWorkingShift>[] = [
     },
     enableHiding: true
   },
-
-  // {
-  //   accessorKey: 'wks_status',
-  //   id: 'Trạng thái',
-  //   header: ({ column }) => <DataTableColumnHeader column={column} title='Trạng thái' />,
-  //   enableHiding: true,
-  //   cell: ({ row }) => {
-  //     const router = useRouter()
-  //     const workingShift = row.original
-  //     const handleUpdateStatus = async () => {
-  //       const res = await updateStatus({
-  //         wks_id: workingShift.wks_id,
-  //         wks_status: workingShift.wks_status === 'enable' ? 'disable' : 'enable'
-  //       })
-  //       if (res.statusCode === 200) {
-  //         workingShift.wks_status = workingShift.wks_status === 'enable' ? 'disable' : 'enable'
-  //         toast({
-  //           title: 'Thành công',
-  //           description: 'Cập nhật trạng thái thành công',
-  //           variant: 'default'
-  //         })
-  //         router.refresh()
-  //       } else if (res.statusCode === 400) {
-  //         if (Array.isArray(res.message)) {
-  //           res.message.map((item: string) => {
-  //             toast({
-  //               title: 'Thất bại',
-  //               description: item,
-  //               variant: 'destructive'
-  //             })
-  //           })
-  //         } else {
-  //           toast({
-  //             title: 'Thất bại',
-  //             description: res.message,
-  //             variant: 'destructive'
-  //           })
-  //         }
-  //       } else if (res.code === -10) {
-  //         toast({
-  //           title: 'Thông báo',
-  //           description: 'Phiên đăng nhập đã hêt hạn, vui lòng đăng nhập lại',
-  //           variant: 'destructive'
-  //         })
-  //         await deleteCookiesAndRedirect()
-  //       } else if (res.code === -11) {
-  //         toast({
-  //           title: 'Thông báo',
-  //           description:
-  //             'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ quản trị viên để biết thêm chi tiết',
-  //           variant: 'destructive'
-  //         })
-  //       } else {
-  //         toast({
-  //           title: 'Thất bại',
-  //           description: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
-  //           variant: 'destructive'
-  //         })
-  //       }
-  //     }
-
-  //     return workingShift.wks_status === 'enable' ? (
-  //       <Button variant={'outline'} onClick={handleUpdateStatus}>
-  //         Hoạt động
-  //       </Button>
-  //     ) : (
-  //       <Button onClick={handleUpdateStatus} variant={'destructive'}>
-  //         Ngừng hoạt động
-  //       </Button>
-  //     )
-  //   }
-  // },
-
   {
     accessorKey: 'Thao tác',
     id: 'Thao tác',
@@ -139,15 +67,20 @@ export const columns: ColumnDef<IWorkingShift>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/working-shifts/view?id=${workingShift.wks_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/working-shifts/edit?id=${workingShift.wks_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforWorkingShift={workingShift} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('working_shift_list_view_detail') && (
+                <Link href={`/dashboard/working-shifts/view?id=${workingShift.wks_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('working_shift_list_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforWorkingShift={workingShift} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

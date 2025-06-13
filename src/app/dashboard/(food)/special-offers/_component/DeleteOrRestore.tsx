@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { ISpecialOffer } from '../special-offer.interface'
 import { deleteSpecialOffer, restoreSpecialOffer } from '../special-offer.api'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforSpecialOffer: ISpecialOffer
   path: 'recycle' | 'delete'
@@ -69,7 +69,7 @@ export default function DeleteOrRestore({ inforSpecialOffer, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('special_offer_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

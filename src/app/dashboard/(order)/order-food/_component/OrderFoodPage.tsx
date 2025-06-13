@@ -91,8 +91,9 @@ const getStatusVariant = (status: string): 'default' | 'destructive' | 'secondar
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea'
 import { Pagination } from '@/components/Pagination'
+import { usePermission } from '@/app/auth/PermissionContext'
 
-const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order, refresh }) => {
+const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void; hasPermission: (key: string) => boolean }> = ({ order, refresh, hasPermission }) => {
   const [feedback, setFeedback] = useState<string>('');
   const [isFeedbackViewActive, setIsFeedbackViewActive] = useState<boolean>(
     order.od_feed_view === 'active'
@@ -307,14 +308,14 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
             <div className="flex gap-2">
               {
                 order.od_status === 'waiting_confirm_restaurant' && (
-                  <Button variant="outline" size="sm" onClick={handleConfirmOrder}>
+                  <Button variant="outline" size="sm" onClick={handleConfirmOrder} disabled={!hasPermission('order_food_update_status')}>
                     Xác nhận đơn hàng
                   </Button>
                 )
               }
               {
                 order.od_status === 'waiting_shipping' && (
-                  <Button variant="outline" size="sm" onClick={handleConfirmShipping}>
+                  <Button variant="outline" size="sm" onClick={handleConfirmShipping} disabled={!hasPermission('order_food_update_status')}>
                     Xác nhận giao hàng
                   </Button>
                 )
@@ -322,10 +323,10 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
               {
                 order.od_status === 'shipping' && (
                   <>
-                    <Button variant="outline" size="sm" onClick={handleDeliveredOrder}>
+                    <Button variant="outline" size="sm" onClick={handleDeliveredOrder} disabled={!hasPermission('order_food_update_status')}>
                       Xác nhận đã giao hàng
                     </Button>
-                    <Button variant="outline" size="sm" onClick={handleCustomerUnreachable}>
+                    <Button variant="outline" size="sm" onClick={handleCustomerUnreachable} disabled={!hasPermission('order_food_update_status')}>
                       Không liên lạc được với khách hàng
                     </Button>
                   </>
@@ -346,6 +347,7 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
                       variant="outline"
                       size="sm"
                       onClick={() => setIsCancelDialogOpen(true)}
+                      disabled={!hasPermission('order_food_update_status')}
                     >
                       Hủy đơn hàng
                     </Button>
@@ -401,7 +403,7 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
             <div className="flex gap-2 mt-2">
               {
                 !order.od_feed_reply &&
-                <Button size="sm" onClick={handleSubmitFeedback}>
+                <Button size="sm" onClick={handleSubmitFeedback} disabled={!hasPermission('order_food_reply_feedback')}>
                   Gửi phản hồi
                 </Button>
               }
@@ -409,6 +411,7 @@ const OrderCard: React.FC<{ order: IOrderFood; refresh: () => void }> = ({ order
                 size="sm"
                 variant={isFeedbackViewActive ? 'destructive' : 'default'}
                 onClick={handleToggleFeedbackView}
+                disabled={!hasPermission('order_food_update_feedback_status')}
               >
                 {isFeedbackViewActive ? 'Ẩn phản hồi' : 'Hiển thị phản hồi'}
               </Button>
@@ -518,7 +521,7 @@ export default function OrderFoodPage() {
   });
   const searchParam = useSearchParams().get('a');
   const [listOrderFood, setListOrderFood] = useState<IOrderFood[]>([]);
-
+  const { hasPermission } = usePermission()
 
   const handleSelectFromDate = (date: Date | undefined) => {
     if (date) {
@@ -700,7 +703,7 @@ export default function OrderFoodPage() {
       <div className="mt-6">
         {listOrderFood.length > 0 ? (
           listOrderFood.map((order) => (
-            <OrderCard key={order.od_id} order={order} refresh={findListBookTable} />
+            <OrderCard key={order.od_id} order={order} refresh={findListBookTable} hasPermission={hasPermission} />
           ))
         ) : (
           <p className="text-center text-gray-500">Không có đơn hàng nào để hiển thị.</p>

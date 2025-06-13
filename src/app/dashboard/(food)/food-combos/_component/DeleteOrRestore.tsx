@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { deleteFoodCombo, restoreFoodCombo } from '../food-combos.api'
 import { IFoodComboRes } from '../food-combos.interface'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforFoodCombo: IFoodComboRes
   path: 'recycle' | 'delete'
@@ -74,7 +75,7 @@ export default function DeleteOrRestore({ inforFoodCombo, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('food_combo_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

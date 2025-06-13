@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 interface ViewWorkScheduleProps {
   inforWorkSchedule: IWorkSchedule
@@ -77,7 +78,7 @@ export default function ViewWorkSchedule({ inforWorkSchedule }: ViewWorkSchedule
     <div className='space-y-6'>
       {inforWorkSchedule.ws_status === 'F' && (
         <div className='flex justify-end'>
-          <Button onClick={handleEdit}>Chỉnh sửa</Button>
+          <Button onClick={handleEdit} disabled={!hasPermissionKey('work_schedule_list_update')}>Chỉnh sửa</Button>
         </div>
       )}
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>

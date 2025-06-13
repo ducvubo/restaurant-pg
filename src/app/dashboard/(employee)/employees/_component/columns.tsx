@@ -24,6 +24,7 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import RegisterFaceUpload from './RegisterFaceUpload'
 import DeleteFace from './DeleteFace'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 // import RegisterFace from './RegisterFace'
 const RegisterFace = dynamic(() => import('./RegisterFace'), {
   ssr: false,
@@ -159,11 +160,11 @@ export const columns: ColumnDef<IEmployee>[] = [
         }
       }
       return employee.epl_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('employee_list_update_status')}>
           Đang làm
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('employee_list_update_status')}>
           Nghỉ làm
         </Button>
       )
@@ -190,36 +191,48 @@ export const columns: ColumnDef<IEmployee>[] = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/employees/edit?id=${employees._id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/employees/view?id=${employees._id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforEmployee={employees} path='delete' />
-            </DropdownMenuItem>
             {
-              employees.epl_face_id && (
+              hasPermissionKey('employee_list_update') && (
+                <Link href={`/dashboard/employees/edit?id=${employees._id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('employee_list_view_detail') && (
+                <Link href={`/dashboard/employees/view?id=${employees._id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('employee_list_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforEmployee={employees} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
+            {
+              employees.epl_face_id && hasPermissionKey('employee_list_delete_face') && (
                 <DropdownMenuItem asChild>
                   <DeleteFace inforEmployee={employees} />
                 </DropdownMenuItem>
               )
             }
-           {
-              !employees.epl_face_id && (
+            {
+              !employees.epl_face_id && hasPermissionKey('employee_list_register_face') && (
                 <DropdownMenuItem asChild>
                   <RegisterFace inforEmployee={employees} />
                 </DropdownMenuItem>
               )
             }
             {
-              !employees.epl_face_id && (
+              !employees.epl_face_id && hasPermissionKey('employee_list_register_face') && (
                 <DropdownMenuItem asChild>
                   <RegisterFaceUpload inforEmployee={employees} />
                 </DropdownMenuItem>
               )
-           }
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

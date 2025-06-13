@@ -4,7 +4,7 @@ import { IMenuItems } from '../menu-items.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface ViewMenuItemsProps {
   inforMenuItems: IMenuItems
 }
@@ -33,7 +33,7 @@ export default function ViewMenuItems({ inforMenuItems }: ViewMenuItemsProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermissionKey('menu_items_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

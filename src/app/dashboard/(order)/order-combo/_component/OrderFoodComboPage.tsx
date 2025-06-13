@@ -92,8 +92,9 @@ import { Pagination } from '@/components/Pagination'
 import { IOrderFoodCombo } from '../order-food-combo.interface'
 import { getListOrderFoodCombo, restaurantCancelOrderFoodCombo, restaurantConfirmOrderFoodCombo, restaurantConfirmShipping, restaurantDeliveredOrderFoodCombo, restaurantFeedbackOrderFoodCombo, restaurantUpdateViewFeedbackOrderFoodCombo } from '../order-food-combo.api'
 import { restaurantCustomerUnreachableOrderFood } from '../../order-food/order-food.api'
+import { usePermission } from '@/app/auth/PermissionContext'
 
-const OrderCard: React.FC<{ order: IOrderFoodCombo; refresh: () => void }> = ({ order, refresh }) => {
+const OrderCard: React.FC<{ order: IOrderFoodCombo; refresh: () => void; hasPermission: (key: string) => boolean }> = ({ order, refresh, hasPermission }) => {
   const [feedback, setFeedback] = useState<string>('');
   const [isFeedbackViewActive, setIsFeedbackViewActive] = useState<boolean>(
     order.od_cb_feed_view === 'active'
@@ -308,14 +309,14 @@ const OrderCard: React.FC<{ order: IOrderFoodCombo; refresh: () => void }> = ({ 
             <div className="flex gap-2">
               {
                 order.od_cb_status === 'waiting_confirm_restaurant' && (
-                  <Button variant="outline" size="sm" onClick={handleConfirmOrder}>
+                  <Button variant="outline" size="sm" onClick={handleConfirmOrder} disabled={!hasPermission('order_combo_update_status')}>
                     Xác nhận đơn hàng
                   </Button>
                 )
               }
               {
                 order.od_cb_status === 'waiting_shipping' && (
-                  <Button variant="outline" size="sm" onClick={handleConfirmShipping}>
+                  <Button variant="outline" size="sm" onClick={handleConfirmShipping} disabled={!hasPermission('order_combo_update_status')}>
                     Xác nhận giao hàng
                   </Button>
                 )
@@ -323,22 +324,15 @@ const OrderCard: React.FC<{ order: IOrderFoodCombo; refresh: () => void }> = ({ 
               {
                 order.od_cb_status === 'shipping' && (
                   <>
-                    <Button variant="outline" size="sm" onClick={handleDeliveredOrder}>
+                    <Button variant="outline" size="sm" onClick={handleDeliveredOrder} disabled={!hasPermission('order_combo_update_status')}>
                       Xác nhận đã giao hàng
                     </Button>
-                    <Button variant="outline" size="sm" onClick={handleCustomerUnreachable}>
+                    <Button variant="outline" size="sm" onClick={handleCustomerUnreachable} disabled={!hasPermission('order_combo_update_status')}>
                       Không liên lạc được với khách hàng
                     </Button>
                   </>
                 )
               }
-              {/* {
-                order.od_cb_status === 'waiting_confirm_restaurant' || order.od_cb_status === 'waiting_shipping' ? (
-                  <Button variant="outline" size="sm" onClick={handleCancelOrder}>
-                    Hủy đơn hàng
-                  </Button>
-                ) : null
-              } */}
               {(order.od_cb_status === 'waiting_confirm_restaurant' || order.od_cb_status === 'waiting_shipping') && (
                 <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
                   <DialogTrigger asChild>
@@ -346,6 +340,7 @@ const OrderCard: React.FC<{ order: IOrderFoodCombo; refresh: () => void }> = ({ 
                       variant="outline"
                       size="sm"
                       onClick={() => setIsCancelDialogOpen(true)}
+                      disabled={!hasPermission('order_combo_update_status')}
                     >
                       Hủy đơn hàng
                     </Button>
@@ -401,7 +396,7 @@ const OrderCard: React.FC<{ order: IOrderFoodCombo; refresh: () => void }> = ({ 
             <div className="flex gap-2 mt-2">
               {
                 !order.od_cb_feed_reply &&
-                <Button size="sm" onClick={handleSubmitFeedback}>
+                <Button size="sm" onClick={handleSubmitFeedback} disabled={!hasPermission('order_combo_reply_feedback')}>
                   Gửi phản hồi
                 </Button>
               }
@@ -409,6 +404,7 @@ const OrderCard: React.FC<{ order: IOrderFoodCombo; refresh: () => void }> = ({ 
                 size="sm"
                 variant={isFeedbackViewActive ? 'destructive' : 'default'}
                 onClick={handleToggleFeedbackView}
+                disabled={!hasPermission('order_combo_update_feedback_status')}
               >
                 {isFeedbackViewActive ? 'Ẩn phản hồi' : 'Hiển thị phản hồi'}
               </Button>
@@ -474,6 +470,7 @@ const OrderCard: React.FC<{ order: IOrderFoodCombo; refresh: () => void }> = ({ 
 };
 
 export default function OrderFoodComboPage() {
+  const { hasPermission } = usePermission()
   const today = new Date();
   const defaultToDate = new Date(today.setHours(0, 0, 0, 0));
   defaultToDate.setDate(defaultToDate.getDate() - 70);
@@ -679,7 +676,7 @@ export default function OrderFoodComboPage() {
       <div className="mt-6">
         {listOrderFoodCombo.length > 0 ? (
           listOrderFoodCombo.map((order) => (
-            <OrderCard key={order.od_cb_id} order={order} refresh={findListBookTable} />
+            <OrderCard key={order.od_cb_id} order={order} refresh={findListBookTable} hasPermission={hasPermission} />
           ))
         ) : (
           <p className="text-center text-gray-500">Không có đơn hàng nào để hiển thị.</p>

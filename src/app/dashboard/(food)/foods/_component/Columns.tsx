@@ -31,6 +31,7 @@ import { IFood } from '../food.interface'
 import Image from 'next/image'
 import { updateStateFood, updateStatusFood } from '../food.api'
 import DeleteOrRestore from './DeleteOrRestore'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 export const columns: ColumnDef<IFood>[] = [
   {
     accessorKey: 'food_name',
@@ -228,11 +229,11 @@ export const columns: ColumnDef<IFood>[] = [
         }
       }
       return food.food_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('online_food_update_status')}>
           Đang bán
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('online_food_update_status')}>
           Ngừng bán
         </Button>
       )
@@ -260,15 +261,27 @@ export const columns: ColumnDef<IFood>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/foods/edit?id=${food.food_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/foods/view?id=${food.food_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforFood={food} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('online_food_update') && (
+                <Link href={`/dashboard/foods/edit?id=${food.food_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('online_food_view_detail') && (
+                <Link href={`/dashboard/foods/view?id=${food.food_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('online_food_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforFood={food} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

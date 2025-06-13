@@ -18,7 +18,7 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../cat-ingredient.api'
 import { MoreHorizontal } from 'lucide-react'
 import { ICatIngredient } from '../cat-ingredient.interface'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 export const columns: ColumnDef<ICatIngredient>[] = [
   {
     accessorKey: 'cat_igd_name',
@@ -91,11 +91,11 @@ export const columns: ColumnDef<ICatIngredient>[] = [
         }
       }
       return catIngredient.cat_igd_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('cat_ingredient_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('cat_ingredient_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -123,15 +123,27 @@ export const columns: ColumnDef<ICatIngredient>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/cat-ingredients/view?id=${catIngredient.cat_igd_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/cat-ingredients/edit?id=${catIngredient.cat_igd_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforCatIngredient={catIngredient} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('cat_ingredient_view_detail') && (
+                <Link href={`/dashboard/cat-ingredients/view?id=${catIngredient.cat_igd_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('cat_ingredient_update') && (
+                <Link href={`/dashboard/cat-ingredients/edit?id=${catIngredient.cat_igd_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('cat_ingredient_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforCatIngredient={catIngredient} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

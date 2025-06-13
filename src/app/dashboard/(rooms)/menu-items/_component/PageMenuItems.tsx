@@ -28,7 +28,7 @@ import { TrashIcon } from '@radix-ui/react-icons';
 import { getAllMenuItemsName, createMenuItems } from '../menu-items.api';
 import { IMenuItems } from '../menu-items.interface';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -354,12 +354,12 @@ export function PageMenuItems<TData, TValue>({ columns, data, meta }: DataTableP
     <div className="flex flex-col" style={{ height: 'calc(100vh - 7rem)' }}>
       <div className="flex justify-end gap-2 items-center py-4">
         <Input placeholder='Tìm kiếm' value={search} onChange={handleSearchChange} />
-        <Button variant={'outline'}>
+        <Button variant={'outline'} disabled={!hasPermissionKey('menu_items_create')}>
           <Link href={'/dashboard/menu-items/add'}>Thêm</Link>
         </Button>
         {
           pathname === 'recycle' ? (
-            <Button variant={'outline'}>
+            <Button variant={'outline'} disabled={!hasPermissionKey('menu_items_view_list')}>
               <Link href={'/dashboard/menu-items'}>Danh sách</Link>
             </Button>
           ) : (
@@ -368,15 +368,19 @@ export function PageMenuItems<TData, TValue>({ columns, data, meta }: DataTableP
             </Button>
           )
         }
-        <Button variant={'outline'} asChild>
-          <label>
-            Tải ảnh menu
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImportMenu}
-              style={{ display: 'none' }}
-            />
+        <Button variant={'outline'} disabled={!hasPermissionKey('menu_items_upload_image_menu')} asChild className={(!hasPermissionKey('menu_items_upload_image_menu') ? 'opacity-50 cursor-not-allowed pointer-events-none' : '') + ' ' + 'hover:bg-gray-100'}>
+          Tải ảnh menu
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImportMenu}
+            style={{ display: 'none' }}
+            id="foood-combo-upload-input"
+          />
+          <label
+            htmlFor="foood-combo-upload-input"
+            className={(!hasPermissionKey('menu_items_upload_image_menu') ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer')}
+          >
           </label>
         </Button>
         <DataTableViewOptions table={table} />

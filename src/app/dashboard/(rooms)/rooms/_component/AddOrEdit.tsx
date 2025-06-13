@@ -16,7 +16,7 @@ import { IRoom } from '../rooms.interface';
 import { ImageUrl } from '@/app/dashboard/(food)/foods/_component/AddOrEdit';
 import { Loader2, UploadIcon, X } from 'lucide-react';
 import Image from 'next/image';
-
+  
 interface Props {
   id: string;
   inforRoom?: IRoom;

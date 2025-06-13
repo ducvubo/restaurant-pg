@@ -14,11 +14,10 @@ import {
 } from '@tanstack/react-table'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { DataTableViewOptions } from '@/components/ColumnToggle'
 import { DataTablePagination } from '@/components/PaginationTable'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+
 import { Input } from '@/components/ui/input'
 
 interface DataTableProps<TData, TValue> {

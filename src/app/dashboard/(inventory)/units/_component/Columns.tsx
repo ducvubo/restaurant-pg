@@ -19,7 +19,7 @@ import { updateStatus } from '../unit.api'
 import { MoreHorizontal } from 'lucide-react'
 import { IUnit } from '../unit.interface'
 import Conversion from './Conversion'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 export const columns: ColumnDef<IUnit>[] = [
   {
     accessorKey: 'unt_name',
@@ -98,11 +98,11 @@ export const columns: ColumnDef<IUnit>[] = [
         }
       }
       return unit.unt_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('unit_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('unit_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -130,18 +130,30 @@ export const columns: ColumnDef<IUnit>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/units/view?id=${unit.unt_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/units/edit?id=${unit.unt_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforUnit={unit} path='delete' />
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            {
+              hasPermissionKey('unit_view_detail') && (
+                <Link href={`/dashboard/units/view?id=${unit.unt_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('unit_update') && (
+                <Link href={`/dashboard/units/edit?id=${unit.unt_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('unit_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforUnit={unit} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
+            {/* <DropdownMenuItem asChild>
               <Conversion inforUnit={unit} />
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       )

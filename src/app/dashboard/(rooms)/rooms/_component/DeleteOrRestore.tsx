@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IRoom } from '../rooms.interface'
 import { deleteRoom, restoreRoom } from '../rooms.api'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforRoom: IRoom
   path: 'recycle' | 'delete'
@@ -68,7 +68,7 @@ export default function DeleteOrRestore({ inforRoom, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('room_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

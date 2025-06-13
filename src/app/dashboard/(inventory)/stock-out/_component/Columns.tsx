@@ -16,7 +16,7 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { MoreHorizontal } from 'lucide-react'
 import { IStockOut, IStockOutItem } from '../stock-out.interface'
 import { formatDate, formatDateMongo } from '@/app/utils'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 export const columns: ColumnDef<IStockOut>[] = [
   {
     accessorKey: 'stko_code',
@@ -69,15 +69,27 @@ export const columns: ColumnDef<IStockOut>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/stock-out/view?id=${stockOut.stko_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/stock-out/edit?id=${stockOut.stko_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforStockOut={stockOut} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('stock_out_view_detail') && (
+                <Link href={`/dashboard/stock-out/view?id=${stockOut.stko_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('stock_out_update') && (
+                <Link href={`/dashboard/stock-out/edit?id=${stockOut.stko_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('stock_out_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforStockOut={stockOut} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

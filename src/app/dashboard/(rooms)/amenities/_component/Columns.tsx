@@ -18,7 +18,7 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../amenities.api'
 import { MoreHorizontal } from 'lucide-react'
 import { IAmenities } from '../amenities.interface'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 export const columns: ColumnDef<IAmenities>[] = [
   {
     accessorKey: 'ame_name',
@@ -104,13 +104,13 @@ export const columns: ColumnDef<IAmenities>[] = [
         }
       }
       return amenities.ame_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('amenities_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('amenities_update_status')}>
           Vô hiệu hóa
-        </Button>
+        </Button> 
       )
     }
   },
@@ -136,15 +136,27 @@ export const columns: ColumnDef<IAmenities>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/amenities/view?id=${amenities.ame_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/amenities/edit?id=${amenities.ame_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforAmenities={amenities} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('amenities_view_detail') && (
+                <Link href={`/dashboard/amenities/view?id=${amenities.ame_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('amenities_update') && (
+                <Link href={`/dashboard/amenities/edit?id=${amenities.ame_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('amenities_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforAmenities={amenities} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

@@ -13,6 +13,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility';
 
 export const calculateFinalPrice = (price: number, sale: { sale_type: string; sale_value: number } | undefined) => {
   if (!sale) return price;
@@ -62,9 +63,9 @@ export default function GetQrPayment({ order_summary }: Props) {
 
   return (
     <>
-      <Button disabled={order_summary.od_dish_smr_status === 'paid' || order_summary.od_dish_smr_status === 'refuse'} className="mr-2" variant="outline" onClick={() => setIsDialogOpen(true)}>
+      <Button disabled={order_summary.od_dish_smr_status === 'paid' || order_summary.od_dish_smr_status === 'refuse' || !hasPermissionKey('order_dish_create_qr_payment')} className="mr-2" variant="outline" onClick={() => setIsDialogOpen(true)}>
         Thanh toán
-      </Button>
+      </Button >
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

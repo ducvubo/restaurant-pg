@@ -18,6 +18,7 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../supplier.api'
 import { MoreHorizontal } from 'lucide-react'
 import { ISupplier } from '../supplier.interface'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 export const columns: ColumnDef<ISupplier>[] = [
   {
@@ -119,11 +120,11 @@ export const columns: ColumnDef<ISupplier>[] = [
         }
       }
       return supplier.spli_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('supplier_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('supplier_update_status')} >
           Vô hiệu hóa
         </Button>
       )
@@ -151,15 +152,27 @@ export const columns: ColumnDef<ISupplier>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/suppliers/view?id=${supplier.spli_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/suppliers/edit?id=${supplier.spli_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforSupplier={supplier} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('supplier_view_detail') && (
+                <Link href={`/dashboard/suppliers/view?id=${supplier.spli_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('supplier_update') && (
+                <Link href={`/dashboard/suppliers/edit?id=${supplier.spli_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('supplier_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforSupplier={supplier} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

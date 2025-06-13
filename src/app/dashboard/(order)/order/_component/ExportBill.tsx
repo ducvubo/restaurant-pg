@@ -7,6 +7,7 @@ import jsPDF from 'jspdf'
 import { calculateFinalPrice } from '@/app/utils'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/app/redux/store'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   order_summary: IOrderRestaurant
 }
@@ -94,6 +95,6 @@ export default function ExportBill({ order_summary }: Props) {
     doc.save(`hoa-don-${order_summary._id}.pdf`);
   }
   return (
-    <Button className='mr-2' variant='outline' onClick={handleExportBill}>Tải hóa đơn</Button>
+    <Button disabled={!hasPermissionKey('order_dish_download_invoice')} className='mr-2' variant='outline' onClick={handleExportBill}>Tải hóa đơn</Button>
   )
 }

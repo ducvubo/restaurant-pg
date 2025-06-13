@@ -17,6 +17,7 @@ import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { QRCodeSVG } from 'qrcode.react'
 import Link from 'next/link'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 interface Props {
   order_summary: IOrderRestaurant
@@ -95,7 +96,8 @@ export default function GetQrOrder({ order_summary }: Props) {
             variant='outline'
             className='-ml-[123px] w-32'
             disabled={
-              order_summary.od_dish_smr_status === 'paid' ||
+              !hasPermissionKey('order_dish_create_qr') ||
+                order_summary.od_dish_smr_status === 'paid' ||
                 order_summary.od_dish_smr_status === 'refuse' ||
                 order_summary.od_dish_smr_guest_id.guest_name === 'Nhân viên order'
                 ? true

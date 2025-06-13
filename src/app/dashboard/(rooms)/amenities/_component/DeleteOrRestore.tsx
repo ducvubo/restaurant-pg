@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IAmenities } from '../amenities.interface'
 import { deleteAmenities, restoreAmenities } from '../amenities.api'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforAmenities: IAmenities
   path: 'recycle' | 'delete'
@@ -68,7 +68,7 @@ export default function DeleteOrRestore({ inforAmenities, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('amenities_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

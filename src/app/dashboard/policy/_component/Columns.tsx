@@ -21,7 +21,7 @@ import Image from 'next/image'
 import { IPolicy } from '../policy.interface'
 import { updateStatus } from '../policy.api'
 import DeleteOrRestore from './DeleteOrRestore'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 export const columns: ColumnDef<IPolicy>[] = [
   {
     accessorKey: 'poly_name',
@@ -94,11 +94,11 @@ export const columns: ColumnDef<IPolicy>[] = [
         }
       }
       return poly.poly_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('policy_update_status')}>
           Đang hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('policy_update_status')}>
           Ngưng hoạt động
         </Button>
       )
@@ -125,15 +125,27 @@ export const columns: ColumnDef<IPolicy>[] = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/policy/view?id=${poly._id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/policy/edit?id=${poly._id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforPolicy={poly} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('policy_view_detail') && (
+                <Link href={`/dashboard/policy/view?id=${poly._id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('policy_update') && (
+                <Link href={`/dashboard/policy/edit?id=${poly._id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('policy_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforPolicy={poly} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

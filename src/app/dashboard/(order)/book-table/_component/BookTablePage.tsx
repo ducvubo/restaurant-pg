@@ -19,7 +19,8 @@ import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { TableCompnonent } from '@/components/Table'
 import { Input } from '@/components/ui/input'
 import { columns } from './Columns'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
+  
 const formatVietnameseDate = (date: Date) => {
   const day = date.getDate()
   const month = date.getMonth() + 1 // Tháng bắt đầu từ 0

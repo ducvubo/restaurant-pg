@@ -49,6 +49,7 @@ import { createIngredient, findAllCategories, findAllUnits } from '../../ingredi
 import { createUnit } from '../../units/unit.api'
 import { createCatIngredient } from '../../cat-ingredients/cat-ingredient.api'
 import slugify from 'slugify'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 interface Props {
   id: string
@@ -745,30 +746,34 @@ export default function AddOrEdit({ id, inforStockOut }: Props) {
 
   return (
     <Form {...form}>
-      <div className="space-y-4 p-4 border rounded-md">
-        <h3 className="text-lg font-semibold">Tải lên file PDF</h3>
-        <div className="flex items-center gap-2">
-          <Input
-            type="file"
-            accept=".pdf"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (file) setPdfFile(file)
-            }}
-            disabled={isUploadingPdf}
-          />
-          <Button type="button" onClick={handleUploadPdf} disabled={!pdfFile || isUploadingPdf}>
-            {isUploadingPdf ? (
-              <>
-                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                Đang tải
-              </>
-            ) : (
-              'Tải lên'
-            )}
-          </Button>
-        </div>
-      </div>
+      {
+        hasPermissionKey('stock_out_export_to_pdf') && (
+          <div className="space-y-4 p-4 border rounded-md">
+            <h3 className="text-lg font-semibold">Tải lên file PDF</h3>
+            <div className="flex items-center gap-2">
+              <Input
+                type="file"
+                accept=".pdf"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) setPdfFile(file)
+                }}
+                disabled={isUploadingPdf}
+              />
+              <Button type="button" onClick={handleUploadPdf} disabled={!pdfFile || isUploadingPdf}>
+                {isUploadingPdf ? (
+                  <>
+                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                    Đang tải
+                  </>
+                ) : (
+                  'Tải lên'
+                )}
+              </Button>
+            </div>
+          </div>
+        )
+      }
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={75} className="p-4">

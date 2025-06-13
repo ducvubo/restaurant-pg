@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IUnit } from '../unit.interface'
 import { deleteUnit, restoreUnit } from '../unit.api'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforUnit: IUnit
   path: 'recycle' | 'delete'
@@ -69,7 +69,7 @@ export default function DeleteOrRestore({ inforUnit, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('unit_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

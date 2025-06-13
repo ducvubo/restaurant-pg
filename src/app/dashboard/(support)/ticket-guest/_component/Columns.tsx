@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Button } from '@/components/ui/button'
 import { MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 export const getTextStatus = (status?: string) => {
   switch (status) {
@@ -164,9 +165,13 @@ export const columns: ColumnDef<ITicketGuestRestaurant>[] = [
           <DropdownMenuContent align='end'>
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem className='cursor-pointer'>
-              <Link href={`/dashboard/ticket-guest/view?id=${ticket.tkgr_id}`} className='cursor-pointer'> Xem chi tiết</Link>
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('ticket_list_view_detail') && (
+                <DropdownMenuItem className='cursor-pointer'>
+                  <Link href={`/dashboard/ticket-guest/view?id=${ticket.tkgr_id}`} className='cursor-pointer'> Xem chi tiết</Link>
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IWorkingShift } from '../working-shift.interface'
 import { deleteWorkingShift, restoreWorkingShift } from '../working-shift.api'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforWorkingShift: IWorkingShift
   path: 'recycle' | 'delete'
@@ -68,7 +69,7 @@ export default function DeleteOrRestore({ inforWorkingShift, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('working_shift_list_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

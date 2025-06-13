@@ -15,6 +15,7 @@ import { usePathname, } from 'next/navigation'
 import DeleteOrRestore from './DeleteOrRestore'
 import { MoreHorizontal } from 'lucide-react'
 import { IInternalNote } from '../internal-note.interface'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 export const columns: ColumnDef<IInternalNote>[] = [
   {
@@ -56,15 +57,27 @@ export const columns: ColumnDef<IInternalNote>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/internal-note/view?id=${internalNote.itn_note_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/internal-note/edit?id=${internalNote.itn_note_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforInternalNote={internalNote} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('internal_note_view_detail') && (
+                <Link href={`/dashboard/internal-note/view?id=${internalNote.itn_note_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('internal_note_update') && (
+                <Link href={`/dashboard/internal-note/edit?id=${internalNote.itn_note_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('internal_note_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforInternalNote={internalNote} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

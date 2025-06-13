@@ -24,6 +24,7 @@ import { toast } from '@/hooks/use-toast'
 import { restaurantCreateOrderDist } from '../order.api'
 import { useRouter } from 'next/navigation'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 interface Props {
   order_summary: IOrderRestaurant
@@ -139,7 +140,7 @@ export default function AddOrderDish({ order_summary }: Props) {
           <Button
             variant='outline'
             className='-ml-16 mr-[130px] w-32'
-            disabled={order_summary.od_dish_smr_status === 'ordering' ? false : true}
+            disabled={order_summary.od_dish_smr_status === 'ordering' && hasPermissionKey('order_dish_call_food') ? false : true}
           >
             Gọi món
           </Button>

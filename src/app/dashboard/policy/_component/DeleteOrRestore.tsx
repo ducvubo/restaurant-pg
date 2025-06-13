@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IPolicy } from '../policy.interface'
 import { deletePolicy, restorePolicy } from '../policy.api'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforPolicy: IPolicy
   path: 'recycle' | 'delete'
@@ -67,7 +68,7 @@ export default function DeleteOrRestore({ inforPolicy, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('policy_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

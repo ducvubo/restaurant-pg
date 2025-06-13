@@ -18,6 +18,7 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../label.api'
 import { MoreHorizontal } from 'lucide-react'
 import { ILabel } from '../label.interface'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 export const columns: ColumnDef<ILabel>[] = [
   {
@@ -110,11 +111,11 @@ export const columns: ColumnDef<ILabel>[] = [
         }
       }
       return label.lb_status === 'ENABLED' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('label_list_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('label_list_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -142,15 +143,27 @@ export const columns: ColumnDef<ILabel>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/labels/view?id=${label.lb_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/labels/edit?id=${label.lb_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforLabel={label} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('label_list_view_detail') && (
+                <Link href={`/dashboard/labels/view?id=${label.lb_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('label_list_update') && (
+                <Link href={`/dashboard/labels/edit?id=${label.lb_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('label_list_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforLabel={label} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

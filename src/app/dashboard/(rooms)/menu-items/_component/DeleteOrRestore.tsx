@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IMenuItems } from '../menu-items.interface'
 import { deleteMenuItems, restoreMenuItems } from '../menu-items.api'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforMenuItems: IMenuItems
   path: 'recycle' | 'delete'
@@ -68,7 +68,7 @@ export default function DeleteOrRestore({ inforMenuItems, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('menu_items_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

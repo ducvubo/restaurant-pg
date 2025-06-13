@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { deleteInternalNote, restoreInternalNote } from '../internal-note.api'
 import { IInternalNote } from '../internal-note.interface'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'  
 interface Props {
   inforInternalNote: IInternalNote
   path: 'recycle' | 'delete'
@@ -68,7 +68,7 @@ export default function DeleteOrRestore({ inforInternalNote, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('internal_note_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

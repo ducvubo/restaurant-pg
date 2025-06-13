@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IDish } from '../dishes.interface'
 import { deleteDish, restoreDish } from '../dishes.api'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface Props {
   inforDish: IDish
   path: 'recycle' | 'delete'
@@ -67,7 +68,7 @@ export default function DeleteOrRestore({ inforDish, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('dish_list_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

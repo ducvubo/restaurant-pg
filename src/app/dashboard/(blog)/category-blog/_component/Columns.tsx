@@ -18,6 +18,7 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../category-blog.api'
 import { MoreHorizontal } from 'lucide-react'
 import { ICategory } from '../category-blog.interface'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 export const columns: ColumnDef<ICategory>[] = [
   {
@@ -103,11 +104,11 @@ export const columns: ColumnDef<ICategory>[] = [
         }
       }
       return cat.catStatus === 'ENABLED' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('category_blog_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('category_blog_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -135,15 +136,21 @@ export const columns: ColumnDef<ICategory>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/category-blog/edit?id=${cat.catId}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/category-blog/view?id=${cat.catId}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforCategory={cat} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('category_blog_update') && (<Link href={`/dashboard/category-blog/edit?id=${cat.catId}`} className='cursor-pointer'>
+                <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+              </Link>)
+            }
+            {
+              hasPermissionKey('category_blog_view_detail') && (<Link href={`/dashboard/category-blog/view?id=${cat.catId}`} className='cursor-pointer'>
+                <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+              </Link>)
+            }
+            {
+              hasPermissionKey('category_blog_delete') && (<DropdownMenuItem asChild>
+                <DeleteOrRestore inforCategory={cat} path='delete' />
+              </DropdownMenuItem>)
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

@@ -3,7 +3,7 @@ import React from 'react'
 import { IInternalProposal } from '../internal-proposal.interface'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 interface ViewInternalProposalProps {
   inforInternalProposal: IInternalProposal
 }
@@ -18,7 +18,7 @@ export default function ViewInternalProposal({ inforInternalProposal }: ViewInte
   return (
     <div className='space-y-6'>
       <div className='flex justify-end'>
-        <Button onClick={handleEdit}>Chỉnh sửa</Button>
+        <Button onClick={handleEdit} disabled={!hasPermissionKey('internal_proposal_update')}>Chỉnh sửa</Button>
       </div>
       <table className='min-w-full border-collapse border border-gray-300 dark:border-gray-700'>
         <tbody>

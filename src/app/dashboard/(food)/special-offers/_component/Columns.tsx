@@ -18,6 +18,7 @@ import DeleteOrRestore from './DeleteOrRestore'
 import { updateStatus } from '../special-offer.api'
 import { MoreHorizontal } from 'lucide-react'
 import { ISpecialOffer } from '../special-offer.interface'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 export const columns: ColumnDef<ISpecialOffer>[] = [
   {
@@ -95,11 +96,11 @@ export const columns: ColumnDef<ISpecialOffer>[] = [
         }
       }
       return specialOffer.spo_status === 'enable' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('special_offer_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('special_offer_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -127,15 +128,27 @@ export const columns: ColumnDef<ISpecialOffer>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/special-offers/view?id=${specialOffer.spo_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/special-offers/edit?id=${specialOffer.spo_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforSpecialOffer={specialOffer} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('special_offer_view_detail') && (
+                <Link href={`/dashboard/special-offers/view?id=${specialOffer.spo_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('special_offer_update') && (
+                <Link href={`/dashboard/special-offers/edit?id=${specialOffer.spo_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('special_offer_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforSpecialOffer={specialOffer} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )

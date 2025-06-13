@@ -37,6 +37,7 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 interface Props {
   selectedTable: ITableOrderSummary | null
@@ -296,7 +297,7 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                       })
                                     }
                                   >
-                                    <SelectTrigger className='w-[120px]'>
+                                    <SelectTrigger className='w-[120px]' disabled={order_summary.od_dish_smr_status !== 'ordering' || !hasPermissionKey('order_dish_update_status')}>
                                       <SelectValue placeholder='Đang nấu' />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -374,7 +375,7 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                                             })
                                           }
                                         >
-                                          <SelectTrigger className='w-[120px]'>
+                                          <SelectTrigger className='w-[120px]' disabled={order_summary.od_dish_smr_status !== 'ordering' || !hasPermissionKey('order_dish_update_status')}>
                                             <SelectValue placeholder='Đang nấu' />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -397,9 +398,21 @@ export function DialogDetailTable({ selectedTable, setSelectedTable }: Props) {
                           <AccordionTrigger className='-mt-5 -mb-5'>Xem chi tiết</AccordionTrigger>
                         </AccordionItem>
                         <div className='flex mt-2'>
-                          <ModalUpdateStatusSummary order_summary={order_summary} />
-                          <AddOrderDish order_summary={order_summary} />
-                          <GetQrOrder order_summary={order_summary} />
+                          {
+                            hasPermissionKey('order_dish_update_status') && (
+                              <ModalUpdateStatusSummary order_summary={order_summary} />
+                            )
+                          }
+                          {
+                            hasPermissionKey('order_dish_call_food') && (
+                              <AddOrderDish order_summary={order_summary} />
+                            )
+                          }
+                          {
+                            hasPermissionKey('order_dish_create_qr') && (
+                              <GetQrOrder order_summary={order_summary} />
+                            )
+                          }
                         </div>
                       </Accordion>
                     </CardContent>

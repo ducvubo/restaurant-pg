@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { IStockIn } from '../stock-in.interface'
 import { deleteStockIn, restoreStockIn } from '../stock-in.api'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'    
 interface Props {
   inforStockIn: IStockIn
   path: 'recycle' | 'delete'
@@ -69,7 +69,7 @@ export default function DeleteOrRestore({ inforStockIn, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('stock_in_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

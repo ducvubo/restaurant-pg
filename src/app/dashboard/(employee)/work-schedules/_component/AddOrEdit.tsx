@@ -144,16 +144,16 @@ export default function AddOrEdit({ id, inforWorkSchedule }: IProps) {
   }, [])
 
 
-  useEffect(() => {
-    if (inforEmployee._id) {
-      toast({
-        title: 'Thông báo',
-        description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ chủ nhà hàng để biết thêm chi tiết',
-        variant: 'destructive'
-      })
-      router.push('/dashboard/work-schedules')
-    }
-  }, [inforRestaurant, inforEmployee])
+  // useEffect(() => {
+  //   if (inforEmployee._id) {
+  //     toast({
+  //       title: 'Thông báo',
+  //       description: 'Bạn không có quyền thực hiện thao tác này, vui lòng liên hệ chủ nhà hàng để biết thêm chi tiết',
+  //       variant: 'destructive'
+  //     })
+  //     router.push('/dashboard/work-schedules')
+  //   }
+  // }, [inforRestaurant, inforEmployee])
 
   const findListLabel = async () => {
     const res: IBackendRes<ILabel[]> = await getAllLabel()

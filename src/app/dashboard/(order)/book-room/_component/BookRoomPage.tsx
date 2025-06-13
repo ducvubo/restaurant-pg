@@ -63,6 +63,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Pagination } from '@/components/Pagination'
 import { IAmenities } from '@/app/dashboard/(rooms)/amenities/amenities.interface'
 import { IMenuItems } from '@/app/dashboard/(rooms)/menu-items/menu-items.interface'
+import { usePermission } from '@/app/auth/PermissionContext'
 
 const formatVietnameseDate = (date: Date) => {
   const day = date.getDate()
@@ -117,7 +118,7 @@ const getStatusVariant = (status: BookRoomStatus): 'default' | 'destructive' | '
   }
 }
 
-const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ bookRoom, refresh }) => {
+const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void; hasPermission: (key: string) => boolean }> = ({ bookRoom, refresh, hasPermission }) => {
   const [feedback, setFeedback] = useState<string>('')
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
   const [cancelReason, setCancelReason] = useState('')
@@ -455,12 +456,12 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
             <div className="flex gap-2 flex-wrap">
               {bookRoom.bkr_status === BookRoomStatus.WAITING_RESTAURANT && (
                 <>
-                  <Button variant="outline" size="sm" onClick={handleConfirmDeposit}>
+                  <Button variant="outline" size="sm" onClick={handleConfirmDeposit} disabled={!hasPermission('book_room_update_status')}>
                     Xác nhận đặt cọc
                   </Button>
                   <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" onClick={() => setIsCancelDialogOpen(true)}>
+                      <Button variant="outline" size="sm" onClick={() => setIsCancelDialogOpen(true)} disabled={!hasPermission('book_room_update_status')}>
                         Hủy đặt phòng
                       </Button>
                     </DialogTrigger>
@@ -490,36 +491,36 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
                 </>
               )}
               {bookRoom.bkr_status === BookRoomStatus.RESTAURANT_CONFIRM_DEPOSIT && (
-                <Button variant="outline" size="sm" onClick={handleConfirmBooking}>
+                <Button variant="outline" size="sm" onClick={handleConfirmBooking} disabled={!hasPermission('book_room_update_status')}>
                   Xác nhận đặt phòng
                 </Button>
               )}
               {bookRoom.bkr_status === BookRoomStatus.RESTAURANT_CONFIRM && (
                 <>
-                  <Button variant="outline" size="sm" onClick={handleCheckIn}>
+                  <Button variant="outline" size="sm" onClick={handleCheckIn} disabled={!hasPermission('book_room_update_status')}>
                     Xác nhận check-in
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleNoShow}>
+                  <Button variant="outline" size="sm" onClick={handleNoShow} disabled={!hasPermission('book_room_update_status')}>
                     Khách không đến
                   </Button>
                 </>
               )}
               {bookRoom.bkr_status === BookRoomStatus.GUEST_CHECK_IN && (
-                <Button variant="outline" size="sm" onClick={handleInUse}>
+                <Button variant="outline" size="sm" onClick={handleInUse} disabled={!hasPermission('book_room_update_status')}>
                   Đang sử dụng
                 </Button>
               )}
               {bookRoom.bkr_status === BookRoomStatus.IN_USE && (
                 <>
-                  <Button variant="outline" size="sm" onClick={handleCheckOut}>
+                  <Button variant="outline" size="sm" onClick={handleCheckOut} disabled={!hasPermission('book_room_update_status')}>
                     Xác nhận check-out
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleCheckOutOvertime}>
+                  <Button variant="outline" size="sm" onClick={handleCheckOutOvertime} disabled={!hasPermission('book_room_update_status')}>
                     Check-out quá giờ
                   </Button>
                   <Dialog open={isAddMenuItemsDialogOpen} onOpenChange={setIsAddMenuItemsDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" onClick={handleAddMenuItems}>
+                      <Button variant="outline" size="sm" onClick={handleAddMenuItems} disabled={!hasPermission('book_room_add_menu_item')}>
                         Thêm món ăn
                       </Button>
                     </DialogTrigger>
@@ -579,7 +580,7 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
                   </Dialog>
                   <Dialog open={isAddAmenitiesDialogOpen} onOpenChange={setIsAddAmenitiesDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" onClick={handleAddAmenities}>
+                      <Button variant="outline" size="sm" onClick={handleAddAmenities} disabled={!hasPermission('book_room_add_amenity')}>
                         Thêm tiện ích
                       </Button>
                     </DialogTrigger>
@@ -638,7 +639,7 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
               {(bookRoom.bkr_status === BookRoomStatus.GUEST_CHECK_OUT || bookRoom.bkr_status === BookRoomStatus.GUEST_CHECK_OUT_OVERTIME) && (
                 <Dialog open={isConfirmPaymentDialogOpen} onOpenChange={setIsConfirmPaymentDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" onClick={() => setIsConfirmPaymentDialogOpen(true)}>
+                    <Button variant="outline" size="sm" onClick={() => setIsConfirmPaymentDialogOpen(true)} disabled={!hasPermission('book_room_update_status')}>
                       Xác nhận thanh toán
                     </Button>
                   </DialogTrigger>
@@ -668,34 +669,34 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
               )}
               {(bookRoom.bkr_status === BookRoomStatus.CANCEL_GUEST || bookRoom.bkr_status === BookRoomStatus.NO_SHOW) && (
                 <>
-                  <Button variant="outline" size="sm" onClick={handleRefundDeposit}>
+                  <Button variant="outline" size="sm" onClick={handleRefundDeposit} disabled={!hasPermission('book_room_update_status')}>
                     Hoàn cọc đầy đủ
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleRefundOneThirdDeposit}>
+                  <Button variant="outline" size="sm" onClick={handleRefundOneThirdDeposit} disabled={!hasPermission('book_room_update_status')}>
                     Hoàn 1/3 cọc
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleRefundOneTwoDeposit}>
+                  <Button variant="outline" size="sm" onClick={handleRefundOneTwoDeposit} disabled={!hasPermission('book_room_update_status')}>
                     Hoàn 1/2 cọc
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleNoDeposit}>
+                  <Button variant="outline" size="sm" onClick={handleNoDeposit} disabled={!hasPermission('book_room_update_status')}>
                     Không hoàn cọc
                   </Button>
                 </>
               )}
               {(bookRoom.bkr_status === BookRoomStatus.GUEST_EXCEPTION || bookRoom.bkr_status === BookRoomStatus.RESTAURANT_EXCEPTION) && (
                 <>
-                  <Button variant="outline" size="sm" onClick={handleRefundOneThirdDeposit}>
+                  <Button variant="outline" size="sm" onClick={handleRefundOneThirdDeposit} disabled={!hasPermission('book_room_update_status')}>
                     Hoàn 1/3 cọc
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleRefundOneTwoDeposit}>
+                  <Button variant="outline" size="sm" onClick={handleRefundOneTwoDeposit} disabled={!hasPermission('book_room_update_status')}>
                     Hoàn 1/2 cọc
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleNoDeposit}>
+                  <Button variant="outline" size="sm" onClick={handleNoDeposit} disabled={!hasPermission('book_room_update_status')}>
                     Không hoàn cọc
                   </Button>
                 </>
               )}{
-                bookRoom.bkr_status === BookRoomStatus.RESTAURANT_CONFIRM && <Button variant="outline" size="sm" onClick={handleRestaurantException}>
+                bookRoom.bkr_status === BookRoomStatus.RESTAURANT_CONFIRM && <Button variant="outline" size="sm" onClick={handleRestaurantException} disabled={!hasPermission('book_room_update_status')}>
                   Ngoại lệ nhà hàng
                 </Button>
               }
@@ -716,22 +717,22 @@ const BookRoomCard: React.FC<{ bookRoom: IBookRoom; refresh: () => void }> = ({ 
             )}
             <div className="flex gap-2 mt-2">
               {!bookRoom.bkr_reply && (
-                <Button size="sm" onClick={handleSubmitFeedback}>
+                <Button size="sm" onClick={handleSubmitFeedback} disabled={!hasPermission('book_room_reply_feedback')}>
                   Gửi phản hồi
                 </Button>
               )}
               {bookRoom.bkr_reply && bookRoom.bkr_feed_view === 'disable' && (
-                <Button size="sm" onClick={() => handleUpdateFeedViewBookRoom('active')}>
+                <Button size="sm" onClick={() => handleUpdateFeedViewBookRoom('active')} disabled={!hasPermission('book_room_update_feedback_status')}>
                   Hiển thị phản hồi
                 </Button>
               )}
               {bookRoom.bkr_reply && bookRoom.bkr_feed_view === 'active' && (
-                <Button size="sm" onClick={() => handleUpdateFeedViewBookRoom('disable')}>
+                <Button size="sm" onClick={() => handleUpdateFeedViewBookRoom('disable')} disabled={!hasPermission('book_room_update_feedback_status')}>
                   Ẩn phản hồi
                 </Button>
               )}
               {bookRoom.bkr_status === BookRoomStatus.GUEST_COMPLAINT && (
-                <Button size="sm" onClick={handleDoneComplaint}>
+                <Button size="sm" onClick={handleDoneComplaint} disabled={!hasPermission('book_room_update_status')}>
                   Giải quyết khiếu nại
                 </Button>
               )}
@@ -835,7 +836,7 @@ export default function BookRoomPage() {
   })
   const searchParam = useSearchParams().get('a')
   const [listBookRoom, setListBookRoom] = useState<IBookRoom[]>([])
-
+  const { hasPermission } = usePermission()
   const handleSelectFromDate = (date: Date | undefined) => {
     if (date) {
       const newDate = new Date(date)
@@ -988,7 +989,7 @@ export default function BookRoomPage() {
       <div className="mt-6">
         {listBookRoom.length > 0 ? (
           listBookRoom.map((bookRoom) => (
-            <BookRoomCard key={bookRoom.bkr_id} bookRoom={bookRoom} refresh={findListBookRoom} />
+            <BookRoomCard key={bookRoom.bkr_id} bookRoom={bookRoom} refresh={findListBookRoom} hasPermission={hasPermission} />
           ))
         ) : (
           <p className="text-center text-gray-500">Không có đặt phòng nào để hiển thị.</p>

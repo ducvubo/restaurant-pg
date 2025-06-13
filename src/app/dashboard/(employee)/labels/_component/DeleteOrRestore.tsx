@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { useLoading } from '@/context/LoadingContext'
 import { ILabel } from '../label.interface'
 import { deleteLabel, restoreLabel } from '../label.api'
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 
 interface Props {
   inforLabel: ILabel
@@ -68,7 +69,7 @@ export default function DeleteOrRestore({ inforLabel, path }: Props) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {path === 'recycle' ? (
-          <Button>Khôi phục</Button>
+          <Button disabled={!hasPermissionKey('label_list_restore')}>Khôi phục</Button>
         ) : (
           <div
             role='menuitem'

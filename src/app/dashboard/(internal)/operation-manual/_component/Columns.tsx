@@ -19,7 +19,7 @@ import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
 import { IOperationManual } from '../operation-manual.interface'
 import { updateStatusOperationManual } from '../operation-manual.api'
-
+import { hasPermissionKey } from '@/app/dashboard/policy/PermissionCheckUtility'
 export const columns: ColumnDef<IOperationManual>[] = [
   {
     accessorKey: 'opera_manual_title',
@@ -111,11 +111,11 @@ export const columns: ColumnDef<IOperationManual>[] = [
         }
       }
       return operationManual.opera_manual_status === 'active' ? (
-        <Button variant={'outline'} onClick={handleUpdateStatus}>
+        <Button variant={'outline'} onClick={handleUpdateStatus} disabled={!hasPermissionKey('operation_manual_update_status')}>
           Hoạt động
         </Button>
       ) : (
-        <Button onClick={handleUpdateStatus} variant={'destructive'}>
+        <Button onClick={handleUpdateStatus} variant={'destructive'} disabled={!hasPermissionKey('operation_manual_update_status')}>
           Vô hiệu hóa
         </Button>
       )
@@ -142,15 +142,27 @@ export const columns: ColumnDef<IOperationManual>[] = [
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/operation-manual/view?id=${operationManual.opera_manual_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
-            </Link>
-            <Link href={`/dashboard/operation-manual/edit?id=${operationManual.opera_manual_id}`} className='cursor-pointer'>
-              <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem asChild>
-              <DeleteOrRestore inforOperationManual={operationManual} path='delete' />
-            </DropdownMenuItem>
+            {
+              hasPermissionKey('operation_manual_view_detail') && (
+                <Link href={`/dashboard/operation-manual/view?id=${operationManual.opera_manual_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Xem</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('operation_manual_update') && (
+                <Link href={`/dashboard/operation-manual/edit?id=${operationManual.opera_manual_id}`} className='cursor-pointer'>
+                  <DropdownMenuItem className='cursor-pointer'>Sửa</DropdownMenuItem>
+                </Link>
+              )
+            }
+            {
+              hasPermissionKey('operation_manual_delete') && (
+                <DropdownMenuItem asChild>
+                  <DeleteOrRestore inforOperationManual={operationManual} path='delete' />
+                </DropdownMenuItem>
+              )
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       )
