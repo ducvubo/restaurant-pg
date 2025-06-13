@@ -369,21 +369,31 @@ export function PageMenuItems<TData, TValue>({ columns, data, meta }: DataTableP
             </Button>
           )
         }
-        <Button variant={'outline'} disabled={!hasPermission('menu_items_upload_image_menu')} asChild className={(!hasPermission('menu_items_upload_image_menu') ? 'opacity-50 cursor-not-allowed pointer-events-none' : '') + ' ' + 'hover:bg-gray-100'}>
-          Tải ảnh menu
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImportMenu}
-            style={{ display: 'none' }}
-            id="foood-combo-upload-input"
-          />
-          <label
-            htmlFor="foood-combo-upload-input"
-            className={(!hasPermission('menu_items_upload_image_menu') ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer')}
+        <div>
+          <Button variant={'outline'} disabled={!hasPermission('menu_items_upload_image_menu')} className={(!hasPermission('menu_items_upload_image_menu') ? 'opacity-50 cursor-not-allowed pointer-events-none' : '') + ' ' + 'hover:bg-gray-100'}
+            onClick={() => {
+              const input = document.getElementById('foood-combo-upload-input') as HTMLInputElement
+              if (input) {
+                input.click()
+              }
+            }}
           >
-          </label>
-        </Button>
+            Tải ảnh menu
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImportMenu}
+              style={{ display: 'none' }}
+              id="foood-combo-upload-input"
+            />
+            <label
+              htmlFor="foood-combo-upload-input"
+              className={(!hasPermission('menu_items_upload_image_menu') ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer')}
+            >
+            </label>
+          </Button>
+        </div>
+
         <DataTableViewOptions table={table} />
       </div>
       <div className="rounded-md border flex-1 overflow-hidden">

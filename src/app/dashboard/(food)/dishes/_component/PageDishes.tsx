@@ -63,7 +63,7 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
   const [errors, setErrors] = useState<{ [key: number]: { [key: string]: boolean } }>({}); // Lưu trạng thái lỗi của các trường
   const [search, setSearch] = React.useState('')
   const { hasPermission } = usePermission()
-      const getListDish = async () => {
+  const getListDish = async () => {
     const res: IBackendRes<IDish[]> = await getAllDishRestaurant();
     if (res.statusCode === 200 && res.data) {
       return res.data;
@@ -389,6 +389,12 @@ export function PageDishes<TData, TValue>({ columns, data, meta }: DataTableProp
             variant="outline"
             disabled={!hasPermission('dish_list_upload_image')}
             className={(!hasPermission('dish_list_upload_image') ? 'opacity-50 cursor-not-allowed pointer-events-none' : '') + ' ' + 'hover:bg-gray-100'}
+            onClick={() => {
+              const input = document.getElementById('menu-upload-input') as HTMLInputElement
+              if (input) {
+                input.click()
+              }
+            }}
           >
             Tải ảnh menu
           </Button>

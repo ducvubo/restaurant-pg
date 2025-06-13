@@ -358,22 +358,31 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
             </Button>
           )
         }
-        <Button variant={'outline'} asChild disabled={!hasPermission('online_food_upload_image')} className={(!hasPermission('online_food_upload_image') ? 'opacity-50 cursor-not-allowed pointer-events-none' : '') + ' ' + 'hover:bg-gray-100'}>
-          Tải ảnh món ăn
-          <input
-            disabled={!hasPermission('online_food_upload_image')}
-            type="file"
-            accept="image/*"
-            onChange={handleImportFood}
-            style={{ display: 'none' }}
-            id="foood-upload-input"
-          />
-          <label
-            htmlFor="foood-upload-input"
-            className={(!hasPermission('online_food_upload_image') ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer')}
+        <div>
+          <Button variant={'outline'} disabled={!hasPermission('online_food_upload_image')} className={(!hasPermission('online_food_upload_image') ? 'opacity-50 cursor-not-allowed pointer-events-none' : '') + ' ' + 'hover:bg-gray-100'}
+            onClick={() => {
+              const input = document.getElementById('food-upload-input') as HTMLInputElement
+              if (input) {
+                input.click()
+              }
+            }}
           >
-          </label>
-        </Button>
+            Tải ảnh món ăn
+            <input
+              disabled={!hasPermission('online_food_upload_image')}
+              type="file"
+              accept="image/*"
+              onChange={handleImportFood}
+              style={{ display: 'none' }}
+              id="food-upload-input"
+            />
+            <label
+              htmlFor="food-upload-input"
+              className={(!hasPermission('online_food_upload_image') ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer')}
+            >
+            </label>
+          </Button>
+        </div>
         <DataTableViewOptions table={table} />
       </div>
       <div className="rounded-md border flex-1 overflow-hidden">
@@ -419,84 +428,6 @@ export function PageFoods<TData, TValue>({ columns, meta, data }: DataTableProps
           onPageChange={(pageIndex, pageSize) => handlePageChange(pageIndex + 1, pageSize)}
         />
       </div>
-
-      {/* Dialog to display new food items */}
-      {/* <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 w-[90vw] max-w-2xl max-h-[60vh] overflow-y-auto">
-            <Dialog.Title className="text-lg font-semibold mb-4">Danh sách món ăn mới</Dialog.Title>
-            <Dialog.Description className="text-sm text-gray-500 mb-4">
-              Các món ăn dưới đây được bóc tách từ ảnh và chưa có trong danh sách hiện tại. Bạn có thể chỉnh sửa hoặc xóa trước khi lưu.
-            </Dialog.Description>
-            <div className="border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tên món</TableHead>
-                    <TableHead>Giá</TableHead>
-                    <TableHead>Mô tả</TableHead>
-                    <TableHead className="w-[50px]">Hành động</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {newFoods.length > 0 ? (
-                    newFoods.map((item, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          <Input
-                            value={item.food_name}
-                            onChange={(e) => handleInputChange(index, 'food_name', e.target.value)}
-                            className={errors[index]?.food_name ? 'border-red-500' : ''}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="number"
-                            value={item.food_price}
-                            onChange={(e) => handleInputChange(index, 'food_price', Number(e.target.value))}
-                            className={errors[index]?.food_price ? 'border-red-500' : ''}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            value={item.food_description}
-                            onChange={(e) => handleInputChange(index, 'food_description', e.target.value)}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteFood(index)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <TrashIcon className="w-4 h-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center">
-                        Không có món ăn mới
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-
-            <div className="flex justify-end gap-2 mt-4">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Đóng
-              </Button>
-              <Button onClick={handleSubmit} disabled={newFoods.length === 0}>Lưu danh sách</Button>
-            </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root> */}
-
       <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <AlertDialogContent className="w-[90vw] max-w-2xl max-h-[60vh] overflow-y-auto rounded-lg p-6">
           <AlertDialogHeader>

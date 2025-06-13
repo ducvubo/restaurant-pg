@@ -262,7 +262,6 @@ export const columns: ColumnDef<IFood>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-
             <DropdownMenuSeparator />
             {
               hasPermission('online_food_update') && (
