@@ -374,7 +374,7 @@ export default function PageWorkSchedule() {
             )
           }
           {
-            hasPermission('work_schedule_list_upload_face') && (
+            hasPermission('work_schedule_list_check_in') && (
               <UploadFace />
             )
           }
