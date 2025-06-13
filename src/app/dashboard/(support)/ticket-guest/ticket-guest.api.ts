@@ -58,11 +58,13 @@ export const getTicketReplice = async (tkgr_id: string) => {
 }
 
 export const createTicketReplice = async (data: ITicketGuestRestaurantReplice) => {
+  console.log('data', data);
   const res: IBackendRes<ITicketGuestRestaurantReplice> = await sendRequest({
     url: `${URL_SERVER_TICKET}/tick-guest-restaurant-replices/restaurant-reply`,
     method: 'POST',
     body: data
   })
+  console.log('res', res);
   return res
 }
 

@@ -150,7 +150,7 @@ export default function PageDetailTicket() {
     setIsSubmitting(true) // Start loading
     try {
       const res: IBackendRes<ITicketGuestRestaurantReplice> = await createTicketReplice({
-        tkgr_id: params.slug as string,
+        tkgr_id: id as string,
         tkgr_rp_content: refContent.current.getContent(),
         tkgr_rp_attachment: JSON.stringify(replyAttachmentLinks)
       })
@@ -160,6 +160,7 @@ export default function PageDetailTicket() {
         refContent.current.setContent('') // Clear editor content
         setReplyAttachmentLinks([])
         setIsReplying(false)
+        
         toast({
           title: 'Thành công',
           description: 'Đã gửi phản hồi thành công'
