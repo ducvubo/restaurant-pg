@@ -25,6 +25,7 @@ export const initialState: IEmployee = {
     poly_res_id: '',
     poly_status: 'enable',
     isDeleted: false,
+    poly_key_normal: [''],
   },
   epl_face_id: false,
   restaurant_phone: '',
@@ -49,6 +50,10 @@ export const initialState: IEmployee = {
     account_name: '',
     account_number: '',
     bank: ''
+  },
+  restaurant_banner: {
+    image_cloud: '',
+    image_custom: ''
   }
 }
 
@@ -71,7 +76,9 @@ const inforEmployeeSlice = createSlice({
         (state.restaurant_name = action.payload.restaurant_name),
         (state.restaurant_address = action.payload.restaurant_address),
         (state.restaurant_email = action.payload.restaurant_email),
-        (state.restaurant_bank = action.payload.restaurant_bank)
+        (state.restaurant_bank = action.payload.restaurant_bank),
+        (state.policy.poly_key_normal = action.payload.policy.poly_key_normal),
+        (state.restaurant_banner = action.payload.restaurant_banner)
     },
     endAppEmployee: (state, action) => {
       return initialState

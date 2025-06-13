@@ -207,6 +207,10 @@ export default function AddOrEdit({ id, inforStockOut }: Props) {
         restaurant_email: '',
         restaurant_name: '',
         restaurant_phone: '',
+        restaurant_banner: {
+          image_cloud: '',
+          image_custom: ''
+        }
       })
       setListEmployees(listEpl)
     }

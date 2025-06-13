@@ -43,7 +43,7 @@ export function Sidebar({ inforEmployee, inforRestaurant }: Props) {
                 src={
                   inforRestaurant.restaurant_email
                     ? inforRestaurant.restaurant_banner.image_cloud
-                    : inforEmployee.epl_avatar?.image_cloud
+                    : inforEmployee.restaurant_banner?.image_cloud
                 }
                 alt='@shadcn'
               />
@@ -55,7 +55,7 @@ export function Sidebar({ inforEmployee, inforRestaurant }: Props) {
                 sidebar?.isOpen === false ? '-translate-x-96 opacity-0 hidden' : 'translate-x-0 opacity-100'
               )}
             >
-              {inforRestaurant.restaurant_email ? inforRestaurant.restaurant_name : inforEmployee.epl_name}
+              {inforRestaurant.restaurant_email ? inforRestaurant.restaurant_name : inforEmployee.restaurant_name}
             </h1>
           </Link>
         </Button>

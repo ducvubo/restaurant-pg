@@ -37,4 +37,8 @@ export interface IEmployee {
   }
   restaurant_email: string
   restaurant_bank: RestaurantBank
+  restaurant_banner: {
+    image_cloud: string
+    image_custom: string
+  }
 }
