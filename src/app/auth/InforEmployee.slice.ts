@@ -77,7 +77,7 @@ const inforEmployeeSlice = createSlice({
         (state.restaurant_address = action.payload.restaurant_address),
         (state.restaurant_email = action.payload.restaurant_email),
         (state.restaurant_bank = action.payload.restaurant_bank),
-        (state.policy.poly_key_normal = action.payload.policy.poly_key_normal),
+        (state.policy.poly_key_normal = action.payload?.policy?.poly_key_normal),
         (state.restaurant_banner = action.payload.restaurant_banner)
     },
     endAppEmployee: (state, action) => {

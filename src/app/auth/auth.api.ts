@@ -324,3 +324,31 @@ export const getInfor = async () => {
     return await reFreshTokenNew()
   }
 }
+
+export const sendOtpChangePassword = async (
+  account_email: string,
+  account_type: 'restaurant' | 'employee'
+) => {
+  const res: IBackendRes<any> = await sendRequest({
+    url: `${process.env.URL_SERVER}/accounts/send-otp-password`,
+    method: 'POST',
+    body: { account_email, account_type }
+  })
+  return res
+}
+
+export const changePassword = async (
+  account_email: string,
+  account_type: 'restaurant' | 'employee',
+  otp: string,
+  account_password: string
+) => {
+  const res: IBackendRes<any> = await sendRequest({
+    url: `${process.env.URL_SERVER}/accounts/verify-otp-password`,
+    method: 'POST',
+    body: { account_email, account_type, otp, account_password }
+  })
+  return res
+}
+
+
