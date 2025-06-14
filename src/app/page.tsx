@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation'
 import { redirect } from 'next/navigation'
 
 export default function HomePage() {
-  redirect('/dashboard') // chuyển hướng sang /dashboard
+  redirect('/dashboard/account') // chuyển hướng sang /dashboard
   //nếu vào trang này thì chuyển hướng sang /auth/login
   return (
     <div className='flex flex-col min-h-screen'>

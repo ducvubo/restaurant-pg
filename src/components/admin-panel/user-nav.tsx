@@ -65,12 +65,16 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem className='hover:cursor-pointer' asChild>
-            <Link href='/dashboard' className='flex items-center'>
-              <LayoutGrid className='w-4 h-4 mr-3 text-muted-foreground' />
-              Thống kê
-            </Link>
-          </DropdownMenuItem>
+          {
+            inforRestaurant._id && (
+              <DropdownMenuItem className='hover:cursor-pointer' asChild>
+                <Link href='/dashboard' className='flex items-center'>
+                  <LayoutGrid className='w-4 h-4 mr-3 text-muted-foreground' />
+                  Thống kê
+                </Link>
+              </DropdownMenuItem>
+            )
+          }
           <DropdownMenuItem className='hover:cursor-pointer' asChild>
             <Link href='/dashboard/account' className='flex items-center'>
               <User className='w-4 h-4 mr-3 text-muted-foreground' />
