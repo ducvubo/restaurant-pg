@@ -28,14 +28,15 @@ export const columns: ColumnDef<IChatBot>[] = [
       return <span>{date.toLocaleString()}</span>
     },
     enableHiding: true
-  }, {
-    accessorKey: 'Action',
-    id: 'Action',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Action' />,
-    cell: ({ row }) => {
-      const { hasPermission } = usePermission()
-      const chatBot = row.original
-      return <Button disabled={!hasPermission('chat_bot_delete')}>Xóa</Button>
-    },
-  }
+  },
+  // {
+  //   accessorKey: 'Action',
+  //   id: 'Action',
+  //   header: ({ column }) => <DataTableColumnHeader column={column} title='Action' />,
+  //   cell: ({ row }) => {
+  //     const { hasPermission } = usePermission()
+  //     const chatBot = row.original
+  //     return <Button disabled={!hasPermission('chat_bot_delete')}>Xóa</Button>
+  //   },
+  // }
 ]

@@ -221,11 +221,11 @@ export const permissions: Module[] = [
             key: 'chat_bot_view_list',
             patchRequire: ['/dashboard/chat-bot']
           },
-          {
-            method: 'Xóa',
-            key: 'chat_bot_delete',
-            patchRequire: ['/dashboard/chat-bot']
-          }
+          // {
+          //   method: 'Xóa',
+          //   key: 'chat_bot_delete',
+          //   patchRequire: ['/dashboard/chat-bot']
+          // }
         ],
       },
     ],
