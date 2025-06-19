@@ -52,13 +52,14 @@ const getTextStatus = (status: string) => {
 }
 
 export default function BookTablePage() {
-  const today = new Date()
-  const defaultToDate = new Date(today.setHours(0, 0, 0, 0))
-  const defaultFromDate = new Date(defaultToDate)
-  defaultFromDate.setDate(defaultFromDate.getDate() + 70)
-  defaultToDate.setDate(defaultToDate.getDate() - 10)
-  const [toDate, setToDate] = useState<Date>(defaultToDate)
-  const [fromDate, setFromDate] = useState<Date>(defaultFromDate)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset giờ phút giây
+  const defaultFromDate = new Date(today); // Hôm nay - 10 ngày
+  defaultFromDate.setDate(defaultFromDate.getDate() + 10);
+  const defaultToDate = new Date(today); // Hôm nay + 10 ngày
+  defaultToDate.setDate(defaultToDate.getDate() - 10);
+  const [fromDate, setFromDate] = useState<Date>(defaultFromDate);
+  const [toDate, setToDate] = useState<Date>(defaultToDate);
   const [pageIndex, setPageIndex] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [query, setQuery] = useState('') // State for search query

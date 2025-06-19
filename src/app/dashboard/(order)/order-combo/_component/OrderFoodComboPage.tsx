@@ -282,6 +282,14 @@ const OrderCard: React.FC<{ order: IOrderFoodCombo; refresh: () => void; hasPerm
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-sm italic text-muted-foreground">
+                Phí ship: {new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND',
+                }).format(order.od_cb_price_shipping || 0)}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-sm italic text-muted-foreground">
                 Tổng hóa đơn: {new Intl.NumberFormat('vi-VN', {
                   style: 'currency',
                   currency: 'VND',
@@ -473,9 +481,9 @@ export default function OrderFoodComboPage() {
   const { hasPermission } = usePermission()
   const today = new Date();
   const defaultToDate = new Date(today.setHours(0, 0, 0, 0));
-  defaultToDate.setDate(defaultToDate.getDate() - 70);
-  const defaultFromDate = new Date(defaultToDate);
-  defaultFromDate.setDate(defaultFromDate.getDate() + 70);
+  defaultToDate.setDate(defaultToDate.getDate() - 10);
+  const defaultFromDate = new Date(today.setHours(23, 59, 59, 0));
+  defaultFromDate.setDate(defaultFromDate.getDate() + 10);
   const [toDate, setToDate] = useState<Date>(defaultToDate);
   const [fromDate, setFromDate] = useState<Date>(defaultFromDate);
   const [pageIndex, setPageIndex] = useState(1);
@@ -501,7 +509,7 @@ export default function OrderFoodComboPage() {
       const newDate = new Date(date);
       newDate.setHours(23);
       newDate.setMinutes(59);
-      newDate.setSeconds(0);
+      newDate.setSeconds(59);
       setFromDate(newDate);
     }
   };

@@ -62,11 +62,13 @@ import { IArticle } from './(blog)/article/article.interface';
 
 
 const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFCE56', '#36A2EB'];
-const blogPerformance = [
-  { title: 'Top món ăn mùa hè', views: 1200, likes: 150 },
-  { title: 'Cách làm phở ngon', views: 800, likes: 90 },
-  { title: 'Chuyện nhà hàng', views: 600, likes: 70 },
-];
+function withTimer<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  console.time(label);
+  return fn().then((res) => {
+    console.timeEnd(label);
+    return res;
+  });
+}
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
@@ -116,43 +118,87 @@ export default function PageDashboard() {
     { title: string; views: number }[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  // const [queryParams, setQueryParams] = useState<{
+  //   startDate: string;
+  //   endDate: string;
+  // }>({
+  //   startDate: '2025-06-12',
+  //   endDate: '2025-06-14',
+  // });
   const [queryParams, setQueryParams] = useState<{
     startDate: string;
     endDate: string;
   }>({
-    startDate: '2025-06-12',
-    endDate: '2025-06-14',
+    startDate: '',
+    endDate: '',
   });
-  // const queryParams = {
-  //   startDate: '2024-01-01',
-  //   endDate: '2026-04-12',
-  // };
+
+  useEffect(() => {
+    const today = new Date();
+
+    const getDateString = (date: Date) => {
+      return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    };
+
+    const pastDate = new Date(today);
+    pastDate.setDate(today.getDate() - 10);
+
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 10);
+
+    setQueryParams({
+      startDate: getDateString(pastDate),
+      endDate: getDateString(futureDate),
+    });
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (!queryParams.startDate || !queryParams.endDate) {
+          return;
+        }
         setLoading(true);
 
+        // const promises = [
+        //   getTotalReservations(queryParams),
+        //   getReservationTrends(queryParams),
+        //   getTotalRevenue(queryParams),
+        //   getRevenueTrends(queryParams),
+        //   getRecentOrders(queryParams),
+        //   getTotalRevenueFood(queryParams),
+        //   getRevenueTrendsFood(queryParams),
+        //   getRecentOrdersFood(queryParams),
+        //   getOrderStatusDistributionFood(queryParams),
+        //   getTotalComboRevenue(queryParams),
+        //   getComboRevenueTrends(queryParams),
+        //   getRecentComboOrders(queryParams),
+        //   getOrderStatusDistributionFoodCombo(queryParams),
+        //   getTotalStockValue(queryParams),
+        //   getLowStockIngredients({ ...queryParams, threshold: 10 }),
+        //   getRecentStockTransactions(queryParams),
+        //   getCountToalViewBlog(),
+        //   getTop5ArticleByView(),
+        // ];
         const promises = [
-          getTotalReservations(queryParams),
-          getReservationTrends(queryParams),
-          getTotalRevenue(queryParams),
-          getRevenueTrends(queryParams),
-          getRecentOrders(queryParams),
-          getTotalRevenueFood(queryParams),
-          getRevenueTrendsFood(queryParams),
-          getRecentOrdersFood(queryParams),
-          getOrderStatusDistributionFood(queryParams),
-          getTotalComboRevenue(queryParams),
-          getComboRevenueTrends(queryParams),
-          getRecentComboOrders(queryParams),
-          getOrderStatusDistributionFoodCombo(queryParams),
-          getTotalStockValue(queryParams),
-          getLowStockIngredients({ ...queryParams, threshold: 10 }),
-          getRecentStockTransactions(queryParams),
-          getCountToalViewBlog(),
-          getTop5ArticleByView(),
+          withTimer("getTotalReservations", () => getTotalReservations(queryParams)),
+          withTimer("getReservationTrends", () => getReservationTrends(queryParams)),
+          withTimer("getTotalRevenue", () => getTotalRevenue(queryParams)),
+          withTimer("getRevenueTrends", () => getRevenueTrends(queryParams)),
+          withTimer("getRecentOrders", () => getRecentOrders(queryParams)),
+          withTimer("getTotalRevenueFood", () => getTotalRevenueFood(queryParams)),
+          withTimer("getRevenueTrendsFood", () => getRevenueTrendsFood(queryParams)),
+          withTimer("getRecentOrdersFood", () => getRecentOrdersFood(queryParams)),
+          withTimer("getOrderStatusDistributionFood", () => getOrderStatusDistributionFood(queryParams)),
+          withTimer("getTotalComboRevenue", () => getTotalComboRevenue(queryParams)),
+          withTimer("getComboRevenueTrends", () => getComboRevenueTrends(queryParams)),
+          withTimer("getRecentComboOrders", () => getRecentComboOrders(queryParams)),
+          withTimer("getOrderStatusDistributionFoodCombo", () => getOrderStatusDistributionFoodCombo(queryParams)),
+          withTimer("getTotalStockValue", () => getTotalStockValue(queryParams)),
+          withTimer("getLowStockIngredients", () => getLowStockIngredients({ ...queryParams, threshold: 10 })),
+          withTimer("getRecentStockTransactions", () => getRecentStockTransactions(queryParams)),
+          withTimer("getCountToalViewBlog", () => getCountToalViewBlog()),
+          withTimer("getTop5ArticleByView", () => getTop5ArticleByView()),
         ];
-
         const [
           totalRes,
           trendsRes,
@@ -706,7 +752,7 @@ export default function PageDashboard() {
               <LineChart data={reservationTrends}>
                 <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
                 <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip formatter={(value: number) => `${value} bàn`} />
+                <Tooltip formatter={(value: number) => `${value} đơn`} />
                 <Line
                   type="monotone"
                   dataKey="reservations"
