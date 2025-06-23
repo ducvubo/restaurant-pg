@@ -43,8 +43,12 @@ export function LoginTableForm() {
     }
   })
 
+  const checkStatusTableByToken = async () => {
+
+  }
+
   if (param.slug === undefined || searchParams.get('token') === undefined) {
-    router.push('/')
+    router.push('https://pato.taphoaictu.id.vn')
   }
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -91,30 +95,6 @@ export function LoginTableForm() {
   }
 
   return (
-    // <div
-    //   className="min-h-screen flex items-center justify-center bg-cover bg-center"
-    //   style={{ backgroundImage: "url('/images/bg-guest.jpg')" }
-    //   }
-    // >
-    //   <Form {...form}>
-    //     <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md space-y-6 bg-white backdrop-blur-md p-4 rounded-xl shadow-xl mx-5">
-    //       <FormField
-    //         control={form.control}
-    //         name='guest_name'
-    //         render={({ field }) => (
-    //           <FormItem>
-    //             <FormLabel>Tên</FormLabel>
-    //             <FormControl>
-    //               <Input className='text-base' placeholder='Vui lòng nhập tên của quý khách' {...field} />
-    //             </FormControl>
-    //             <FormMessage />
-    //           </FormItem>
-    //         )}
-    //       />
-    //       <Button type='submit'>Vào bàn</Button>
-    //     </form>
-    //   </Form>
-    // </div>
     <div
       className="min-h-screen flex items-center justify-center bg-cover bg-center"
       style={{ backgroundImage: "url('/images/bg-guest.jpg')" }}

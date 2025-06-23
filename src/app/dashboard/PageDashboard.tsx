@@ -881,7 +881,7 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-md">
+        {/* <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-teal-600">
               Top Món Tại Bàn
@@ -981,9 +981,83 @@ export default function PageDashboard() {
               ))}
             </div>
           </CardContent>
+        </Card> */}
+
+
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-teal-600">
+              Top Món Tại Bàn
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={topDishes}>
+                <XAxis dataKey="dishName" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip formatter={(value: number) => `${value} đã bán`} />
+                <Bar dataKey="totalQuantity" fill="#14B8A6" />
+              </BarChart>
+            </ResponsiveContainer>
+            {/* <div className="mt-2 flex flex-wrap gap-2 justify-center">
+              {topDishes.map((item) => (
+                <Badge key={item.id} variant="outline">
+                  {item.dishName}: {item.totalQuantity}
+                </Badge>
+              ))}
+            </div> */}
+          </CardContent>
         </Card>
 
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-purple-600">
+              Top Món Ăn Online
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={topFoods}>
+                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip formatter={(value: number) => `${value} đã bán`} />
+                <Bar dataKey="orders" fill="#8B5CF6" />
+              </BarChart>
+            </ResponsiveContainer>
+            {/* <div className="mt-2 flex flex-wrap gap-2 justify-center">
+              {topFoods.map((item) => (
+                <Badge key={item.id} variant="outline">
+                  {item.name}: {item.orders}
+                </Badge>
+              ))}
+            </div> */}
+          </CardContent>
+        </Card>
 
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-red-600">
+              Top Combo
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={topCombos}>
+                <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip formatter={(value: number) => `${value} đã bán`} />
+                <Bar dataKey="orders" fill="#EF4444" />
+              </BarChart>
+            </ResponsiveContainer>
+            {/* <div className="mt-2 flex flex-wrap gap-2 justify-center">
+              {topCombos.map((item) => (
+                <Badge key={item.id} variant="outline">
+                  {item.name}: {item.orders}
+                </Badge>
+              ))}
+            </div> */}
+          </CardContent>
+        </Card>
 
 
         <Card className=" shadow-md">
