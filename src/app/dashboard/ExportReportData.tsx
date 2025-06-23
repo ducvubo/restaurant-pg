@@ -2,7 +2,6 @@ import { format } from "date-fns";
 import {
   getTotalReservations,
   getReservationTrends,
-  getCustomerDistribution,
   getTotalRevenue,
   getRevenueTrends,
   getRecentOrders,
@@ -14,8 +13,6 @@ import {
   getComboRevenueTrends,
   getRecentComboOrders,
   getTotalStockValue,
-  getLowStockIngredients,
-  getRecentStockTransactions,
   getOrderStatusDistributionFoodCombo,
 } from './dashboard.api';
 
@@ -45,8 +42,6 @@ export const exportReportData = async () => {
       recentComboOrders,
       orderStatusDistributionCombo,
       totalStockValue,
-      lowStockIngredients,
-      recentStockTransactions,
     ] = await Promise.all([
       getTotalReservations(queryParams),
       getReservationTrends(queryParams),
@@ -62,8 +57,6 @@ export const exportReportData = async () => {
       getRecentComboOrders(queryParams),
       getOrderStatusDistributionFoodCombo(queryParams),
       getTotalStockValue(queryParams),
-      getLowStockIngredients({ ...queryParams, threshold: 10 }),
-      getRecentStockTransactions(queryParams),
     ]);
 
     return {
@@ -81,8 +74,6 @@ export const exportReportData = async () => {
       recentComboOrders: recentComboOrders.data || [],
       orderStatusDistributionCombo: orderStatusDistributionCombo.data || [],
       totalStockValue: totalStockValue.data?.totalStockValue || 0,
-      lowStockIngredients: lowStockIngredients.data || [],
-      recentStockTransactions: recentStockTransactions.data || [],
     };
   } catch (error) {
     throw new Error('Lỗi khi xuất dữ liệu báo cáo');

@@ -6,6 +6,24 @@ import { IGuest, IOrderDishGuest } from './guest.interface'
 import { IDish } from '../dashboard/(food)/dishes/dishes.interface'
 import { IRestaurant } from '../auth/auth.interface'
 
+export const checkSatusTable = async ({
+  tbl_token,
+  tbl_restaurant_id
+}: {
+  tbl_token: string
+  tbl_restaurant_id: string
+}) => {
+  const res: IBackendRes<{ status: boolean }> = await sendRequest({
+    url: `${process.env.URL_SERVER}/tables/check-status-table-by-token`,
+    method: 'GET',
+    queryParams: {
+      tbl_token,
+      tbl_restaurant_id
+    }
+  })
+  return res
+}
+
 export const loginGuest = async (payload: {
   guest_name: string
   guest_restaurant_id: string

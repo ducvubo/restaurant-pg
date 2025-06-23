@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { format, parse } from 'date-fns';
-import { CalendarIcon, Loader2 } from 'lucide-react';
+import { CalendarIcon, Loader2, Ticket } from 'lucide-react';
 import { vi } from 'date-fns/locale';
 import {
   Utensils,
@@ -50,15 +50,30 @@ import {
   getComboRevenueTrends,
   getRecentComboOrders,
   getTotalStockValue,
-  getLowStockIngredients,
-  getRecentStockTransactions,
   getOrderStatusDistributionFoodCombo,
   getTop5ArticleByView,
   getCountToalViewBlog,
+  getTopFoods,
+  getTopCombos,
+  getTopDishes,
+  getTotalSpecialOffer,
+  getTotalInventory,
+  getTotalInventoryValue,
+  getLowStockIngredients,
+  getStockOutByTime,
+  getStockInByTime,
+  getStockMovementByIngredient,
+  getTotalStockInCost,
+  getTotalStockOutValue,
+  getStockInBySupplier,
+  getStockInCostBySupplier,
+  getInventoryByCategory,
+  getStockInCostByCategory,
 } from './dashboard.api';
 import { exportReportData } from './ExportReportData';
 import * as XLSX from 'xlsx';
 import { IArticle } from './(blog)/article/article.interface';
+import { IUnit } from './(inventory)/units/unit.interface';
 
 
 const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFCE56', '#36A2EB'];
@@ -107,12 +122,50 @@ export default function PageDashboard() {
     { id: string; customer: string; total: number; status: string }[]
   >([]);
   const [totalStockValue, setTotalStockValue] = useState<number>(0);
+
+  const [totalInventory, setTotalInventory] = useState<
+    { igd_id: string; igd_name: string; total_quantity: number }[]
+  >([]);
+  const [totalInventoryValue, setTotalInventoryValue] = useState<
+    { igd_id: string; igd_name: string; total_quantity: number; total_value: number }[]
+  >([]);
   const [lowStockIngredients, setLowStockIngredients] = useState<
-    { igd_name: string; stock: number; unit: string }[]
+    { igd_id: string; igd_name: string; total_quantity: number, unt_name: string }[]
   >([]);
-  const [recentStockTransactions, setRecentStockTransactions] = useState<
-    { id: string; code: string; ingredient: string; quantity: number; date: string; type: 'in' | 'out' }[]
+  const [stockInByTime, setStockInByTime] = useState<
+    { date: string; total_amount: number, invoice_count: number }[]
   >([]);
+  const [stockOutByTime, setStockOutByTime] = useState<
+    { date: string; total_amount: number, invoice_count: number }[]
+  >([]);
+  const [stockMovementByIngredient, setStockMovementByIngredient] = useState<
+    { igd_id: string; igd_name: string; total_in: number; total_out: number }[]
+  >([]);
+  const [totalStockInCost, setTotalStockInCost] = useState<number>(0);
+  const [totalStockOutValue, setTotalStockOutValue] = useState<number>(0);
+  const [stockInBySupplier, setStockInBySupplier] = useState<
+    { spli_id: string; spli_name: string; total_quantity: number }[]
+  >([]);
+  const [stockInCostBySupplier, setStockInCostBySupplier] = useState<
+    { spli_id: string; spli_name: string; total_cost: number }[]
+  >([]);
+  const [inventoryByCategory, setInventoryByCategory] = useState<
+    { cat_igd_id: string; cat_igd_name: string; total_quantity: number }[]
+  >([]);
+  const [stockInCostByCategory, setStockInCostByCategory] = useState<
+    { cat_igd_id: string; cat_igd_name: string; total_cost: number }[]
+  >([]);
+
+  const [topFoods, setTopFoods] = useState<
+    { id: string; name: string; orders: number; revenue: number }[]
+  >([]);
+  const [topCombos, setTopCombos] = useState<
+    { id: string; name: string; price: number; orders: number; revenue: number }[]
+  >([]);
+  const [topDishes, setTopDishes] = useState<
+    { id: string; dishName: string; totalQuantity: number }[]
+  >([]);
+  const [totalSpecialOffer, setTotalSpecialOffer] = useState<number>(0);
   const [totalViewBlog, setTotalViewBlog] = useState<number>(0);
   const [top5Article, setTop5Article] = useState<
     { title: string; views: number }[]>([]);
@@ -141,7 +194,7 @@ export default function PageDashboard() {
     };
 
     const pastDate = new Date(today);
-    pastDate.setDate(today.getDate() - 10);
+    pastDate.setDate(today.getDate() - 100);
 
     const futureDate = new Date(today);
     futureDate.setDate(today.getDate() + 10);
@@ -194,8 +247,25 @@ export default function PageDashboard() {
           withTimer("getRecentComboOrders", () => getRecentComboOrders(queryParams)),
           withTimer("getOrderStatusDistributionFoodCombo", () => getOrderStatusDistributionFoodCombo(queryParams)),
           withTimer("getTotalStockValue", () => getTotalStockValue(queryParams)),
+
+
+          withTimer("getTotalInventory", () => getTotalInventory()),
+          withTimer("getTotalInventoryValue", () => getTotalInventoryValue()),
           withTimer("getLowStockIngredients", () => getLowStockIngredients({ ...queryParams, threshold: 10 })),
-          withTimer("getRecentStockTransactions", () => getRecentStockTransactions(queryParams)),
+          withTimer("getStockInByTime", () => getStockInByTime(queryParams)),
+          withTimer("getStockOutByTime", () => getStockOutByTime(queryParams)),
+          withTimer("getStockMovementByIngredient", () => getStockMovementByIngredient()),
+          withTimer("getTotalStockInCost", () => getTotalStockInCost(queryParams)),
+          withTimer("getTotalStockOutValue", () => getTotalStockOutValue(queryParams)),
+          withTimer("getStockInBySupplier", () => getStockInBySupplier(queryParams)),
+          withTimer("getStockInCostBySupplier", () => getStockInCostBySupplier(queryParams)),
+          withTimer("getInventoryByCategory", () => getInventoryByCategory()),
+          withTimer("getStockInCostByCategory", () => getStockInCostByCategory(queryParams)),
+
+          withTimer("getTopFoods", () => getTopFoods(queryParams)),
+          withTimer("getTopCombos", () => getTopCombos(queryParams)),
+          withTimer("getTopDishes", () => getTopDishes(queryParams)),
+          withTimer("getTotalSpecialOffer", () => getTotalSpecialOffer()),
           withTimer("getCountToalViewBlog", () => getCountToalViewBlog()),
           withTimer("getTop5ArticleByView", () => getTop5ArticleByView()),
         ];
@@ -214,8 +284,24 @@ export default function PageDashboard() {
           recentOrdersComboRes,
           statusDistributionResCombo,
           totalStockRes,
-          lowStockRes,
-          recentStockRes,
+
+          totalInventoryRes,
+          totalInventoryValueRes,
+          lowStockIngredientsRes,
+          stockInByTimeRes,
+          stockOutByTimeRes,
+          stockMovementByIngredientRes,
+          totalStockInCostRes,
+          totalStockOutValueRes,
+          stockInBySupplierRes,
+          stockInCostBySupplierRes,
+          inventoryByCategoryRes,
+          stockInCostByCategoryRes,
+
+          topFoodsRes,
+          topCombosRes,
+          topDishesRes,
+          totalSpecialOfferRes,
           totalViewBlogRes,
           top5ArticleRes,
         ] = await Promise.all(promises);
@@ -262,11 +348,61 @@ export default function PageDashboard() {
         if (totalStockRes.statusCode === 200 && totalStockRes.data)
           setTotalStockValue(totalStockRes.data.totalStockValue);
 
-        if (lowStockRes.statusCode === 200 && lowStockRes.data)
-          setLowStockIngredients(lowStockRes.data);
 
-        if (recentStockRes.statusCode === 200 && recentStockRes.data)
-          setRecentStockTransactions(recentStockRes.data);
+        if (totalInventoryRes.statusCode === 200 && totalInventoryRes.data)
+          setTotalInventory(totalInventoryRes.data);
+        if (totalInventoryValueRes.statusCode === 200 && totalInventoryValueRes.data)
+          setTotalInventoryValue(totalInventoryValueRes.data);
+        if (lowStockIngredientsRes.statusCode === 200 && lowStockIngredientsRes.data)
+          setLowStockIngredients(lowStockIngredientsRes.data);
+        if (stockInByTimeRes.statusCode === 200 && stockInByTimeRes.data)
+          setStockInByTime(stockInByTimeRes.data);
+        if (stockOutByTimeRes.statusCode === 200 && stockOutByTimeRes.data)
+          setStockOutByTime(stockOutByTimeRes.data);
+        if (stockMovementByIngredientRes.statusCode === 200 && stockMovementByIngredientRes.data)
+          setStockMovementByIngredient(stockMovementByIngredientRes.data);
+        if (totalStockInCostRes.statusCode === 200 && totalStockInCostRes.data)
+          setTotalStockInCost(totalStockInCostRes.data.total_cost);
+        if (totalStockOutValueRes.statusCode === 200 && totalStockOutValueRes.data)
+          setTotalStockOutValue(totalStockOutValueRes.data.total_value);
+        if (stockInBySupplierRes.statusCode === 200 && stockInBySupplierRes.data)
+          setStockInBySupplier(stockInBySupplierRes.data);
+        if (stockInCostBySupplierRes.statusCode === 200 && stockInCostBySupplierRes.data)
+          setStockInCostBySupplier(stockInCostBySupplierRes.data);
+        if (inventoryByCategoryRes.statusCode === 200 && inventoryByCategoryRes.data)
+          setInventoryByCategory(inventoryByCategoryRes.data);
+        if (stockInCostByCategoryRes.statusCode === 200 && stockInCostByCategoryRes.data)
+          setStockInCostByCategory(stockInCostByCategoryRes.data);
+
+
+
+
+        if (topFoodsRes.statusCode === 200 && topFoodsRes.data)
+          setTopFoods(topFoodsRes.data.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            orders: item.orders,
+            revenue: item.revenue,
+          })));
+
+        if (topCombosRes.statusCode === 200 && topCombosRes.data)
+          setTopCombos(topCombosRes.data.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            orders: item.orders,
+            revenue: item.revenue,
+          })));
+
+        if (topDishesRes.statusCode === 200 && topDishesRes.data)
+          setTopDishes(topDishesRes.data.map((item: any) => ({
+            id: item.id,
+            dishName: item.dishName,
+            totalQuantity: item.totalQuantity,
+          })));
+
+        if (totalSpecialOfferRes.statusCode === 200 && totalSpecialOfferRes.data)
+          setTotalSpecialOffer(totalSpecialOfferRes.data.totalRevenue || 0);
 
         if (totalViewBlogRes.statusCode === 200 && totalViewBlogRes.data)
           setTotalViewBlog(totalViewBlogRes.data);
@@ -452,35 +588,9 @@ export default function PageDashboard() {
       XLSX.utils.book_append_sheet(workbook, statusComboSheet, 'Trạng Thái Đơn Combo');
 
       // Sheet 11: Low Stock Ingredients
-      const lowStockData = [
-        ['Nguyên Liệu', 'Số Lượng', 'Đơn Vị'],
-        ...data.lowStockIngredients.map((item: any) => [
-          item.igd_name,
-          item.stock,
-          item.unit,
-        ]),
-      ];
-      const lowStockSheet = XLSX.utils.aoa_to_sheet(lowStockData);
-      applyStylesToSheet(lowStockSheet, 3, lowStockData.length);
-      XLSX.utils.book_append_sheet(workbook, lowStockSheet, 'Nguyên Liệu Sắp Hết');
 
       // Sheet 12: Recent Stock Transactions
-      const stockTransactionsData = [
-        ['ID', 'Mã', 'Nguyên Liệu', 'Số Lượng', 'Ngày', 'Loại'],
-        ...data.recentStockTransactions.map((item: any) => [
-          item.id,
-          item.code,
-          item.ingredient,
-          item.quantity,
-          item.date,
-          item.type === 'in' ? 'Nhập' : 'Xuất',
-        ]),
-      ];
-      const stockSheet = XLSX.utils.aoa_to_sheet(stockTransactionsData);
-      applyStylesToSheet(stockSheet, 6, stockTransactionsData.length);
-      XLSX.utils.book_append_sheet(workbook, stockSheet, 'Giao Dịch Kho');
 
-      // Auto-size columns for better readability
       const sheets = [
         summarySheet,
         reservationSheet,
@@ -492,8 +602,6 @@ export default function PageDashboard() {
         ordersComboSheet,
         statusSheet,
         statusComboSheet,
-        lowStockSheet,
-        stockSheet,
       ];
       sheets.forEach((sheet) => {
         const colWidths = [];
@@ -627,6 +735,13 @@ export default function PageDashboard() {
             color: 'text-teal-600',
           },
           {
+            title: 'Ưu Đãi Đặc Biệt',
+            value: totalSpecialOffer,
+            // change: '+10%',
+            icon: Ticket,
+            color: 'text-orange-600',
+          },
+          {
             title: 'Tồn Kho',
             value: formatCurrency(totalStockValue),
             // change: 'Cập nhật',
@@ -741,6 +856,7 @@ export default function PageDashboard() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
+
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-teal-600">
@@ -752,7 +868,7 @@ export default function PageDashboard() {
               <LineChart data={reservationTrends}>
                 <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
                 <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip formatter={(value: number) => `${value} đơn`} />
+                <Tooltip formatter={(value: number) => `${value} đã bán`} />
                 <Line
                   type="monotone"
                   dataKey="reservations"
@@ -765,67 +881,109 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        <Card className=" shadow-md">
+        <Card className="shadow-md">
           <CardHeader>
-            <CardTitle className="text-base font-medium text-yellow-600">
-              Nguyên Liệu Sắp Hết
+            <CardTitle className="text-base font-medium text-teal-600">
+              Top Món Tại Bàn
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {lowStockIngredients.length ? (
-                lowStockIngredients.slice(0, 8).map((item) => (
-                  <div
-                    key={item.igd_name}
-                    className="flex justify-between border-b py-1 text-sm"
-                  >
-                    <span>{item.igd_name}</span>
-                    <Badge variant="outline">
-                      {item.stock} {item.unit}
-                    </Badge>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm ">Không có nguyên liệu sắp hết.</p>
-              )}
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={topDishes}
+                  dataKey="totalQuantity"
+                  nameKey="dishName"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                >
+                  {topDishes.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => `${value} đã bán`} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-2 flex flex-wrap gap-2 justify-center">
+              {topDishes.map((item) => (
+                <Badge key={item.id} variant="outline">
+                  {item.dishName}: {item.totalQuantity}
+                </Badge>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        <Card className=" shadow-md">
+        <Card className="shadow-md">
           <CardHeader>
-            <CardTitle className="text-base font-medium ">
-              Giao Dịch Kho
+            <CardTitle className="text-base font-medium text-purple-600">
+              Top Món Ăn Online
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {recentStockTransactions.length ? (
-                recentStockTransactions.slice(0, 5).map((transaction) => (
-                  <div
-                    key={transaction.id}
-                    className="flex justify-between border-b py-1 text-sm"
-                  >
-                    <div>
-                      <p>{transaction.ingredient}</p>
-                      <p className="text-xs ">{transaction.code}</p>
-                    </div>
-                    <div className="text-right">
-                      <p>{transaction.quantity} đơn vị</p>
-                      <Badge
-                        variant={transaction.type === 'in' ? 'default' : 'destructive'}
-                      >
-                        {transaction.type === 'in' ? 'Nhập' : 'Xuất'}
-                      </Badge>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm ">Không có giao dịch.</p>
-              )}
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={topFoods}
+                  dataKey="orders"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                >
+                  {topFoods.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => `${value} đã bán`} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-2 flex flex-wrap gap-2 justify-center">
+              {topFoods.map((item) => (
+                <Badge key={item.id} variant="outline">
+                  {item.name}: {item.orders}
+                </Badge>
+              ))}
             </div>
           </CardContent>
         </Card>
+
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-red-600">
+              Top Combo
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={topCombos}
+                  dataKey="orders"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                >
+                  {topCombos.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => `${value} đã bán`} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-2 flex flex-wrap gap-2 justify-center">
+              {topCombos.map((item) => (
+                <Badge key={item.id} variant="outline">
+                  {item.name}: {item.orders}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+
 
 
         <Card className=" shadow-md">
@@ -1003,6 +1161,313 @@ export default function PageDashboard() {
             </div>
           </CardContent>
         </Card>
+
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-blue-600">
+              Xu Hướng Nhập Kho
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={stockInByTime}>
+                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip formatter={(value: number) => `${value.toLocaleString()}đ`} />
+                <Line
+                  type="monotone"
+                  dataKey="total_amount"
+                  stroke="#3B82F6"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-red-600">
+              Xu Hướng Xuất Kho
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={stockOutByTime}>
+                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip formatter={(value: number) => `${value.toLocaleString()}đ`} />
+                <Line
+                  type="monotone"
+                  dataKey="total_amount"
+                  stroke="#EF4444"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-green-600">
+              Tồn Kho Theo Danh Mục
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={inventoryByCategory}
+                  dataKey="total_quantity"
+                  nameKey="cat_igd_name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                >
+                  {inventoryByCategory.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-2 flex flex-wrap gap-2 justify-center">
+              {inventoryByCategory.map((item) => (
+                <Badge key={item.cat_igd_id} variant="outline">
+                  {item.cat_igd_name}: {item.total_quantity}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-purple-600">
+              Nhập Kho Theo Nhà Cung Cấp
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={stockInBySupplier}>
+                <XAxis dataKey="spli_name" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
+                <Bar dataKey="total_quantity" fill="#8B5CF6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-orange-600">
+              Nguyên Liệu Sắp Hết
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {lowStockIngredients.sort((a, b) => a.total_quantity - b.total_quantity).length ? (
+                lowStockIngredients.map((item) => (
+                  <div key={item.igd_id} className="flex justify-between border-b py-1 text-sm">
+                    <span>{item.igd_name}</span>
+                    <Badge variant="destructive">{item.total_quantity} {item.unt_name}</Badge>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm">Không có nguyên liệu sắp hết.</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Total Inventory Card */}
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-teal-600">
+              Tổng Tồn Kho
+            </CardTitle>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={totalInventory}>
+                  <XAxis dataKey="igd_name" stroke="#6B7280" fontSize={12} />
+                  <YAxis stroke="#6B7280" fontSize={12} />
+                  <Tooltip formatter={(value: number) => `${value} đơn vị`} />
+                  <Bar dataKey="total_quantity" fill="#14B8A6" />
+                </BarChart>
+              </ResponsiveContainer>
+              {/* <div className="mt-2 flex flex-wrap gap-2 justify-center">
+                {totalInventory.map((item) => (
+                  <Badge key={item.igd_id} variant="outline">
+                    {item.igd_name}: {item.total_quantity}
+                  </Badge>
+                ))}
+              </div> */}
+            </CardContent>
+          </CardHeader>
+        </Card>
+
+        {/* Total Inventory Value Card */}
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-indigo-600">
+              Giá Trị Tồn Kho
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={totalInventoryValue}>
+                <XAxis dataKey="igd_name" stroke="#6B7280" fontSize={12} />
+                <YAxis
+                  tickFormatter={(value) => formatCurrency(value)}
+                  stroke="#6B7280"
+                  fontSize={12}
+                />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                <Bar dataKey="total_value" fill="#4F46E5" />
+              </BarChart>
+            </ResponsiveContainer>
+            {/* <div className="mt-2 flex flex-wrap gap-2 justify-center">
+              {totalInventoryValue.map((item) => (
+                <Badge key={item.igd_id} variant="outline">
+                  {item.igd_name}: {formatCurrency(item.total_value)}
+                </Badge>
+              ))}
+            </div> */}
+          </CardContent>
+        </Card>
+
+        {/* Stock Movement by Ingredient Card */}
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-blue-600">
+              Di Chuyển Kho Theo Nguyên Liệu
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={stockMovementByIngredient}>
+                <XAxis dataKey="igd_name" stroke="#6B7280" fontSize={12} />
+                <YAxis stroke="#6B7280" fontSize={12} />
+                <Tooltip
+                  formatter={(value: number, name: string) =>
+                    `${value} (${name === 'total_in' ? 'Nhập' : 'Xuất'})`
+                  }
+                />
+                <Bar dataKey="total_in" fill="#3B82F6" name="Nhập" />
+                <Bar dataKey="total_out" fill="#EF4444" name="Xuất" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Total Stock In/Out Cost Card */}
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-purple-600">
+              Tổng Chi Phí Nhập/Xuất Kho
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: 'Chi Phí Nhập', value: totalStockInCost },
+                    { name: 'Giá Trị Xuất', value: totalStockOutValue },
+                  ]}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                >
+                  <Cell fill="#8B5CF6" />
+                  <Cell fill="#F87171" />
+                </Pie>
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-2 flex gap-2 justify-center">
+              <Badge variant="outline">Nhập: {formatCurrency(totalStockInCost)}</Badge>
+              <Badge variant="outline">Xuất: {formatCurrency(totalStockOutValue)}</Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Stock In Cost by Supplier Card */}
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-orange-600">
+              Chi Phí Nhập Theo Nhà Cung Cấp
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={stockInCostBySupplier}
+                  dataKey="total_cost"
+                  nameKey="spli_name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                >
+                  {stockInCostBySupplier.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-2 flex flex-wrap gap-2 justify-center">
+              {stockInCostBySupplier.map((item) => (
+                <Badge key={item.spli_id} variant="outline">
+                  {item.spli_name}: {formatCurrency(item.total_cost)}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Stock In Cost by Category Card */}
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-base font-medium text-green-600">
+              Chi Phí Nhập Theo Danh Mục
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={stockInCostByCategory}
+                  dataKey="total_cost"
+                  nameKey="cat_igd_name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                >
+                  {stockInCostByCategory.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-2 flex flex-wrap gap-2 justify-center">
+              {stockInCostByCategory.map((item) => (
+                <Badge key={item.cat_igd_id} variant="outline">
+                  {item.cat_igd_name}: {formatCurrency(item.total_cost)}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
 
         <Card className=" shadow-md">
           <CardHeader>
