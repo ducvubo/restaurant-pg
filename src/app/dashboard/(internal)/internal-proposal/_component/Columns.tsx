@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { updateStatusInternalProposal } from '../internal-proposal.api'
 import { toast } from '@/hooks/use-toast'
 import { deleteCookiesAndRedirect } from '@/app/actions/action'
-import { usePermission } from '@/app/auth/PermissionContext'  
+import { usePermission } from '@/app/auth/PermissionContext'
 
 export const columns: ColumnDef<IInternalProposal>[] = [
   {
@@ -103,7 +103,7 @@ export const columns: ColumnDef<IInternalProposal>[] = [
           value={internalProposal.itn_proposal_status}
           onValueChange={(value: 'pending' | 'approved' | 'rejected') => handleUpdateStatus(value)}
         >
-          <SelectTrigger className='w-1/2' >
+          <SelectTrigger className='w-[150px]' >
             <SelectValue placeholder='Trạng thái' />
           </SelectTrigger>
           <SelectContent>
