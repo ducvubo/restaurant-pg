@@ -123,12 +123,6 @@ export default function PageDashboard() {
   >([]);
   const [totalStockValue, setTotalStockValue] = useState<number>(0);
 
-  const [totalInventory, setTotalInventory] = useState<
-    { igd_id: string; igd_name: string; total_quantity: number, unt_name: string }[]
-  >([]);
-  const [totalInventoryValue, setTotalInventoryValue] = useState<
-    { igd_id: string; igd_name: string; total_quantity: number; total_value: number }[]
-  >([]);
   const [lowStockIngredients, setLowStockIngredients] = useState<
     { igd_id: string; igd_name: string; total_quantity: number, unt_name: string }[]
   >([]);
@@ -143,18 +137,6 @@ export default function PageDashboard() {
   >([]);
   const [totalStockInCost, setTotalStockInCost] = useState<number>(0);
   const [totalStockOutValue, setTotalStockOutValue] = useState<number>(0);
-  const [stockInBySupplier, setStockInBySupplier] = useState<
-    { spli_id: string; spli_name: string; total_quantity: number }[]
-  >([]);
-  const [stockInCostBySupplier, setStockInCostBySupplier] = useState<
-    { spli_id: string; spli_name: string; total_cost: number }[]
-  >([]);
-  const [inventoryByCategory, setInventoryByCategory] = useState<
-    { cat_igd_id: string; cat_igd_name: string; total_quantity: number }[]
-  >([]);
-  const [stockInCostByCategory, setStockInCostByCategory] = useState<
-    { cat_igd_id: string; cat_igd_name: string; total_cost: number }[]
-  >([]);
 
   const [topFoods, setTopFoods] = useState<
     { id: string; name: string; orders: number; revenue: number }[]
@@ -171,13 +153,7 @@ export default function PageDashboard() {
     { title: string; views: number }[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  // const [queryParams, setQueryParams] = useState<{
-  //   startDate: string;
-  //   endDate: string;
-  // }>({
-  //   startDate: '2025-06-12',
-  //   endDate: '2025-06-14',
-  // });
+
   const [queryParams, setQueryParams] = useState<{
     startDate: string;
     endDate: string;
@@ -248,19 +224,12 @@ export default function PageDashboard() {
           withTimer("getOrderStatusDistributionFoodCombo", () => getOrderStatusDistributionFoodCombo(queryParams)),
           withTimer("getTotalStockValue", () => getTotalStockValue(queryParams)),
 
-
-          withTimer("getTotalInventory", () => getTotalInventory()),
-          withTimer("getTotalInventoryValue", () => getTotalInventoryValue()),
           withTimer("getLowStockIngredients", () => getLowStockIngredients({ ...queryParams, threshold: 10 })),
           withTimer("getStockInByTime", () => getStockInByTime(queryParams)),
           withTimer("getStockOutByTime", () => getStockOutByTime(queryParams)),
           withTimer("getStockMovementByIngredient", () => getStockMovementByIngredient()),
           withTimer("getTotalStockInCost", () => getTotalStockInCost(queryParams)),
           withTimer("getTotalStockOutValue", () => getTotalStockOutValue(queryParams)),
-          withTimer("getStockInBySupplier", () => getStockInBySupplier(queryParams)),
-          withTimer("getStockInCostBySupplier", () => getStockInCostBySupplier(queryParams)),
-          withTimer("getInventoryByCategory", () => getInventoryByCategory()),
-          withTimer("getStockInCostByCategory", () => getStockInCostByCategory(queryParams)),
 
           withTimer("getTopFoods", () => getTopFoods(queryParams)),
           withTimer("getTopCombos", () => getTopCombos(queryParams)),
@@ -285,18 +254,13 @@ export default function PageDashboard() {
           statusDistributionResCombo,
           totalStockRes,
 
-          totalInventoryRes,
-          totalInventoryValueRes,
           lowStockIngredientsRes,
           stockInByTimeRes,
           stockOutByTimeRes,
           stockMovementByIngredientRes,
           totalStockInCostRes,
           totalStockOutValueRes,
-          stockInBySupplierRes,
-          stockInCostBySupplierRes,
-          inventoryByCategoryRes,
-          stockInCostByCategoryRes,
+
 
           topFoodsRes,
           topCombosRes,
@@ -347,12 +311,6 @@ export default function PageDashboard() {
 
         if (totalStockRes.statusCode === 200 && totalStockRes.data)
           setTotalStockValue(totalStockRes.data.totalStockValue);
-
-
-        if (totalInventoryRes.statusCode === 200 && totalInventoryRes.data)
-          setTotalInventory(totalInventoryRes.data);
-        if (totalInventoryValueRes.statusCode === 200 && totalInventoryValueRes.data)
-          setTotalInventoryValue(totalInventoryValueRes.data);
         if (lowStockIngredientsRes.statusCode === 200 && lowStockIngredientsRes.data)
           setLowStockIngredients(lowStockIngredientsRes.data);
         if (stockInByTimeRes.statusCode === 200 && stockInByTimeRes.data)
@@ -365,17 +323,6 @@ export default function PageDashboard() {
           setTotalStockInCost(totalStockInCostRes.data.total_cost);
         if (totalStockOutValueRes.statusCode === 200 && totalStockOutValueRes.data)
           setTotalStockOutValue(totalStockOutValueRes.data.total_value);
-        if (stockInBySupplierRes.statusCode === 200 && stockInBySupplierRes.data)
-          setStockInBySupplier(stockInBySupplierRes.data);
-        if (stockInCostBySupplierRes.statusCode === 200 && stockInCostBySupplierRes.data)
-          setStockInCostBySupplier(stockInCostBySupplierRes.data);
-        if (inventoryByCategoryRes.statusCode === 200 && inventoryByCategoryRes.data)
-          setInventoryByCategory(inventoryByCategoryRes.data);
-        if (stockInCostByCategoryRes.statusCode === 200 && stockInCostByCategoryRes.data)
-          setStockInCostByCategory(stockInCostByCategoryRes.data);
-
-
-
 
         if (topFoodsRes.statusCode === 200 && topFoodsRes.data)
           setTopFoods(topFoodsRes.data.map((item: any) => ({
@@ -578,7 +525,6 @@ export default function PageDashboard() {
       applyStylesToSheet(statusSheet, 2, orderStatusData.length);
       XLSX.utils.book_append_sheet(workbook, statusSheet, 'Trạng Thái Đơn Online');
 
-      // Sheet 10: Order Status Distribution (Combo)
       const orderStatusComboData = [
         ['Trạng Thái', 'Số Lượng'],
         ...data.orderStatusDistributionCombo.map((item: any) => [item.type, item.value]),
@@ -587,9 +533,7 @@ export default function PageDashboard() {
       applyStylesToSheet(statusComboSheet, 2, orderStatusComboData.length);
       XLSX.utils.book_append_sheet(workbook, statusComboSheet, 'Trạng Thái Đơn Combo');
 
-      // Sheet 11: Low Stock Ingredients
 
-      // Sheet 12: Recent Stock Transactions
 
       const sheets = [
         summarySheet,
@@ -619,7 +563,6 @@ export default function PageDashboard() {
         sheet['!cols'] = colWidths;
       });
 
-      // Generate and download the Excel file
       const fileName = `BaoCao_5Thang_${format(new Date(), 'yyyyMMdd')}.xlsx`;
       XLSX.writeFile(workbook, fileName);
     } catch (error: any) {
@@ -880,110 +823,6 @@ export default function PageDashboard() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-
-        {/* <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-teal-600">
-              Top Món Tại Bàn
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={topDishes}
-                  dataKey="totalQuantity"
-                  nameKey="dishName"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                >
-                  {topDishes.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => `${value} đã bán`} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {topDishes.map((item) => (
-                <Badge key={item.id} variant="outline">
-                  {item.dishName}: {item.totalQuantity}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-purple-600">
-              Top Món Ăn Online
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={topFoods}
-                  dataKey="orders"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                >
-                  {topFoods.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => `${value} đã bán`} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {topFoods.map((item) => (
-                <Badge key={item.id} variant="outline">
-                  {item.name}: {item.orders}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-red-600">
-              Top Combo
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={topCombos}
-                  dataKey="orders"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                >
-                  {topCombos.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => `${value} đã bán`} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {topCombos.map((item) => (
-                <Badge key={item.id} variant="outline">
-                  {item.name}: {item.orders}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card> */}
-
-
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-teal-600">
@@ -999,13 +838,6 @@ export default function PageDashboard() {
                 <Bar dataKey="totalQuantity" fill="#14B8A6" />
               </BarChart>
             </ResponsiveContainer>
-            {/* <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {topDishes.map((item) => (
-                <Badge key={item.id} variant="outline">
-                  {item.dishName}: {item.totalQuantity}
-                </Badge>
-              ))}
-            </div> */}
           </CardContent>
         </Card>
 
@@ -1024,13 +856,6 @@ export default function PageDashboard() {
                 <Bar dataKey="orders" fill="#8B5CF6" />
               </BarChart>
             </ResponsiveContainer>
-            {/* <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {topFoods.map((item) => (
-                <Badge key={item.id} variant="outline">
-                  {item.name}: {item.orders}
-                </Badge>
-              ))}
-            </div> */}
           </CardContent>
         </Card>
 
@@ -1049,13 +874,7 @@ export default function PageDashboard() {
                 <Bar dataKey="orders" fill="#EF4444" />
               </BarChart>
             </ResponsiveContainer>
-            {/* <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {topCombos.map((item) => (
-                <Badge key={item.id} variant="outline">
-                  {item.name}: {item.orders}
-                </Badge>
-              ))}
-            </div> */}
+
           </CardContent>
         </Card>
 
@@ -1284,59 +1103,6 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-green-600">
-              Tồn Kho Theo Danh Mục
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={inventoryByCategory}
-                  dataKey="total_quantity"
-                  nameKey="cat_igd_name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                >
-                  {inventoryByCategory.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {inventoryByCategory.map((item) => (
-                <Badge key={item.cat_igd_id} variant="outline">
-                  {item.cat_igd_name}: {item.total_quantity}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card> */}
-
-        {/* 
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-purple-600">
-              Nhập Kho Theo Nhà Cung Cấp
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={stockInBySupplier}>
-                <XAxis dataKey="spli_name" stroke="#6B7280" fontSize={12} />
-                <YAxis stroke="#6B7280" fontSize={12} />
-                <Tooltip formatter={(value: number) => `${value} đơn vị`} />
-                <Bar dataKey="total_quantity" fill="#8B5CF6" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card> */}
-
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-orange-600">
@@ -1359,27 +1125,6 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Total Inventory Card */}
-        {/* <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-teal-600">
-              Tổng Tồn Kho
-            </CardTitle>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={totalInventory}>
-                  <XAxis dataKey="igd_name" stroke="#6B7280" fontSize={12} />
-                  <YAxis stroke="#6B7280" fontSize={12} />
-                  <Tooltip formatter={(value: number) => `${value} đơn vị`} />
-                  <Bar dataKey="total_quantity" fill="#14B8A6" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </CardHeader>
-        </Card> */}
-
-
-        {/* Stock Movement by Ingredient Card */}
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-blue-600">
@@ -1403,7 +1148,6 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Total Stock In/Out Cost Card */}
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-purple-600">
@@ -1437,9 +1181,6 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-
-
-
         <Card className=" shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-orange-600">
@@ -1470,9 +1211,6 @@ export default function PageDashboard() {
               <Badge variant="outline">
                 Xem: {top5Article.reduce((sum, item) => sum + item.views, 0)}
               </Badge>
-              {/* <Badge variant="outline">
-                Thích: {top5Article.reduce((sum, item) => sum + item.likes, 0)}
-              </Badge> */}
             </div>
           </CardContent>
         </Card>
