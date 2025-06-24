@@ -1385,7 +1385,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Total Inventory Value Card */}
-        <Card className="shadow-md">
+        {/* <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-indigo-600">
               Giá Trị Tồn Kho
@@ -1404,15 +1404,8 @@ export default function PageDashboard() {
                 <Bar dataKey="total_value" fill="#4F46E5" />
               </BarChart>
             </ResponsiveContainer>
-            {/* <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {totalInventoryValue.map((item) => (
-                <Badge key={item.igd_id} variant="outline">
-                  {item.igd_name}: {formatCurrency(item.total_value)}
-                </Badge>
-              ))}
-            </div> */}
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Stock Movement by Ingredient Card */}
         <Card className="shadow-md">
@@ -1473,7 +1466,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Stock In Cost by Supplier Card */}
-        <Card className="shadow-md">
+        {/* <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-orange-600">
               Chi Phí Nhập Theo Nhà Cung Cấp
@@ -1505,10 +1498,10 @@ export default function PageDashboard() {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Stock In Cost by Category Card */}
-        <Card className="shadow-md">
+        {/* <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-green-600">
               Chi Phí Nhập Theo Danh Mục
@@ -1540,7 +1533,7 @@ export default function PageDashboard() {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
 
         <Card className=" shadow-md">
