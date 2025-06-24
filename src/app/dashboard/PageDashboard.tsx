@@ -124,7 +124,7 @@ export default function PageDashboard() {
   const [totalStockValue, setTotalStockValue] = useState<number>(0);
 
   const [totalInventory, setTotalInventory] = useState<
-    { igd_id: string; igd_name: string; total_quantity: number }[]
+    { igd_id: string; igd_name: string; total_quantity: number, unt_name: string }[]
   >([]);
   const [totalInventoryValue, setTotalInventoryValue] = useState<
     { igd_id: string; igd_name: string; total_quantity: number; total_value: number }[]
@@ -1284,7 +1284,7 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-md">
+        {/* <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-green-600">
               Tồn Kho Theo Danh Mục
@@ -1316,8 +1316,9 @@ export default function PageDashboard() {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
+        {/* 
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-purple-600">
@@ -1334,7 +1335,7 @@ export default function PageDashboard() {
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card className="shadow-md">
           <CardHeader>
@@ -1359,7 +1360,7 @@ export default function PageDashboard() {
         </Card>
 
         {/* Total Inventory Card */}
-        <Card className="shadow-md">
+        {/* <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-base font-medium text-teal-600">
               Tổng Tồn Kho
@@ -1373,39 +1374,10 @@ export default function PageDashboard() {
                   <Bar dataKey="total_quantity" fill="#14B8A6" />
                 </BarChart>
               </ResponsiveContainer>
-              {/* <div className="mt-2 flex flex-wrap gap-2 justify-center">
-                {totalInventory.map((item) => (
-                  <Badge key={item.igd_id} variant="outline">
-                    {item.igd_name}: {item.total_quantity}
-                  </Badge>
-                ))}
-              </div> */}
             </CardContent>
           </CardHeader>
-        </Card>
-
-        {/* Total Inventory Value Card */}
-        {/* <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-indigo-600">
-              Giá Trị Tồn Kho
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={totalInventoryValue}>
-                <XAxis dataKey="igd_name" stroke="#6B7280" fontSize={12} />
-                <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
-                  stroke="#6B7280"
-                  fontSize={12}
-                />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Bar dataKey="total_value" fill="#4F46E5" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
         </Card> */}
+
 
         {/* Stock Movement by Ingredient Card */}
         <Card className="shadow-md">
@@ -1465,75 +1437,7 @@ export default function PageDashboard() {
           </CardContent>
         </Card>
 
-        {/* Stock In Cost by Supplier Card */}
-        {/* <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-orange-600">
-              Chi Phí Nhập Theo Nhà Cung Cấp
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={stockInCostBySupplier}
-                  dataKey="total_cost"
-                  nameKey="spli_name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                >
-                  {stockInCostBySupplier.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {stockInCostBySupplier.map((item) => (
-                <Badge key={item.spli_id} variant="outline">
-                  {item.spli_name}: {formatCurrency(item.total_cost)}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card> */}
 
-        {/* Stock In Cost by Category Card */}
-        {/* <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-green-600">
-              Chi Phí Nhập Theo Danh Mục
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={stockInCostByCategory}
-                  dataKey="total_cost"
-                  nameKey="cat_igd_name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                >
-                  {stockInCostByCategory.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-2 flex flex-wrap gap-2 justify-center">
-              {stockInCostByCategory.map((item) => (
-                <Badge key={item.cat_igd_id} variant="outline">
-                  {item.cat_igd_name}: {formatCurrency(item.total_cost)}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card> */}
 
 
         <Card className=" shadow-md">
