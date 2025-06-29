@@ -8,10 +8,11 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input'
 import { toast } from '@/hooks/use-toast'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { loginGuest } from '../guest.api'
+import { checkSatusTable, loginGuest } from '../guest.api'
 import { startAppGuest } from '../guest.slice'
 import { IGuest } from '../guest.interface'
 import { useDispatch } from 'react-redux'
+import { useEffect } from 'react'
 
 const FormSchema = z.object({
   guest_name: z
@@ -44,12 +45,31 @@ export function LoginTableForm() {
   })
 
   const checkStatusTableByToken = async () => {
+    const res: IBackendRes<{ status: boolean }> = await checkSatusTable({
+      tbl_token: searchParams.get('token') as string,
+      tbl_restaurant_id: param.slug as string
+    })
+    console.log('res', res);
+    if (res.statusCode === 200) {
+    }
+    else {
+      toast({
+        title: 'Thông báo',
+        description: res.message,
+        variant: 'destructive'
+      })
+      router.push('https://pato.taphoaictu.id.vn')
+    }
 
   }
 
-  if (param.slug === undefined || searchParams.get('token') === undefined) {
-    router.push('https://pato.taphoaictu.id.vn')
-  }
+
+  useEffect(() => {
+    if (param.slug === undefined || searchParams.get('token') === undefined) {
+      router.push('https://pato.taphoaictu.id.vn')
+    }
+    checkStatusTableByToken()
+  }, [param.slug, searchParams])
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     const res = await loginGuest(data)
