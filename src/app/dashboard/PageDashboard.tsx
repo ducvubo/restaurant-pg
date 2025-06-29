@@ -170,7 +170,7 @@ export default function PageDashboard() {
     };
 
     const pastDate = new Date(today);
-    pastDate.setDate(today.getDate() - 100);
+    pastDate.setDate(today.getDate() - 10);
 
     const futureDate = new Date(today);
     futureDate.setDate(today.getDate() + 10);
