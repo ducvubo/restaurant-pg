@@ -22,6 +22,7 @@ interface ImageUrl {
 }
 
 export default function InforEmployee({ inforEmployee }: InforEmployeeProps) {
+  console.log("🚀 ~ InforEmployee ~ inforEmployee:", inforEmployee)
   const { setLoading } = useLoading()
   const [mode, setMode] = useState<'view' | 'edit'>('view')
   const [epl_name, setEpl_name] = useState(inforEmployee?.epl_name || '')
@@ -37,8 +38,6 @@ export default function InforEmployee({ inforEmployee }: InforEmployeeProps) {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
   const fileInputAvatarRef = useRef<HTMLInputElement | null>(null)
   const [listWorkSchedule, setListWorkSchedule] = useState<IWorkSchedule[]>([])
-
-  console.log("🚀 ~ InforEmployee ~ listWorkSchedule:", listWorkSchedule)
 
   const validateForm = () => {
     if (!epl_name.trim()) {
