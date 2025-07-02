@@ -170,10 +170,10 @@ export default function PageDashboard() {
     };
 
     const pastDate = new Date(today);
-    pastDate.setDate(today.getDate() - 10);
+    pastDate.setDate(today.getDate() - 30);
 
     const futureDate = new Date(today);
-    futureDate.setDate(today.getDate() + 10);
+    futureDate.setDate(today.getDate() + 30);
 
     setQueryParams({
       startDate: getDateString(pastDate),
